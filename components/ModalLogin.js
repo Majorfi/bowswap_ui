@@ -2,7 +2,7 @@
 **	@Author:				Thomas Bouder <Tbouder>
 **	@Email:					Tbouder@protonmail.com
 **	@Date:					Sunday July 4th 2021
-**	@Filename:				LoginModal.js
+**	@Filename:				ModalLogin.js
 ******************************************************************************/
 
 import	React, {Fragment, useRef}		from	'react';
@@ -10,7 +10,7 @@ import	{Dialog, Transition}			from	'@headlessui/react';
 import	Image							from	'next/image';
 import	useWeb3							from	'contexts/useWeb3';
 
-function	LoginModal({open, set_open}) {
+function	ModalLogin({open, set_open}) {
 	const	walletConnectRef = useRef();
 	const	{connect, walletType} = useWeb3();
 
@@ -80,4 +80,4 @@ function	LoginModal({open, set_open}) {
 }
 
 
-export default LoginModal;
+export default ModalLogin;

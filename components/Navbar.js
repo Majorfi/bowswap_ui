@@ -9,7 +9,7 @@ import	React, {Fragment, useRef, useState, useEffect}	from	'react';
 import	{Popover, Transition}							from	'@headlessui/react';
 import	useWeb3											from	'contexts/useWeb3';
 import	Popup											from	'reactjs-popup';
-import	LoginModal										from	'components/LoginModal';
+import	ModalLogin										from	'components/ModalLogin';
 
 function FlyoutMenu() {
 	const	timeoutDuration = 100;
@@ -111,12 +111,12 @@ function FlyoutMenu() {
 
 function	Navbar() {
 	const	{active, address, ens, deactivate, onDesactivate} = useWeb3();
-	const	[loginModalOpen, set_loginModalOpen] = useState(false);
+	const	[ModalLoginOpen, set_ModalLoginOpen] = useState(false);
 
 	function	renderWalletButton() {
 		if (!active) {
 			return (
-				<button onClick={() => set_loginModalOpen(true)} className={'ml-8 inline-flex px-4 py-2 items-center leading-4 rounded-md text-sm cursor-pointer font-medium whitespace-nowrap text-white border border-solid border-white hover:bg-white hover:text-emerald-800 transition-colors'}>
+				<button onClick={() => set_ModalLoginOpen(true)} className={'ml-8 inline-flex px-4 py-2 items-center leading-4 rounded-md text-sm cursor-pointer font-medium whitespace-nowrap text-white border border-solid border-white hover:bg-white hover:text-emerald-800 transition-colors'}>
 					{'Connect wallet'}
 				</button>
 			);
@@ -151,7 +151,7 @@ function	Navbar() {
 					{renderWalletButton()}
 				</div>
 			</div>
-			<LoginModal open={loginModalOpen} set_open={set_loginModalOpen} />
+			<ModalLogin open={ModalLoginOpen} set_open={set_ModalLoginOpen} />
 		</nav>
 	);
 }
