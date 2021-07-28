@@ -1,7 +1,7 @@
 /******************************************************************************
 **	@Author:				Thomas Bouder <Tbouder>
 **	@Email:					Tbouder@protonmail.com
-**	@Date:					Monday June 14th 2021
+**	@Date:					Sunday July 4th 2021
 **	@Filename:				LoginModal.js
 ******************************************************************************/
 

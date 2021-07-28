@@ -1,7 +1,7 @@
 /******************************************************************************
 **	@Author:				Thomas Bouder <Tbouder>
 **	@Email:					Tbouder@protonmail.com
-**	@Date:					Wednesday August 26th 2020
+**	@Date:					Sunday June 13th 2021
 **	@Filename:				_app.js
 ******************************************************************************/
 
@@ -16,7 +16,6 @@ import	{TMP_VAULTS}					from	'utils/API';
 
 import	'style/Default.css';
 import	'tailwindcss/tailwind.css';
-
 
 function	AppWrapper(props) {
 	const	{Component, pageProps, router} = props;

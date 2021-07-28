@@ -67,7 +67,22 @@ function FlyoutMenu() {
 							<Popover.Panel className={'absolute z-10 w-screen max-w-sm px-4 pt-8 transform -translate-x-1/2 left-1/2 sm:px-0 '}>
 								<div className={'overflow-hidden rounded-md shadow-xl ring-1 ring-black ring-opacity-5 border border-gray-200'}>
 									<div className={'relative grid gap-8 bg-white p-6 max-h-96 overflow-scroll'}>
-									
+										<a href={'https://github.com/pandadefi/y-crv-metapool-swapper'} target={'_blank'} className={'flex items-center p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50 cursor-pointer'} rel={'noreferrer'}>
+											<svg width={'48'} height={'48'} viewBox={'0 0 48 48'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
+												<rect width={'48'} height={'48'} rx={'8'} fill={'#DCFCE7'} />
+												<path d={'M24 11L35.2583 17.5V30.5L24 37L12.7417 30.5V17.5L24 11Z'} stroke={'#22C55E'} strokeWidth={'2'} />
+												<path fillRule={'evenodd'} clipRule={'evenodd'} d={'M16.7417 19.8094V28.1906L24 32.3812L31.2584 28.1906V19.8094L24 15.6188L16.7417 19.8094Z'} stroke={'#4ADE80'} strokeWidth={'2'} />
+												<path fillRule={'evenodd'} clipRule={'evenodd'} d={'M20.7417 22.1196V25.882L24 27.7632L27.2584 25.882V22.1196L24 20.2384L20.7417 22.1196Z'} stroke={'#BBF7D0'} strokeWidth={'2'} />
+											</svg>
+											<div className={'ml-4'}>
+												<p className={'text-sm font-medium text-gray-900'}>
+													{'SmartContract'}
+												</p>
+												<p className={'text-sm text-gray-500'}>
+													{'Check the Vyper code on Github'}
+												</p>
+											</div>
+										</a>
 									</div>
 									<div className={'p-4 bg-gray-50'}>
 										<a

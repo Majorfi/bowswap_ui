@@ -23,7 +23,8 @@ module.exports = {
 		},
 		extend: {
 			height: {
-				xxl: '520px',
+				'15': '3.75rem',
+				'xxl': '520px',
 			},
 			boxShadow: {
 				base: '0 10px 30px rgb(209 213 223 / 50%)'
