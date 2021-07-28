@@ -207,7 +207,7 @@ function	Index({vaults}) {
 	const	[fromCounterValue, set_fromCounterValue] = useState(0);
 	const	[toCounterValue, set_toCounterValue] = useState(0);
 	const	[amount, set_amount] = useState('1554.547');
-	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('546.547');
+	const	[expectedReceiveAmount] = useState('546.547');
 
 
 	const [txStep, set_txStep] = useState('Approve');
