@@ -8,7 +8,6 @@
 import	React, {Fragment, useRef, useState, useEffect}	from	'react';
 import	{Popover, Transition}							from	'@headlessui/react';
 import	useWeb3											from	'contexts/useWeb3';
-import	{CubeIcon}										from	'@heroicons/react/solid';
 import	Popup											from	'reactjs-popup';
 import	LoginModal										from	'components/LoginModal';
 
@@ -53,8 +52,7 @@ function FlyoutMenu() {
 				{({open}) => (
 					<div onMouseEnter={() => onHover(open, 'onMouseEnter')}>
 						<Popover.Button ref={buttonRef} onClick={() => handleClick(open)} className={'flex flex-row items-center cursor-pointer outline-none focus:outline-none'}>
-							<CubeIcon className={'text-white w-5 h-5 mr-2'} />
-							<p className={'text-white font-base text-lg'}>{'Vaults'}</p>
+							<p className={'text-white font-base text-lg'}>{'Pandaswap'}</p>
 						</Popover.Button>
 
 						<Transition
