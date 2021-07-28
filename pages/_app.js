@@ -55,7 +55,7 @@ function	AppWrapper(props) {
 }
 
 const getLibrary = (provider) => {
-	return new ethers.providers.Web3Provider(provider, 'any');
+	return new ethers.providers.Web3Provider(provider);
 };
 
 function	MyApp(props) {

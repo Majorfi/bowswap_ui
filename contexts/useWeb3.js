@@ -50,6 +50,7 @@ export const Web3ContextApp = ({children}) => {
 			set_address(toAddress(update.account));
 		}
 		set_nonce(n => n + 1);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [library, set_address, set_chainID]);
 
 	const onDesactivate = useCallback(() => {
@@ -63,6 +64,7 @@ export const Web3ContextApp = ({children}) => {
 				.off(ConnectorEvent.Update, onUpdate)
 				.off(ConnectorEvent.Deactivate, onDesactivate);
 		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [connector, onUpdate, set_address, set_chainID, set_lastWallet]);
 
 	const onActivate = useCallback(async () => {
@@ -74,6 +76,7 @@ export const Web3ContextApp = ({children}) => {
 		connector
 			.on(ConnectorEvent.Update, onUpdate)
 			.on(ConnectorEvent.Deactivate, onDesactivate);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [account, chainId, connector, library, onDesactivate, onUpdate, set_address, set_chainID]);
 
 
@@ -134,7 +137,8 @@ export const Web3ContextApp = ({children}) => {
 		if (!active && lastWallet !== walletType.NONE) {
 			connect(lastWallet);
 		}
-	}, [active, connect, lastWallet]);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [active]);
 
 	useEffect(() => {
 		setTimeout(() => set_initialized(true), 1500);
