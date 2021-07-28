@@ -375,8 +375,8 @@ input[type=number] {
 	border-color: rgba(226, 232, 240, 1) !important;
 }
 
-.main-gradient {
-	background-image: linear-gradient(to right, #22c55e, #1fbc59, #1cb454, #19ab4f, #16a34a);
+.bg-primary {
+	background: #1CA023;
 }
 
 .toast {
