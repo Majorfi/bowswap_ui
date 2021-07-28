@@ -112,8 +112,8 @@ export const Web3ContextApp = ({children}) => {
 			}
 			const walletconnect = new WalletConnectConnector({
 				rpc: {
-					1: getProvider('ethereum'),
-					1337: getProvider('major'),
+					1: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
+					1337: 'http://localhost:8545',
 				},
 				chainId: 1,
 				bridge: 'https://bridge.walletconnect.org',
