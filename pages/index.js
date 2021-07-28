@@ -147,7 +147,7 @@ function VaultList({vaults, value, set_value}) {
 	);
 }
 
-function	InputDeposit({value, set_value, balanceOf, exactBalanceOf, decimals}) {
+function	InputDeposit({value, set_value, balanceOf, decimals}) {
 	const [txStatus, set_txStatus] = useState({none: true, pending: false, success: false, error: false});
 
 	useEffect(() => {
