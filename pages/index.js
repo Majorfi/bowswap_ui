@@ -181,7 +181,7 @@ function	InputDeposit({value, set_value, balanceOf, exactBalanceOf, decimals}) {
 
 				<div className={'flex border-l border-gray-200'}>
 					<button
-						onClick={() => set_value(ethers.utils.formatUnits(exactBalanceOf.toString(), decimals))}
+						onClick={() => set_value(ethers.utils.formatUnits(balanceOf, decimals))}
 						className={'items-center space-x-2 px-4 py-2 text-xs font-medium text-gray-500 bg-gray-100 hover:bg-gray-200 hover:text-gray-600 focus:outline-none'}>
 						<span>{'max'}</span>
 					</button>
