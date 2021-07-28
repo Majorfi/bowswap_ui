@@ -245,14 +245,6 @@ function	Index({vaults}) {
 		fetchCRVBalance();
 	}, [fetchCRVBalance, fetchCRVVirtualPrice]);
 
-
-	function	renderXsReceipt() {
-		return (
-			<div className={'bg-white rounded-xl shadow-md p-6 w-full relative overflow-hidden space-y-2 block md:hidden mt-6'}>
-			</div>
-		);
-	}
-
 	return (
 		<section className={'mt-12 pt-16 w-full md:px-12 px-4 space-y-12 mb-64 z-10 relative'}>
 			<div className={'flex justify-center items-center'}>
@@ -290,8 +282,6 @@ function	Index({vaults}) {
 							fromVault={fromVault}
 							fromAmount={fromAmount} />
 					</div>
-
-					{renderXsReceipt()}
 				</div>
 			</div>
 
