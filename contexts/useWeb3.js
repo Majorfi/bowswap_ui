@@ -54,11 +54,11 @@ export const Web3ContextApp = ({children}) => {
 	}, [library, set_address, set_chainID]);
 
 	const onDesactivate = useCallback(() => {
-		set_address('');
-		set_ens('');
 		set_chainID(-1);
 		set_provider(undefined);
 		set_lastWallet(walletType.NONE);
+		set_address('');
+		set_ens('');
 		if (connector !== undefined) {
 			connector
 				.off(ConnectorEvent.Update, onUpdate)
@@ -69,9 +69,9 @@ export const Web3ContextApp = ({children}) => {
 
 	const onActivate = useCallback(async () => {
 		set_provider(library);
-		await getProvider().lookupAddress(toAddress(account)).then(_ens => set_ens(_ens || ''));
 		set_address(toAddress(account));
 		set_chainID(parseInt(chainId, 16));
+		await getProvider().lookupAddress(toAddress(account)).then(_ens => set_ens(_ens || ''));
 
 		connector
 			.on(ConnectorEvent.Update, onUpdate)

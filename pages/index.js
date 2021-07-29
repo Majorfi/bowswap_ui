@@ -14,7 +14,7 @@ import	useDebounce									from	'hook/useDebounce';
 import	{approveToken, swapTokens}					from	'utils/actions';
 import	InputToken									from	'components/InputToken';
 import	ModalVaultList								from	'components/ModalVaultList';
-import	{USD_VAULTS, BTC_VAULTS}					from	'utils/API';
+import	{USD_VAULTS, BTC_VAULTS, fetchCryptoPrice}					from	'utils/API';
 import {bigNumber} from 'utils';
 
 function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, fromCounterValue, balanceOf}) {
@@ -131,7 +131,7 @@ function	SectionReceipt({fromVault, toVault, fromAmount, fromCounterValue, toCou
 											<div className={'w-3 h-3 rounded-full bg-gray-400 animate animate-pulse animation-delay-500'} />
 											<div className={'w-3 h-3 rounded-full bg-gray-400 animate animate-pulse'} />
 										</div>
-										<p className={`font-bold text-base text-green-600 cursor-help ${isFetchingExpectedReceiveAmount ? 'hidden' : ''}`}>{`+${Number(expectedReceiveAmount).toFixed(4)}`}</p>
+										<p className={`font-bold text-base text-green-600 cursor-help ${isFetchingExpectedReceiveAmount ? 'hidden' : ''} ${fromAmount === 0 || fromAmount === '0' ? 'opacity-0' : ''}`}>{`+${Number(expectedReceiveAmount).toFixed(4)}`}</p>
 									</div>
 								}>
 								<div className={'bg-white border border-gray-200 text-gray-800 px-2 py-1 rounded-md mb-1'}>
@@ -243,16 +243,31 @@ function	Index() {
 	const	fetchCRVVirtualPrice = useCallback(async () => {
 		if (!provider)
 			return;
+		const	prices = await fetchCryptoPrice(['bitcoin'], 'usd');
 
 		if (fromVault) {
-			const	fromPool = new ethers.Contract(fromVault.poolAddress, ['function get_virtual_price() public view returns (uint256)'], provider);
-			const	virtualPrice = await fromPool.get_virtual_price();
-			set_fromCounterValue(ethers.utils.formatEther(virtualPrice));
+			const	poolContract = new ethers.Contract(fromVault.poolAddress, ['function get_virtual_price() public view returns (uint256)'], provider);
+			const	vaultContract = new ethers.Contract(fromVault.address, ['function pricePerShare() public view returns (uint256)'], provider);
+			const	virtualPrice = await poolContract.get_virtual_price();
+			const	pricePerShare = await vaultContract.pricePerShare();
+			const	scaledBalanceOf = bigNumber.from(ethers.constants.WeiPerEther).mul(pricePerShare).div(bigNumber.from(10).pow(18)).mul(virtualPrice).div(bigNumber.from(10).pow(18));
+			if (fromVault.scope === 'btc') {
+				set_fromCounterValue(prices.bitcoin.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
+			} else {
+				set_fromCounterValue(ethers.utils.formatUnits(scaledBalanceOf, 18));
+			}
 		}
 		if (toVault) {
-			const	toPool = new ethers.Contract(toVault.poolAddress, ['function get_virtual_price() public view returns (uint256)'], provider);
-			const	virtualPrice = await toPool.get_virtual_price();
-			set_toCounterValue(ethers.utils.formatEther(virtualPrice));
+			const	poolContract = new ethers.Contract(toVault.poolAddress, ['function get_virtual_price() public view returns (uint256)'], provider);
+			const	vaultContract = new ethers.Contract(toVault.address, ['function pricePerShare() public view returns (uint256)'], provider);
+			const	virtualPrice = await poolContract.get_virtual_price();
+			const	pricePerShare = await vaultContract.pricePerShare();
+			const	scaledBalanceOf = bigNumber.from(ethers.constants.WeiPerEther).mul(pricePerShare).div(bigNumber.from(10).pow(18)).mul(virtualPrice).div(bigNumber.from(10).pow(18));
+			if (toVault.scope === 'btc') {
+				set_toCounterValue(prices.bitcoin.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
+			} else {
+				set_toCounterValue(ethers.utils.formatUnits(scaledBalanceOf, 18));
+			}
 		}
 	}, [fromVault, provider, toVault]);
 

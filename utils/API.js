@@ -171,6 +171,17 @@ export const BTC_VAULTS = [
 ];
 
 
+export async function	fetchCryptoPrice(from, to) {
+	const	result = await performGet(
+		`https://api.coingecko.com/api/v3/simple/price?ids=${from}&vs_currencies=${to}`
+	);
+
+	if (result) {
+		return result;
+	}
+	return null;
+}
+
 async function	_fetchYearnVaults() {
 	const	result = await performGet('https://api.yearn.tools/vaults/all');
 
