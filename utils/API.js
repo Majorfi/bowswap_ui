@@ -21,26 +21,17 @@ export const	performGet = (url) => {
 	);
 };
 
-export const TMP_VAULTS = [
+export const USD_VAULTS = [
 	{
 		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417/logo-128.png',
 		'symbol': 'yvCurve-USDP',
 		'name': 'Curve USDP Pool yVault',
 		'displayName': 'crvUSDP',
 		'decimals': 18,
+		'scope': 'usd',
 		'address': '0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417',
 		'tokenAddress': '0x7Eb40E450b9655f4B3cC4259BCC731c63ff55ae6',
 		'poolAddress': '0x42d7025938bEc20B69cBae5A77421082407f053A',
-	},
-	{
-		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x0FCDAeDFb8A7DfDa2e9838564c5A1665d856AFDF/logo-128.png',
-		'symbol': 'yvmusd3CRV',
-		'name': 'yearn Curve.fi MUSD/3Crv',
-		'displayName': 'crvMUSD',
-		'decimals': 18,
-		'address': '0x0FCDAeDFb8A7DfDa2e9838564c5A1665d856AFDF',
-		'tokenAddress': '0x1AEf73d49Dedc4b1778d0706583995958Dc862e6',
-		'poolAddress': '0x8474DdbE98F5aA3179B3B3F5942D724aFcdec9f6',
 	},
 	{
 		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x8cc94ccd0f3841a468184aCA3Cc478D2148E1757/logo-128.png',
@@ -48,39 +39,10 @@ export const TMP_VAULTS = [
 		'name': 'Curve mUSD Pool yVault',
 		'displayName': 'crvMUSD',
 		'decimals': 18,
+		'scope': 'usd',
 		'address': '0x8cc94ccd0f3841a468184aCA3Cc478D2148E1757',
 		'tokenAddress': '0x1AEf73d49Dedc4b1778d0706583995958Dc862e6',
 		'poolAddress': '0x8474DdbE98F5aA3179B3B3F5942D724aFcdec9f6',
-	},
-	{
-		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x23D3D0f1c697247d5e0a9efB37d8b0ED0C464f7f/logo-128.png',
-		'symbol': 'yvCurve-tBTC',
-		'name': 'Curve tBTC Pool yVault',
-		'displayName': 'crvTBTC',
-		'decimals': 18,
-		'address': '0x23D3D0f1c697247d5e0a9efB37d8b0ED0C464f7f',
-		'tokenAddress': '0x64eda51d3Ad40D56b9dFc5554E06F94e1Dd786Fd',
-		'poolAddress': '0xC25099792E9349C7DD09759744ea681C7de2cb66'
-	},
-	{
-		'displayName': 'crvUSDN',
-		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0xFe39Ce91437C76178665D64d7a2694B0f6f17fE3/logo-128.png',
-		'symbol': 'yvusdn3CRV',
-		'decimals': 18,
-		'name': 'yearn Curve.fi USDN/3Crv',
-		'address': '0xFe39Ce91437C76178665D64d7a2694B0f6f17fE3',
-		'tokenAddress': '0x4f3E8F405CF5aFC05D68142F3783bDfE13811522',
-		'poolAddress': '0x0f9cb53Ebe405d49A0bbdBD291A65Ff571bC83e1'
-	},
-	{
-		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x3D27705c64213A5DcD9D26880c1BcFa72d5b6B0E/logo-128.png',
-		'symbol': 'yvCurve-USDK',
-		'name': 'Curve USDK Pool yVault',
-		'displayName': 'crvUSDK',
-		'decimals': 18,
-		'address': '0x3D27705c64213A5DcD9D26880c1BcFa72d5b6B0E',
-		'tokenAddress': '0x97E2768e8E73511cA874545DC5Ff8067eB19B787',
-		'poolAddress': '0x3E01dD8a5E1fb3481F0F589056b428Fc308AF0Fb'
 	},
 	{
 		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x5fA5B62c8AF877CB37031e0a3B2f34A78e3C56A6/logo-128.png',
@@ -88,9 +50,21 @@ export const TMP_VAULTS = [
 		'name': 'Curve LUSD Pool yVault',
 		'displayName': 'crvLUSD',
 		'decimals': 18,
+		'scope': 'usd',
 		'address': '0x5fA5B62c8AF877CB37031e0a3B2f34A78e3C56A6',
 		'tokenAddress': '0xEd279fDD11cA84bEef15AF5D39BB4d4bEE23F0cA',
 		'poolAddress': '0xEd279fDD11cA84bEef15AF5D39BB4d4bEE23F0cA'
+	},
+	{
+		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x30FCf7c6cDfC46eC237783D94Fc78553E79d4E9C/logo-128.png',
+		'symbol': 'yvCurve-DUSD',
+		'name': 'Curve DUSD Pool yVault',
+		'displayName': 'crvDUSD',
+		'decimals': 18,
+		'scope': 'usd',
+		'address': '0x30FCf7c6cDfC46eC237783D94Fc78553E79d4E9C',
+		'tokenAddress': '0x3a664Ab939FD8482048609f652f9a0B0677337B9',
+		'poolAddress': '0x8038C01A0390a8c547446a0b2c18fc9aEFEcc10c'
 	},
 	{
 		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0xf8768814b88281DE4F532a3beEfA5b85B69b9324/logo-128.png',
@@ -98,6 +72,7 @@ export const TMP_VAULTS = [
 		'name': 'Curve TUSD Pool yVault',
 		'displayName': 'crvTUSD',
 		'decimals': 18,
+		'scope': 'usd',
 		'address': '0xf8768814b88281DE4F532a3beEfA5b85B69b9324',
 		'tokenAddress': '0xEcd5e75AFb02eFa118AF914515D6521aaBd189F1',
 		'poolAddress': '0xEcd5e75AFb02eFa118AF914515D6521aaBd189F1'
@@ -108,19 +83,10 @@ export const TMP_VAULTS = [
 		'name': 'Curve HUSD Pool yVault',
 		'displayName': 'crvHUSD',
 		'decimals': 18,
+		'scope': 'usd',
 		'address': '0x054AF22E1519b020516D72D749221c24756385C9',
 		'tokenAddress': '0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858',
 		'poolAddress': '0x3eF6A01A0f81D6046290f3e2A8c5b843e738E604'
-	},
-	{
-		'displayName': 'crvTBTC',
-		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x07FB4756f67bD46B748b16119E802F1f880fb2CC/logo-128.png',
-		'symbol': 'yvtbtc/sbtcCrv',
-		'name': 'yearn Curve.fi tBTC/sbtcCrv',
-		'decimals': 18,
-		'address': '0x07FB4756f67bD46B748b16119E802F1f880fb2CC',
-		'tokenAddress': '0x64eda51d3Ad40D56b9dFc5554E06F94e1Dd786Fd',
-		'poolAddress': '0xC25099792E9349C7DD09759744ea681C7de2cb66'
 	},
 	{
 		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x3B96d491f067912D18563d56858Ba7d6EC67a6fa/logo-128.png',
@@ -128,40 +94,80 @@ export const TMP_VAULTS = [
 		'name': 'Curve USDN Pool yVault',
 		'displayName': 'crvUSDN',
 		'decimals': 18,
+		'scope': 'usd',
 		'address': '0x3B96d491f067912D18563d56858Ba7d6EC67a6fa',
 		'tokenAddress': '0x4f3E8F405CF5aFC05D68142F3783bDfE13811522',
 		'poolAddress': '0x0f9cb53Ebe405d49A0bbdBD291A65Ff571bC83e1'
-	},
-	{
-		'displayName': 'crvHUSD',
-		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x39546945695DCb1c037C836925B355262f551f55/logo-128.png',
-		'symbol': 'yvhusd3CRV',
-		'decimals': 18,
-		'name': 'yearn Curve.fi HUSD/3Crv',
-		'address': '0x39546945695DCb1c037C836925B355262f551f55',
-		'tokenAddress': '0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858',
-		'poolAddress': '0x3eF6A01A0f81D6046290f3e2A8c5b843e738E604'
 	},
 	{
 		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x6Ede7F19df5df6EF23bD5B9CeDb651580Bdf56Ca/logo-128.png',
 		'symbol': 'yvCurve-BUSD',
 		'name': 'Curve BUSD Pool yVault',
 		'decimals': 18,
+		'scope': 'usd',
 		'displayName': 'crvBUSD',
 		'address': '0x6Ede7F19df5df6EF23bD5B9CeDb651580Bdf56Ca',
 		'tokenAddress': '0x4807862AA8b2bF68830e4C8dc86D0e9A998e085a',
 		'poolAddress': '0x4807862AA8b2bF68830e4C8dc86D0e9A998e085a'
 	},
+	// {
+	// 	'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x3D27705c64213A5DcD9D26880c1BcFa72d5b6B0E/logo-128.png',
+	// 	'symbol': 'yvCurve-USDK',
+	// 	'name': 'Curve USDK Pool yVault',
+	// 	'displayName': 'crvUSDK',
+	// 	'decimals': 18,
+	// 	'scope': 'usd',
+	// 	'address': '0x3D27705c64213A5DcD9D26880c1BcFa72d5b6B0E',
+	// 	'tokenAddress': '0x97E2768e8E73511cA874545DC5Ff8067eB19B787',
+	// 	'poolAddress': '0x3E01dD8a5E1fb3481F0F589056b428Fc308AF0Fb'
+	// },
+];
+
+export const BTC_VAULTS = [
 	{
-		'displayName': 'crvUSDP',
-		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x1B5eb1173D2Bf770e50F10410C9a96F7a8eB6e75/logo-128.png',
-		'symbol': 'yvusdp3CRV',
-		'name': 'yearn Curve.fi USDP/3Crv',
+		'displayName': 'crvPBTC',
+		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x3c5DF3077BcF800640B5DAE8c91106575a4826E6/logo-128.png',
+		'symbol': 'yvCurve-pBTC',
+		'name': 'Curve pBTC Pool yVault',
 		'decimals': 18,
-		'address': '0x1B5eb1173D2Bf770e50F10410C9a96F7a8eB6e75',
-		'tokenAddress': '0x7Eb40E450b9655f4B3cC4259BCC731c63ff55ae6',
-		'poolAddress': '0x42d7025938bEc20B69cBae5A77421082407f053A'
-	}
+		'scope': 'btc',
+		'address': '0x3c5DF3077BcF800640B5DAE8c91106575a4826E6',
+		'tokenAddress': '0xDE5331AC4B3630f94853Ff322B66407e0D6331E8',
+		'poolAddress': '0x7f55dde206dbad629c080068923b36fe9d6bdbef'
+	},
+	{
+		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x8fA3A9ecd9EFb07A8CE90A6eb014CF3c0E3B32Ef/logo-128.png',
+		'symbol': 'yvCurve-BBTC',
+		'name': 'Curve BBTC Pool yVault',
+		'displayName': 'crvBBTC',
+		'decimals': 18,
+		'scope': 'btc',
+		'address': '0x8fA3A9ecd9EFb07A8CE90A6eb014CF3c0E3B32Ef',
+		'tokenAddress': '0x410e3E86ef427e30B9235497143881f717d93c2A',
+		'poolAddress': '0x071c661b4deefb59e2a3ddb20db036821eee8f4b'
+	},
+	{
+		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0xe9Dc63083c464d6EDcCFf23444fF3CFc6886f6FB/logo-128.png',
+		'symbol': 'yvCurve-oBTC',
+		'name': 'Curve oBTC Pool yVault',
+		'displayName': 'crvOBTC',
+		'decimals': 18,
+		'scope': 'btc',
+		'address': '0xe9Dc63083c464d6EDcCFf23444fF3CFc6886f6FB',
+		'tokenAddress': '0x2fE94ea3d5d4a175184081439753DE15AeF9d614',
+		'poolAddress': '0xd81da8d904b52208541bade1bd6595d8a251f8dd'
+	},
+	// {
+	// 	'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x23D3D0f1c697247d5e0a9efB37d8b0ED0C464f7f/logo-128.png',
+	// 	'symbol': 'yvCurve-tBTC',
+	// 	'name': 'Curve tBTC Pool yVault',
+	// 	'displayName': 'crvTBTC',
+	// 	'decimals': 18,
+	// 	'scope': 'btc',
+	// 	'address': '0x23D3D0f1c697247d5e0a9efB37d8b0ED0C464f7f',
+	// 	'tokenAddress': '0x64eda51d3Ad40D56b9dFc5554E06F94e1Dd786Fd',
+	// 	'poolAddress': '0xC25099792E9349C7DD09759744ea681C7de2cb66'
+	// },
 ];
 
 
@@ -173,6 +179,7 @@ async function	_fetchYearnVaults() {
 	}
 	return null;
 }
+
 export async function	fetchYearnVaults() {
 	return await toast.promise(_fetchYearnVaults(), {
 		loading: 'Fetching Vaults',

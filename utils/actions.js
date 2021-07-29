@@ -47,34 +47,22 @@ export async function	approveToken({provider, contractAddress, amount, from}, ca
 	}
 }
 
-export async function	depositToken({provider, contractAddress, amount}, callback) {
+export async function	swapTokens({provider, contractAddress, from, to, amount, minAmountOut}, callback) {
 	const	signer = provider.getSigner();
 	const	contract = new ethers.Contract(
 		contractAddress,
-		['function deposit(uint256 amount) public returns (uint256)'],
+		['function swap(address from, address to, uint256 amount, uint256 min_amount_out)'],
 		signer
 	);
-
-	/**********************************************************************
-	**	In order to avoid dumb error, let's first check if the TX would
-	**	be successful with a static call
-	**********************************************************************/
-	try {
-		await contract.callStatic.deposit(amount);
-	} catch (error) {
-		toast.error(error?.data?.message || error?.message);
-		callback({error: true, data: undefined});
-		return;
-	}
 
 	/**********************************************************************
 	**	If the call is successful, try to perform the actual TX
 	**********************************************************************/
 	try {
-		const	transaction = await contract.deposit(amount);
+		const	transaction = await contract.swap(from, to, amount, minAmountOut);
 		const	transactionResult = await transaction.wait();
 		if (transactionResult.status === 1) {
-			toast.success('Transaction deposit executed');
+			toast.success('Transaction swap executed');
 			callback({error: false, data: amount});
 		} else {
 			toast.error('Transaction mined but not successful');

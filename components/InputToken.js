@@ -37,7 +37,7 @@ function	InputToken({value, set_value, balanceOf, decimals}) {
 					placeholder={''}
 					style={{background: 'transparent'}}
 					className={'block truncate py-4 w-full text-lg'}
-					type={'number'}
+					type={'text'}
 					min={0} />
 
 				<div className={'flex border-l border-gray-200'}>

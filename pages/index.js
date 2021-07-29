@@ -10,9 +10,12 @@ import	{ethers}									from	'ethers';
 import	Popup										from	'reactjs-popup';
 import	{ArrowCircleRightIcon, CheckIcon, XIcon}	from	'@heroicons/react/solid';
 import	useWeb3										from	'contexts/useWeb3';
-import	{approveToken, depositToken}				from	'utils/actions';
+import	useDebounce									from	'hook/useDebounce';
+import	{approveToken, swapTokens}					from	'utils/actions';
 import	InputToken									from	'components/InputToken';
 import	ModalVaultList								from	'components/ModalVaultList';
+import	{USD_VAULTS, BTC_VAULTS}					from	'utils/API';
+import {bigNumber} from 'utils';
 
 function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, fromCounterValue, balanceOf}) {
 	return (
@@ -76,7 +79,7 @@ function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, to
 	);
 }
 
-function	SectionReceipt({fromVault, toVault, fromAmount, fromCounterValue, toCounterValue, expectedReceiveAmount}) {
+function	SectionReceipt({fromVault, toVault, fromAmount, fromCounterValue, toCounterValue, expectedReceiveAmount, isFetchingExpectedReceiveAmount}) {
 	return (
 		<div className={'mt-6 pt-6 border-t border-dashed border-gray-200 hidden md:block'}>
 			<div className={'bg-gray-50 rounded-lg p-6 space-y-6'}>
@@ -122,7 +125,14 @@ function	SectionReceipt({fromVault, toVault, fromAmount, fromCounterValue, toCou
 								on={['hover', 'focus']}
 								arrow={false}
 								trigger={
-									<p className={'font-bold text-base text-green-600 cursor-help'}>{`+${Number(expectedReceiveAmount).toFixed(4)}`}</p>
+									<div className={'relative'}>
+										<div className={`absolute inset-0 flex flex-row w-max -ml-14 justify-center items-center space-x-2 ${isFetchingExpectedReceiveAmount ? '' : 'hidden'}`}>
+											<div className={'w-3 h-3 rounded-full bg-gray-400 animate animate-pulse'} />
+											<div className={'w-3 h-3 rounded-full bg-gray-400 animate animate-pulse animation-delay-500'} />
+											<div className={'w-3 h-3 rounded-full bg-gray-400 animate animate-pulse'} />
+										</div>
+										<p className={`font-bold text-base text-green-600 cursor-help ${isFetchingExpectedReceiveAmount ? 'hidden' : ''}`}>{`+${Number(expectedReceiveAmount).toFixed(4)}`}</p>
+									</div>
 								}>
 								<div className={'bg-white border border-gray-200 text-gray-800 px-2 py-1 rounded-md mb-1'}>
 									<p className={'text-xs'}>{`-${expectedReceiveAmount} ${toVault.symbol}`}</p>
@@ -141,22 +151,33 @@ function	SectionReceipt({fromVault, toVault, fromAmount, fromCounterValue, toCou
 	);
 }
 
-function	SectionAction({fromVault, fromAmount}) {
+function	SectionAction({fromVault, toVault, fromAmount, onSuccess}) {
 	const	{provider} = useWeb3();
 	const	[txStep, set_txStep] = useState('Approve');
 	const	[txStatus, set_txStatus] = useState({none: true, pending: false, success: false, error: false});
 
-	function	performDeposit(amount) {
+	useEffect(() => {
+		if (txStatus.error) {
+			setTimeout(() => set_txStatus({none: true, pending: false, success: false, error: false}), 1500);
+		}
+	}, [txStatus]);
+
+	function	performSwap() {
 		set_txStatus({none: false, pending: true, success: false, error: false});
-		depositToken({
+		swapTokens({
 			provider: provider,
-			contractAddress: fromVault.address,
-			amount: amount
+			contractAddress: process.env.METAPOOL_SWAPPER_ADDRESS,
+			from: fromVault.address,
+			to: toVault.address,
+			amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
+			minAmountOut: bigNumber.from(1)
 		}, ({error}) => {
 			if (error) {
 				return set_txStatus({none: false, pending: false, success: false, error: true});
 			}
 			set_txStatus({none: false, pending: false, success: true, error: false});
+			setTimeout(() => set_txStatus({none: true, pending: false, success: false, error: false}), 1500);
+			onSuccess();
 		});
 	}
 
@@ -164,24 +185,24 @@ function	SectionAction({fromVault, fromAmount}) {
 		set_txStatus({none: false, pending: true, success: false, error: false});
 		approveToken({
 			provider: provider,
-			contractAddress: fromVault.tokenAddress,
+			contractAddress: fromVault.address,
 			amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-			from: fromVault.address
+			from: process.env.METAPOOL_SWAPPER_ADDRESS
 		}, ({error, data}) => {
 			if (error) {
 				return set_txStatus({none: false, pending: false, success: false, error: true});
 			}
-			set_txStep('Deposit');
+			set_txStep('Swap');
 			set_txStatus({none: false, pending: false, success: true, error: false});
-			performDeposit(data);
+			performSwap(data);
 		});
 	}
 
 	return (
-		<div className={'flex flex-row justify-end mt-6'}>
+		<div className={'flex flex-row justify-center mt-6'}>
 			<button
-				onClick={performApprove}
-				className={`w-24 flex items-center justify-center space-x-2 px-4 py-2 text-sm font-medium rounded-md focus:outline-none overflow-hidden ${
+				onClick={txStep === 'Swap' ? performSwap : performApprove}
+				className={`w-32 h-11 flex items-center justify-center space-x-2 px-6 py-2 text-lg font-medium rounded-md focus:outline-none overflow-hidden ${
 					txStatus.pending ? 'text-gray-500 bg-gray-100 cursor-not-allowed' :
 						txStatus.success ? 'bg-green-500 text-white cursor-not-allowed' :
 							txStatus.error ? 'bg-red-500 text-white cursor-not-allowed' :
@@ -203,17 +224,21 @@ function	SectionAction({fromVault, fromAmount}) {
 	);
 }
 
-function	Index({vaults}) {
+function	Index() {
 	const	{address, provider} = useWeb3();
 	const	[balanceOf, set_balanceOf] = useState('0');
 
-	const	[fromVault, set_fromVault] = useState(vaults[0]);
-	const	[toVault, set_toVault] = useState(vaults[1]);
+	const	[fromVault, set_fromVault] = useState(USD_VAULTS[0]);
+	const	[toVault, set_toVault] = useState(USD_VAULTS[1]);
+	const	[toVaultsList, set_toVaultsList] = useState(USD_VAULTS.slice(1));
+
 	const	[fromCounterValue, set_fromCounterValue] = useState(0);
 	const	[toCounterValue, set_toCounterValue] = useState(0);
-	const	[fromAmount, set_fromAmount] = useState('1554.547');
-	const	[expectedReceiveAmount] = useState('546.547');
+	const	[fromAmount, set_fromAmount] = useState('0');
+	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('0');
+	const	[isFetchingExpectedReceiveAmount, set_isFetchingExpectedReceiveAmount] = useState(false);
 
+	const	debouncedFetchExpectedAmount = useDebounce(fromAmount, 500);
 
 	const	fetchCRVVirtualPrice = useCallback(async () => {
 		if (!provider)
@@ -234,16 +259,49 @@ function	Index({vaults}) {
 	const	fetchCRVBalance = useCallback(async () => {
 		if (!provider)
 			return;
-		const	token = '0x38e4adb44ef08f22f5b5b76a8f0c2d0dcbe7dca1' || fromVault.tokenAddress;
+		const	token = fromVault.address;
 		const	fromToken = new ethers.Contract(token, ['function balanceOf(address) public view returns (uint256)'], provider);
 		const	_balanceOf = await fromToken.balanceOf(address);
 		set_balanceOf(_balanceOf);
-	}, [address, fromVault.tokenAddress, provider]);
+	}, [address, fromVault.address, provider]);
+
+	const	fetchEstimateOut = useCallback(async (from, to, amount) => {
+		const	fromToken = new ethers.Contract(process.env.METAPOOL_SWAPPER_ADDRESS, ['function estimate_out(address from, address to, uint256 amount) public view returns (uint256)'], provider);
+		const	estimate_out = await fromToken.estimate_out(from, to, amount);
+		set_expectedReceiveAmount(ethers.utils.formatUnits(estimate_out, toVault.decimals));
+		set_isFetchingExpectedReceiveAmount(false);
+	}, [provider, toVault.decimals]);
+
+	useEffect(() => {
+		if (fromVault.scope === 'btc') {
+			const	vaultList = BTC_VAULTS.filter(e => e.address !== fromVault.address);
+			set_toVaultsList(vaultList);
+			if (fromVault.scope !== toVault.scope || fromVault.address === toVault.address)
+				set_toVault(vaultList[0]);
+		}
+		if (fromVault.scope === 'usd') {
+			const	vaultList = USD_VAULTS.filter(e => e.address !== fromVault.address);
+			set_toVaultsList(vaultList);
+			if (fromVault.scope !== toVault.scope || fromVault.address === toVault.address)
+				set_toVault(vaultList[0]);
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [fromVault.address]);
 
 	useEffect(() => {
 		fetchCRVVirtualPrice();
 		fetchCRVBalance();
 	}, [fetchCRVBalance, fetchCRVVirtualPrice]);
+
+	useEffect(() => {
+		if (debouncedFetchExpectedAmount) {
+			if (Number(fromAmount) !== 0) {
+				set_isFetchingExpectedReceiveAmount(true);
+				fetchEstimateOut(fromVault.address, toVault.address, ethers.utils.parseUnits(fromAmount, fromVault.decimals));
+			}
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [debouncedFetchExpectedAmount, fromVault.address, toVault.address, fromVault.decimals]);
 
 	return (
 		<section className={'mt-12 pt-16 w-full md:px-12 px-4 space-y-12 mb-64 z-10 relative'}>
@@ -251,7 +309,7 @@ function	Index({vaults}) {
 				<div className={'w-full max-w-2xl'}>
 					<div className={'bg-white rounded-xl shadow-md p-6 pt-8 w-full relative overflow-hidden space-y-0 md:space-y-6'}>
 						<SectionFromVault
-							vaults={vaults}
+							vaults={[...USD_VAULTS, ...BTC_VAULTS]}
 							fromVault={fromVault}
 							set_fromVault={set_fromVault}
 							fromAmount={fromAmount}
@@ -264,7 +322,7 @@ function	Index({vaults}) {
 						</div>
 
 						<SectionToVault
-							vaults={vaults}
+							vaults={toVaultsList}
 							toVault={toVault}
 							set_toVault={set_toVault}
 							expectedReceiveAmount={expectedReceiveAmount}
@@ -276,11 +334,18 @@ function	Index({vaults}) {
 							fromAmount={fromAmount}
 							fromCounterValue={fromCounterValue}
 							toCounterValue={toCounterValue}
-							expectedReceiveAmount={expectedReceiveAmount} />
+							expectedReceiveAmount={expectedReceiveAmount}
+							isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount} />
 
 						<SectionAction
 							fromVault={fromVault}
-							fromAmount={fromAmount} />
+							toVault={toVault}
+							fromAmount={fromAmount}
+							onSuccess={() => {
+								fetchCRVBalance();
+								set_fromAmount('0');
+							}}
+						/>
 					</div>
 				</div>
 			</div>

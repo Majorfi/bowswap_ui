@@ -13,6 +13,7 @@ module.exports = ({
 	],
 	env: {
 		ALCHEMY_KEY: process.env.ALCHEMY_KEY,
+		METAPOOL_SWAPPER_ADDRESS: process.env.METAPOOL_SWAPPER_ADDRESS,
 	},
 	optimization: {
 		minimize: true,
