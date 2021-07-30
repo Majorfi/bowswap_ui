@@ -14,8 +14,9 @@ import	useDebounce									from	'hook/useDebounce';
 import	{approveToken, swapTokens}					from	'utils/actions';
 import	InputToken									from	'components/InputToken';
 import	ModalVaultList								from	'components/ModalVaultList';
-import	{USD_VAULTS, BTC_VAULTS, fetchCryptoPrice}					from	'utils/API';
-import {bigNumber} from 'utils';
+import	PopoverSlippage								from	'components/PopoverSlippage';
+import	{USD_VAULTS, BTC_VAULTS, fetchCryptoPrice}	from	'utils/API';
+import	{bigNumber}									from	'utils';
 
 function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, fromCounterValue, balanceOf}) {
 	return (
@@ -79,10 +80,13 @@ function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, to
 	);
 }
 
-function	SectionReceipt({fromVault, toVault, fromAmount, fromCounterValue, toCounterValue, expectedReceiveAmount, isFetchingExpectedReceiveAmount}) {
+function	SectionReceipt({fromVault, toVault, fromAmount, fromCounterValue, toCounterValue, expectedReceiveAmount, isFetchingExpectedReceiveAmount, slippage, set_slippage}) {
 	return (
 		<div className={'mt-6 pt-6 border-t border-dashed border-gray-200 hidden md:block'}>
-			<div className={'bg-gray-50 rounded-lg p-6 space-y-6'}>
+			<div className={'bg-gray-50 rounded-lg p-6 space-y-6 relative'}>
+				<div className={'absolute top-2 right-2 flex justify-end z-30'}>
+					<PopoverSlippage slippage={slippage} set_slippage={set_slippage}/>
+				</div>
 				<div className={'flex flex-row'}>
 					<div className={'mr-4'}>
 						<div className={'bg-blue-500 w-16 h-16 flex justify-center items-center rounded-lg'}>
@@ -135,13 +139,18 @@ function	SectionReceipt({fromVault, toVault, fromAmount, fromCounterValue, toCou
 									</div>
 								}>
 								<div className={'bg-white border border-gray-200 text-gray-800 px-2 py-1 rounded-md mb-1'}>
-									<p className={'text-xs'}>{`-${expectedReceiveAmount} ${toVault.symbol}`}</p>
+									<p className={'inline text-xs'}>{`+${expectedReceiveAmount} ${toVault.symbol}`}</p>
 								</div>
 							</Popup>
 						</div>
-						<div className={'border-t border-gray-200 mt-1 pt-1'}>
-							<p className={'inline font-medium text-sm text-gray-500'}>{`~$${(toCounterValue * Number(expectedReceiveAmount)).toFixed(2)}`}</p>&nbsp;
-							<p className={'inline font-normal text-xs text-gray-500'}>{`($${(Number(toCounterValue).toFixed(4))} per token)`}</p>
+						<div className={'border-t border-gray-200 mt-1 pt-1 flex flex-row justify-between'}>
+							<div>
+								<p className={'inline font-medium text-sm text-gray-500'}>{`~$${(toCounterValue * Number(expectedReceiveAmount)).toFixed(2)}`}</p>&nbsp;
+								<p className={'inline font-normal text-xs text-gray-500'}>{`($${(Number(toCounterValue).toFixed(4))} per token)`}</p>
+							</div>
+							<div>
+								<p className={'inline font-normal text-xs text-gray-500'}>{`Min received: ${(Number(expectedReceiveAmount) - ((Number(expectedReceiveAmount) * slippage / 100))).toFixed(6)} tokens`}</p>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -151,7 +160,7 @@ function	SectionReceipt({fromVault, toVault, fromAmount, fromCounterValue, toCou
 	);
 }
 
-function	SectionAction({fromVault, toVault, fromAmount, onSuccess}) {
+function	SectionAction({fromVault, toVault, fromAmount, expectedReceiveAmount, slippage, onSuccess}) {
 	const	{provider} = useWeb3();
 	const	[txStep, set_txStep] = useState('Approve');
 	const	[txStatus, set_txStatus] = useState({none: true, pending: false, success: false, error: false});
@@ -170,7 +179,7 @@ function	SectionAction({fromVault, toVault, fromAmount, onSuccess}) {
 			from: fromVault.address,
 			to: toVault.address,
 			amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-			minAmountOut: bigNumber.from(1)
+			minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toString(), fromVault.decimals)
 		}, ({error}) => {
 			if (error) {
 				return set_txStatus({none: false, pending: false, success: false, error: true});
@@ -236,6 +245,9 @@ function	Index() {
 	const	[toCounterValue, set_toCounterValue] = useState(0);
 	const	[fromAmount, set_fromAmount] = useState('0');
 	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('0');
+
+	const	[slippage, set_slippage] = useState(0.10);
+
 	const	[isFetchingExpectedReceiveAmount, set_isFetchingExpectedReceiveAmount] = useState(false);
 
 	const	debouncedFetchExpectedAmount = useDebounce(fromAmount, 500);
@@ -322,7 +334,7 @@ function	Index() {
 		<section className={'mt-12 pt-16 w-full md:px-12 px-4 space-y-12 mb-64 z-10 relative'}>
 			<div className={'flex justify-center items-center'}>
 				<div className={'w-full max-w-2xl'}>
-					<div className={'bg-white rounded-xl shadow-md p-6 pt-8 w-full relative overflow-hidden space-y-0 md:space-y-6'}>
+					<div className={'bg-white rounded-xl shadow-md p-6 pt-8 w-full relative space-y-0 md:space-y-6'}>
 						<SectionFromVault
 							vaults={[...USD_VAULTS, ...BTC_VAULTS]}
 							fromVault={fromVault}
@@ -350,12 +362,16 @@ function	Index() {
 							fromCounterValue={fromCounterValue}
 							toCounterValue={toCounterValue}
 							expectedReceiveAmount={expectedReceiveAmount}
-							isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount} />
+							isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount}
+							slippage={slippage}
+							set_slippage={set_slippage} />
 
 						<SectionAction
 							fromVault={fromVault}
 							toVault={toVault}
 							fromAmount={fromAmount}
+							expectedReceiveAmount={expectedReceiveAmount}
+							slippage={slippage}
 							onSuccess={() => {
 								fetchCRVBalance();
 								set_fromAmount('0');
