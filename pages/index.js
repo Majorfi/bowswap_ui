@@ -21,7 +21,7 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 	return (
 		<section aria-label={'FROM_VAULT'}>
 			<label className={'font-medium text-sm text-gray-800'}>{'From Vault'}</label>
-			<div className={'flex flex-col md:flex-row items-start justify-center md:space-x-4 w-full'}>
+			<div className={'flex flex-col md:flex-row items-start justify-center space-y-2 md:space-y-0 md:space-x-4 w-full'}>
 				<div className={'w-full md:w-2/6'}>
 					<ModalVaultList
 						vaults={vaults}
@@ -59,7 +59,7 @@ function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, to
 	return (
 		<section aria-label={'TO_VAULT'}>
 			<label className={'font-medium text-sm text-gray-800'}>{'To Vault'}</label>
-			<div className={'flex flex-col md:flex-row items-start justify-center md:space-x-4 w-full'}>
+			<div className={'flex flex-col md:flex-row items-start justify-center space-y-2 md:space-y-0 md:space-x-4 w-full'}>
 				<div className={'w-full md:w-2/6'}>
 					<ModalVaultList
 						vaults={vaults}
