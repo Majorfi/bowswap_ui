@@ -9,7 +9,7 @@ import	React, {useState, useEffect, Fragment}	from	'react';
 import	Image									from	'next/image';
 import	{List}									from	'react-virtualized';
 import	{Dialog, Transition}					from	'@headlessui/react';
-import	{XIcon, SelectorIcon}					from	'@heroicons/react/solid';
+import	{XIcon, ChevronRightIcon}				from	'@heroicons/react/solid';
 import	{toAddress}								from	'utils';
 
 function ModalVaultList({vaults, value, set_value}) {
@@ -34,7 +34,7 @@ function ModalVaultList({vaults, value, set_value}) {
 			<div className={'relative'}>
 				<button
 					onClick={() => set_open(true)}
-					className={'relative w-full py-2 pl-3 pr-10 text-left bg-white rounded-lg border border-gray-200 focus:outline-none cursor-pointer h-15'}>
+					className={'relative w-full pl-3 pr-10 text-left bg-gray-100 rounded-lg focus:outline-none cursor-pointer h-24 py-2'}>
 					<div className={'flex flex-row items-center'}>
 						<Image
 							src={value.icon}
@@ -43,12 +43,12 @@ function ModalVaultList({vaults, value, set_value}) {
 							loading={'eager'}
 							width={48}
 							height={48} />
-						<span className={'block truncate ml-4'}>
+						<span className={'block truncate ml-4 font-medium text-lg text-gray-800'}>
 							{value?.symbol}
 						</span>
 					</div>
 					<span className={'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none'}>
-						<SelectorIcon className={'w-5 h-5 text-gray-400'} aria-hidden={'true'} />
+						<ChevronRightIcon className={'w-5 h-5 text-gray-800'} aria-hidden={'true'} />
 					</span>
 				</button>
 			</div>
@@ -90,8 +90,8 @@ function ModalVaultList({vaults, value, set_value}) {
 										<div className={'mb-1'}>
 											<input
 												type={'text'}
-												name={'vaultName'}
-												id={'vaultName'}
+												name={'vaultName_or_address'}
+												id={'vaultName_or_address'}
 												value={filter}
 												onChange={(e) => set_filter(e.target.value)}
 												placeholder={'Filter or address'}

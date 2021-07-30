@@ -11,19 +11,15 @@ module.exports = {
 	},
 	theme: {
 		colors: {
-			gray: colors.blueGray,
+			gray: colors.coolGray,
 			green: colors.green,
 			red: colors.red,
-			orange: colors.orange,
 			white: colors.white,
-			emerald: colors.emerald,
-			blue: colors.blue,
-			yellow: colors.yellow,
-			indigo: colors.indigo,
+			sky: colors.sky,
 		},
 		extend: {
 			height: {
-				'15': '3.75rem',
+				'17': '68px',
 				'xxl': '520px',
 			},
 			boxShadow: {
@@ -41,7 +37,6 @@ module.exports = {
 	},
 	plugins: [
 		require('@tailwindcss/typography'),
-		require('@tailwindcss/forms'),
-		require('@tailwindcss/aspect-ratio'),
+		require('@tailwindcss/forms')
 	],
 };
