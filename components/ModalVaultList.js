@@ -8,8 +8,7 @@
 import	React, {useState, useEffect, Fragment}	from	'react';
 import	Image									from	'next/image';
 import	{List}									from	'react-virtualized';
-import	{Dialog, Transition}					from	'@headlessui/react';
-import	{XIcon}									from	'@heroicons/react/solid';
+import	{Transition}							from	'@headlessui/react';
 import	{toAddress}								from	'utils';
 
 function ModalVaultList({vaults, value, set_value}) {
