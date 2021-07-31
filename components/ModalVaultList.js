@@ -8,13 +8,16 @@
 import	React, {useState, useEffect, Fragment}	from	'react';
 import	Image									from	'next/image';
 import	{List}									from	'react-virtualized';
+import	{ethers}								from	'ethers';
 import	{Transition}							from	'@headlessui/react';
+import	useAccount								from	'contexts/useAccount';
 import	{toAddress}								from	'utils';
 
 function ModalVaultList({vaults, value, set_value}) {
-	const [open, set_open] = useState(false);
-	const [filter, set_filter] = useState('');
-	const [filteredVaultList, set_filteredVaultList] = useState(vaults);
+	const	{balancesOf} = useAccount();
+	const	[open, set_open] = useState(false);
+	const	[filter, set_filter] = useState('');
+	const	[filteredVaultList, set_filteredVaultList] = useState(vaults);
 
 	useEffect(() => {
 		if (filter === '') {
@@ -53,63 +56,67 @@ function ModalVaultList({vaults, value, set_value}) {
 					</span>
 				</button>
 			</div>
-			<Transition.Root show={open} as={Fragment}>
-				<div as={'div'} static className={'absolute z-30 inset-0 overflow-hidden'} open={open} onClose={set_open}>
-					<div className={'flex w-full h-full bg-white p-4 rounded-lg overflow-hidden'}>
-						<Transition.Child
-							as={Fragment}
-							enter={'ease-out duration-300'}
-							enterFrom={'opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'}
-							enterTo={'opacity-100 translate-y-0 sm:scale-100'}
-							leave={'ease-in duration-200'}
-							leaveFrom={'opacity-100 translate-y-0 sm:scale-100'}
-							leaveTo={'opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'}>
-							<div className={'inline-block bg-blue-400 rounded-lg w-full f-full'}>
-								<div className={'px-6 py-7 relative h-full overflow-hidden'}>
-									<div className={'flex flex-row items-center justify-between w-full mb-6'}>
-										<svg className={'cursor-pointer'} onClick={() => set_open(false)} width={'24'} height={'24'} viewBox={'0 0 24 24'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
-											<path fillRule={'evenodd'} clipRule={'evenodd'} d={'M14.8144 17.7439C14.5417 18.0556 14.0678 18.0872 13.7561 17.8144L7.75612 12.5644C7.59336 12.422 7.5 12.2163 7.5 12C7.5 11.7837 7.59336 11.578 7.75612 11.4356L13.7561 6.18558C14.0678 5.91282 14.5417 5.9444 14.8144 6.25613C15.0872 6.56786 15.0556 7.04168 14.7439 7.31444L9.38894 12L14.7439 16.6856C15.0556 16.9583 15.0872 17.4321 14.8144 17.7439Z'} fill={'white'}/>
-										</svg>
-										<h3 as={'h3'} className={'text-lg font-medium text-white'}>
-											{'Select from vault'}
-										</h3>
-										<div />
-									</div>
-									<div className={'py-0.5'}>
-										<div className={'w-full rounded-md bg-blue-900 text-lg p-4 relative'}>
-											<input
-												type={'text'}
-												name={'vaultName_or_address'}
-												id={'vaultName_or_address'}
-												value={filter}
-												onChange={(e) => set_filter(e.target.value)}
-												placeholder={'Filter or address'}
-												style={{backgroundColor: 'transparent', opacity: 1}}
-												className={'whitePlaceholder block w-full text-white'} />
-											<div className={'absolute right-4 top-0 bottom-0 flex items-center'}>
-												<svg width={'24'} height={'24'} viewBox={'0 0 24 24'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
-													<path fillRule={'evenodd'} clipRule={'evenodd'} d={'M10 1C5.02972 1 1 5.02972 1 10C1 14.9703 5.02972 19 10 19C12.1249 19 14.0779 18.2635 15.6176 17.0318L21.2929 22.7071C21.6834 23.0976 22.3166 23.0976 22.7071 22.7071C23.0976 22.3166 23.0976 21.6834 22.7071 21.2929L17.0318 15.6176C18.2635 14.0779 19 12.1249 19 10C19 5.02972 14.9703 1 10 1ZM3 10C3 6.13428 6.13428 3 10 3C13.8657 3 17 6.13428 17 10C17 13.8657 13.8657 17 10 17C6.13428 17 3 13.8657 3 10Z'} fill={'white'}/>
-												</svg>
-											</div>
+
+			<Transition
+				show={open}
+				as={Fragment}
+				appear={true}
+				unmount={false}
+				enter={'ease-out duration-200'}
+				enterFrom={'opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'}
+				enterTo={'opacity-100 translate-y-0 sm:scale-100'}
+				leave={'ease-in duration-200'}
+				leaveFrom={'opacity-100 translate-y-0 sm:scale-100'}
+				leaveTo={'opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'}>
+				<div as={'div'} className={'absolute z-50 inset-0 overflow-hidden'}>
+					<div className={'flex w-full h-full bg-white p-4 rounded-lg overflow-hidden z-10'}>
+						<div className={'inline-block bg-blue-400 rounded-lg w-full f-full z-20'}>
+							<div className={'px-6 py-7 relative h-full overflow-hidden'}>
+								<div className={'flex flex-row items-center justify-between w-full mb-6'}>
+									<svg className={'cursor-pointer'} onClick={() => set_open(false)} width={'24'} height={'24'} viewBox={'0 0 24 24'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
+										<path fillRule={'evenodd'} clipRule={'evenodd'} d={'M14.8144 17.7439C14.5417 18.0556 14.0678 18.0872 13.7561 17.8144L7.75612 12.5644C7.59336 12.422 7.5 12.2163 7.5 12C7.5 11.7837 7.59336 11.578 7.75612 11.4356L13.7561 6.18558C14.0678 5.91282 14.5417 5.9444 14.8144 6.25613C15.0872 6.56786 15.0556 7.04168 14.7439 7.31444L9.38894 12L14.7439 16.6856C15.0556 16.9583 15.0872 17.4321 14.8144 17.7439Z'} fill={'white'}/>
+									</svg>
+									<h3 as={'h3'} className={'text-lg font-medium text-white'}>
+										{'Select from vault'}
+									</h3>
+									<div />
+								</div>
+								<div className={'py-0.5'}>
+									<div className={'w-full rounded-md bg-blue-900 text-lg p-4 relative'}>
+										<input
+											type={'text'}
+											name={'vaultName_or_address'}
+											id={'vaultName_or_address'}
+											value={filter}
+											onChange={(e) => set_filter(e.target.value)}
+											placeholder={'Filter or address'}
+											style={{backgroundColor: 'transparent', opacity: 1}}
+											className={'whitePlaceholder block w-full text-white'} />
+										<div className={'absolute right-4 top-0 bottom-0 flex items-center'}>
+											<svg width={'24'} height={'24'} viewBox={'0 0 24 24'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
+												<path fillRule={'evenodd'} clipRule={'evenodd'} d={'M10 1C5.02972 1 1 5.02972 1 10C1 14.9703 5.02972 19 10 19C12.1249 19 14.0779 18.2635 15.6176 17.0318L21.2929 22.7071C21.6834 23.0976 22.3166 23.0976 22.7071 22.7071C23.0976 22.3166 23.0976 21.6834 22.7071 21.2929L17.0318 15.6176C18.2635 14.0779 19 12.1249 19 10C19 5.02972 14.9703 1 10 1ZM3 10C3 6.13428 6.13428 3 10 3C13.8657 3 17 6.13428 17 10C17 13.8657 13.8657 17 10 17C6.13428 17 3 13.8657 3 10Z'} fill={'white'}/>
+											</svg>
 										</div>
 									</div>
-									<div className={'mt-6 h-full overflow-hidden'}>
-										<div className={'list h-full'}>
-											<List
-												width={600}
-												height={384}
-												className={'focus:outline-none'}
-												rowHeight={56}
-												rowRenderer={({index, key, style}) => {
-													return (
-														<div
-															onClick={() => {
-																set_value(filteredVaultList[index]);
-																set_open(false);
-															}}
-															key={key}
-															style={style}
-															className={'flex flex-row hover:bg-white hover:bg-opacity-20 cursor-pointer items-center rounded-lg p-2 focus:outline-none'}>
+								</div>
+								<div className={'mt-6 h-full overflow-hidden'}>
+									<div className={'list h-full'}>
+										<List
+											width={600}
+											height={384}
+											className={'focus:outline-none'}
+											rowHeight={56}
+											rowRenderer={({index, key, style}) => {
+												return (
+													<div
+														onClick={() => {
+															set_value(filteredVaultList[index]);
+															set_open(false);
+														}}
+														key={key}
+														style={style}
+														className={'flex flex-row justify-between hover:bg-white hover:bg-opacity-20 cursor-pointer items-center rounded-lg p-2 pr-4 focus:outline-none'}>
+														<div className={'flex flex-row items-center'}>
 															<Image
 																src={filteredVaultList[index]?.icon || ''}
 																alt={filteredVaultList[index]?.displayName || filteredVaultList[index]?.name}
@@ -121,17 +128,21 @@ function ModalVaultList({vaults, value, set_value}) {
 																{filteredVaultList[index]?.symbol}
 															</span>
 														</div>
-													);
-												}}
-												rowCount={filteredVaultList.length} />
-										</div>
+														<span className={'text-white text-ybase font-bold'}>
+															{ethers.utils.formatUnits(balancesOf[filteredVaultList[index].address]?.toString() || '0', filteredVaultList[index].decimals)}
+														</span>
+													</div>
+												);
+											}}
+											rowCount={filteredVaultList.length} />
 									</div>
 								</div>
 							</div>
-						</Transition.Child>
+						</div>
 					</div>
 				</div>
-			</Transition.Root>
+			</Transition>
+				
 		</div>
 	);
 }
