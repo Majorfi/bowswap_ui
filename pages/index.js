@@ -9,6 +9,7 @@ import	React, {useState, useEffect, useCallback}	from	'react';
 import	{ethers}									from	'ethers';
 import	{CheckIcon, XIcon}							from	'@heroicons/react/solid';
 import	useWeb3										from	'contexts/useWeb3';
+import	useAccount										from	'contexts/useAccount';
 import	useDebounce									from	'hook/useDebounce';
 import	{approveToken, swapTokens}					from	'utils/actions';
 import	InputToken									from	'components/InputToken';
@@ -184,17 +185,16 @@ function	SectionAction({fromVault, toVault, fromAmount, expectedReceiveAmount, s
 }
 
 function	Index() {
-	const	{address, provider} = useWeb3();
+	const	{provider} = useWeb3();
+	const	{balancesOf, updateBalanceOf} = useAccount();
 
 	const	[fromVault, set_fromVault] = useState(USD_VAULTS[0]);
 	const	[fromCounterValue, set_fromCounterValue] = useState(0);
 	const	[fromAmount, set_fromAmount] = useState('');
-	const	[fromBalanceOf, set_fromBalanceOf] = useState('0');
 
 	const	[toVaultsList, set_toVaultsList] = useState(USD_VAULTS.slice(1));
 	const	[toVault, set_toVault] = useState(USD_VAULTS[1]);
 	const	[toCounterValue, set_toCounterValue] = useState(0);
-	const	[toBalanceOf, set_toBalanceOf] = useState('0');
 	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('');
 
 	const	[slippage, set_slippage] = useState(0.10);
@@ -233,22 +233,6 @@ function	Index() {
 		}
 	}, [fromVault, provider, toVault]);
 
-	const	fetchCRVFromBalance = useCallback(async () => {
-		if (!provider)
-			return;
-		const	fromToken = new ethers.Contract(fromVault.address, ['function balanceOf(address) public view returns (uint256)'], provider);
-		const	_balanceOf = await fromToken.balanceOf(address);
-		set_fromBalanceOf(_balanceOf);
-	}, [address, fromVault.address, provider]);
-
-	const	fetchCRVToBalance = useCallback(async () => {
-		if (!provider)
-			return;
-		const	toToken = new ethers.Contract(toVault.address, ['function balanceOf(address) public view returns (uint256)'], provider);
-		const	_balanceOf = await toToken.balanceOf(address);
-		set_toBalanceOf(_balanceOf);
-	}, [address, toVault.address, provider]);
-
 	const	fetchEstimateOut = useCallback(async (from, to, amount) => {
 		const	fromToken = new ethers.Contract(process.env.METAPOOL_SWAPPER_ADDRESS, ['function estimate_out(address from, address to, uint256 amount) public view returns (uint256)'], provider);
 		const	estimate_out = await fromToken.estimate_out(from, to, amount);
@@ -274,8 +258,6 @@ function	Index() {
 
 
 	useEffect(() => fetchCRVVirtualPrice(), [fetchCRVVirtualPrice]);
-	useEffect(() => fetchCRVFromBalance(), [fetchCRVFromBalance]);
-	useEffect(() => fetchCRVToBalance(), [fetchCRVToBalance]);
 
 	useEffect(() => {
 		if (debouncedFetchExpectedAmount) {
@@ -301,12 +283,12 @@ function	Index() {
 							fromAmount={fromAmount}
 							set_fromAmount={set_fromAmount}
 							fromCounterValue={fromCounterValue}
-							balanceOf={fromBalanceOf}
+							balanceOf={balancesOf[fromVault.address]?.toString() || '0'}
 							slippage={slippage}
 							set_slippage={set_slippage} />
 
 						<div className={'flex w-full justify-center pt-4'}>
-							{Number(fromAmount) > Number(ethers.utils.formatUnits(fromBalanceOf, fromVault.decimals)) ?
+							{Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals)) ?
 								<div className={'w-full bg-error text-yerror font-medium text-white rounded-lg h-16 flex justify-center items-center'}>
 									<svg className={'mr-4'} width={'28'} height={'24'} viewBox={'0 0 28 24'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
 										<path d={'M27.5616 18.9767L17.0397 1.67442C16.4551 0.669767 15.286 0 14 0C12.714 0 11.5449 0.669767 10.9603 1.67442L0.438413 18.9767C-0.146138 19.9814 -0.146138 21.3209 0.438413 22.3256C1.13987 23.3302 2.19207 24 3.47808 24H24.5219C25.8079 24 26.977 23.3302 27.5616 22.3256C28.1461 21.2093 28.1461 19.9814 27.5616 18.9767ZM25.5741 21.2093C25.4572 21.4326 25.2234 21.7674 24.5219 21.7674H3.47808C2.89353 21.7674 2.5428 21.3209 2.42589 21.2093C2.30898 21.0977 2.07516 20.5395 2.42589 20.093L12.9478 2.7907C13.2985 2.23256 13.7662 2.23256 14 2.23256C14.2338 2.23256 14.7015 2.23256 15.0522 2.7907L25.5741 20.093C25.8079 20.5395 25.5741 20.986 25.5741 21.2093Z'} fill={'white'}/>
@@ -330,18 +312,19 @@ function	Index() {
 							expectedReceiveAmount={expectedReceiveAmount}
 							toCounterValue={toCounterValue}
 							slippage={slippage}
-							balanceOf={toBalanceOf}
+							balanceOf={balancesOf[toVault.address]?.toString() || '0'}
 							isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount} />
 
 						<SectionAction
-							disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(fromBalanceOf, fromVault.decimals))}
+							disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals))}
 							fromVault={fromVault}
 							toVault={toVault}
 							fromAmount={fromAmount}
 							expectedReceiveAmount={expectedReceiveAmount}
 							slippage={slippage}
 							onSuccess={() => {
-								fetchCRVFromBalance();
+								updateBalanceOf(fromVault.address);
+								updateBalanceOf(toVault.address);
 								set_fromAmount('0');
 							}}
 						/>

@@ -31,3 +31,9 @@ export function truncateAddress(address) {
 	}
 	return '0x000...0000';
 }
+
+export async function asyncForEach(array, callback) {
+	for (let index = 0; index < array.length; index++) {
+		await callback(array[index], index, array);
+	}
+}

@@ -11,6 +11,7 @@ import	{Toaster}						from	'react-hot-toast';
 import	{Web3ReactProvider}				from	'@web3-react/core';
 import	{ethers}						from	'ethers';
 import	{Web3ContextApp}				from	'contexts/useWeb3';
+import	{AccountContextApp}				from	'contexts/useAccount';
 import	Navbar							from	'components/Navbar';
 
 import	'style/Default.css';
@@ -59,11 +60,13 @@ function	MyApp(props) {
 	return (
 		<Web3ReactProvider getLibrary={getLibrary}>
 			<Web3ContextApp>
-				<AppWrapper
-					Component={Component}
-					pageProps={pageProps}
-					element={props.element}
-					router={props.router} />
+				<AccountContextApp>
+					<AppWrapper
+						Component={Component}
+						pageProps={pageProps}
+						element={props.element}
+						router={props.router} />
+				</AccountContextApp>
 			</Web3ContextApp>
 		</Web3ReactProvider>
 	);
