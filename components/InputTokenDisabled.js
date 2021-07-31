@@ -59,11 +59,11 @@ function	InputTokenDisabled({value, toCounterValue, slippage, isFetchingExpected
 			</div>
 			<div className={'h-4'}>
 				<div className={`flex w-full justify-between items-center ${isFetchingExpectedReceiveAmount ? 'hidden' : ''}`}>
-					<div className={'items-center text-ybase font-medium text-ygray-500'}>
+					<div className={'items-center text-ybase text-ygray-500'}>
 						<span>{`≃ $${(toCounterValue * Number(value)).toFixed(2)}`}</span>
 					</div>
-					<div className={'items-center text-xxs font-medium text-ygray-500'}>
-						<span>{`≥ ${(Number(value) - ((Number(value) * slippage / 100))).toFixed(6)} with slippage`}</span>
+					<div className={'items-center text-ybase text-ygray-500'}>
+						<span>{`Slippage: ≥ ${(Number(value) - ((Number(value) * slippage / 100))).toFixed(6)}`}</span>
 					</div>
 				</div>
 			</div>

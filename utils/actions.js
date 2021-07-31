@@ -6,7 +6,6 @@
 ******************************************************************************/
 
 import	{ethers}						from	'ethers';
-import	toast							from	'react-hot-toast';
 
 export async function	approveToken({provider, contractAddress, amount, from}, callback) {
 	const	signer = provider.getSigner();
@@ -23,7 +22,6 @@ export async function	approveToken({provider, contractAddress, amount, from}, ca
 	try {
 		await erc20.callStatic.approve(from, amount);
 	} catch (error) {
-		toast.error(error?.data?.message || error?.message);
 		callback({error: true, data: undefined});
 		return;
 	}
@@ -35,14 +33,11 @@ export async function	approveToken({provider, contractAddress, amount, from}, ca
 		const	transaction = await erc20.approve(from, amount);
 		const	transactionResult = await transaction.wait();
 		if (transactionResult.status === 1) {
-			toast.success('Transaction approve executed');
 			callback({error: false, data: amount});
 		} else {
-			toast.error('Transaction mined but not successful');
 			callback({error: true, data: undefined});
 		}
 	} catch (error) {
-		toast.error(error?.data?.message || error?.message);
 		callback({error: true, data: undefined});
 	}
 }
@@ -62,14 +57,11 @@ export async function	swapTokens({provider, contractAddress, from, to, amount, m
 		const	transaction = await contract.swap(from, to, amount, minAmountOut);
 		const	transactionResult = await transaction.wait();
 		if (transactionResult.status === 1) {
-			toast.success('Transaction swap executed');
 			callback({error: false, data: amount});
 		} else {
-			toast.error('Transaction mined but not successful');
 			callback({error: true, data: undefined});
 		}
 	} catch (error) {
-		toast.error(error?.data?.message || error?.message);
 		callback({error: true, data: undefined});
 	}
 }

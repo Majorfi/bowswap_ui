@@ -7,14 +7,18 @@
 
 import	React, {useState, useEffect, useCallback}	from	'react';
 import	{ethers}									from	'ethers';
-import	{CheckIcon, XIcon}							from	'@heroicons/react/solid';
 import	useWeb3										from	'contexts/useWeb3';
-import	useAccount										from	'contexts/useAccount';
+import	useAccount									from	'contexts/useAccount';
 import	useDebounce									from	'hook/useDebounce';
 import	{approveToken, swapTokens}					from	'utils/actions';
 import	InputToken									from	'components/InputToken';
 import	InputTokenDisabled							from	'components/InputTokenDisabled';
 import	ModalVaultList								from	'components/ModalVaultList';
+import	ModalStatus									from	'components/ModalStatus';
+import	BlockStatus									from	'components/BlockStatus';
+import	Success										from	'components/Icons/Success';
+import	Error										from	'components/Icons/Error';
+import	Pending										from	'components/Icons/Pending';
 import	{USD_VAULTS, BTC_VAULTS, fetchCryptoPrice}	from	'utils/API';
 import	{bigNumber}									from	'utils';
 
@@ -69,124 +73,112 @@ function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, to
 	);
 }
 
-function	SectionAction({fromVault, toVault, fromAmount, expectedReceiveAmount, slippage, onSuccess, disabled}) {
+function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slippage, approved, disabled, onCallback}) {
 	const	{provider} = useWeb3();
-	const	[txStep, set_txStep] = useState('Approve');
-	const	[txApproveStatus, set_txApproveStatus] = useState({none: true, pending: false, success: false, error: false});
-	const	[txSwapStatus, set_txSwapStatus] = useState({none: true, pending: false, success: false, error: false});
-
-	useEffect(() => {
-		if (txApproveStatus.error) {
-			setTimeout(() => set_txApproveStatus({none: true, pending: false, success: false, error: false}), 2000);
-		}
-	}, [txApproveStatus]);
-
-	useEffect(() => {
-		if (txSwapStatus.error) {
-			setTimeout(() => set_txSwapStatus({none: true, pending: false, success: false, error: false}), 2000);
-		}
-	}, [txSwapStatus]);
+	const	[transactionProcessing, set_transactionProcessing] = useState(false);
 
 	function	performSwap() {
-		if (disabled) {
+		if (disabled || transactionProcessing || !approved) {
 			return;
 		}
-		set_txSwapStatus({none: false, pending: true, success: false, error: false});
-		swapTokens({
-			provider: provider,
-			contractAddress: process.env.METAPOOL_SWAPPER_ADDRESS,
-			from: fromVault.address,
-			to: toVault.address,
-			amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-			minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toString(), fromVault.decimals)
-		}, ({error}) => {
-			if (error) {
-				return set_txSwapStatus({none: false, pending: false, success: false, error: true});
-			}
-			set_txSwapStatus({none: false, pending: false, success: true, error: false});
-			setTimeout(() => set_txSwapStatus({none: true, pending: false, success: false, error: false}), 1500);
-			onSuccess();
-		});
-	}
-
-	function	performApprove() {
-		if (disabled) {
-			return;
+		set_transactionProcessing(false);
+		onCallback('pending');
+		try {
+			swapTokens({
+				provider: provider,
+				contractAddress: process.env.METAPOOL_SWAPPER_ADDRESS,
+				from: fromVault.address,
+				to: toVault.address,
+				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
+				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toString(), fromVault.decimals)
+			}, ({error}) => {
+				if (error) {
+					set_transactionProcessing(false);
+					return onCallback('error');
+				}
+				set_transactionProcessing(false);
+				onCallback('success');
+			});
+		} catch (error) {
+			set_transactionProcessing(false);
+			return onCallback('error');
 		}
-		set_txApproveStatus({none: false, pending: true, success: false, error: false});
-		approveToken({
-			provider: provider,
-			contractAddress: fromVault.address,
-			amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-			from: process.env.METAPOOL_SWAPPER_ADDRESS
-		}, ({error, data}) => {
-			if (error) {
-				return set_txApproveStatus({none: false, pending: false, success: false, error: true});
-			}
-			set_txStep('Swap');
-			set_txApproveStatus({none: false, pending: false, success: true, error: false});
-			performSwap(data);
-		});
 	}
 
 	return (
-		<div className={'flex flex-row justify-center pt-8 w-full space-x-4'}>
-			<button
-				onClick={performApprove}
-				className={`w-full h-11 flex items-center justify-center space-x-2 px-6 py-3 text-ybase font-medium rounded-lg focus:outline-none overflow-hidden transition-colors border ${
-					disabled ? 'text-ygray-400 bg-white border-ygray-400 cursor-not-allowed' :
-						txApproveStatus.pending ? 'text-gray-500 bg-gray-100 border-gray-100 cursor-not-allowed' :
-							txApproveStatus.success ? 'bg-white border-blue-400 text-blue-400 cursor-not-allowed' :
-								txApproveStatus.error ? 'bg-red-500 border-red-500 text-white cursor-not-allowed' :
-									'bg-blue-400 border-blue-400 hover:bg-blue-500 hover:border-blue-500 text-white cursor-pointer'
-				}`}>
-				{txApproveStatus.none === true ? <span>{'Approve'}</span> : null}
-				{txApproveStatus.pending === true ? (
-					<svg className={'animate-spin h-5 w-5'} xmlns={'http://www.w3.org/2000/svg'} fill={'none'} viewBox={'0 0 24 24'}>
-						<circle className={'opacity-25'} cx={'12'} cy={'12'} r={'10'} stroke={'currentColor'} strokeWidth={'4'}></circle>
-						<path className={'opacity-75'} fill={'currentColor'} d={'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'}></path>
-					</svg>
-				) : null}
-				{txApproveStatus.success === true ?
-					<div className={'flex flex-row items-center justify-center'}>
-						<span>{'Approved'}</span>
-						<svg className={'ml-2'} width={'16'} height={'16'} viewBox={'0 0 16 16'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
-							<path fillRule={'evenodd'} clipRule={'evenodd'} d={'M13.7602 3.48787C14.043 3.72358 14.0813 4.14396 13.8456 4.42681L7.17889 12.4268C6.96078 12.6885 6.58042 12.7437 6.29694 12.5547L2.29694 9.88805C1.99058 9.68382 1.9078 9.2699 2.11204 8.96355C2.31627 8.6572 2.73019 8.57442 3.03654 8.77865L6.53809 11.113L12.8213 3.57323C13.057 3.29038 13.4773 3.25216 13.7602 3.48787Z'} fill={'#00A3FF'}/>
-						</svg>
-					</div>
-					: null}
-				{txApproveStatus.error === true ? <XIcon className={'w-5 h-5'} /> : null}
-			</button>
-
-			<button
-				onClick={performSwap}
-				className={`w-full h-11 flex items-center justify-center space-x-2 px-6 py-3 text-ybase font-medium rounded-lg focus:outline-none overflow-hidden transition-colors border ${
-					disabled ? 'text-ygray-400 bg-white border-ygray-400 cursor-not-allowed' :
-						txStep === 'Approve' ? 'text-gray-500 bg-white border-gray-100 cursor-not-allowed' :
-							txSwapStatus.pending ? 'text-gray-500 bg-gray-100 border-gray-100 cursor-not-allowed' :
-								txSwapStatus.success ? 'bg-green-500 border-green-500 text-white cursor-not-allowed' :
-									txSwapStatus.error ? 'bg-red-500 border-red-500 text-white cursor-not-allowed' :
-										'bg-blue-400 border-blue-400 hover:bg-blue-500 hover:border-blue-500 text-white cursor-pointer'
-				}`}>
-				{txSwapStatus.none === true ? (
-					<span>{'Swap'}</span>
-				) : null}
-				{txSwapStatus.pending === true ? (
-					<svg className={'animate-spin h-5 w-5'} xmlns={'http://www.w3.org/2000/svg'} fill={'none'} viewBox={'0 0 24 24'}>
-						<circle className={'opacity-25'} cx={'12'} cy={'12'} r={'10'} stroke={'currentColor'} strokeWidth={'4'}></circle>
-						<path className={'opacity-75'} fill={'currentColor'} d={'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'}></path>
-					</svg>
-				) : null}
-				{txSwapStatus.success === true ? <CheckIcon className={'w-5 h-5'} /> : null}
-				{txSwapStatus.error === true ? <XIcon className={'w-5 h-5'} /> : null}
-			</button>
-		</div>
+		<button
+			onClick={performSwap}
+			className={`w-full h-11 flex items-center justify-center space-x-2 px-6 py-3 text-ybase font-medium rounded-lg focus:outline-none overflow-hidden transition-colors border ${
+				disabled || transactionProcessing || !approved ? 'text-ygray-400 bg-white border-ygray-400 cursor-not-allowed' :
+					'bg-blue-400 border-blue-400 hover:bg-blue-300 hover:border-blue-300 text-white cursor-pointer'
+			}`}>
+			<span>{'Swap'}</span>
+		</button>
 	);
 }
+
+function	ButtonApprove({fromVault, fromAmount, approved, disabled, onCallback}) {
+	const	{provider} = useWeb3();
+	const	[transactionProcessing, set_transactionProcessing] = useState(false);
+
+	function	performApprove() {
+		if (disabled || transactionProcessing) {
+			return;
+		}
+		set_transactionProcessing(true);
+		onCallback('pending');
+		try {
+			approveToken({
+				provider: provider,
+				contractAddress: fromVault.address,
+				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
+				from: process.env.METAPOOL_SWAPPER_ADDRESS
+			}, ({error}) => {
+				if (error) {
+					set_transactionProcessing(false);
+					return onCallback('error');
+				}
+				set_transactionProcessing(false);
+				onCallback('success');
+			});	
+		} catch (error) {
+			set_transactionProcessing(false);
+			onCallback('error');
+		}
+	}
+
+	if (approved) {
+		return (
+			<button
+				className={'w-full h-11 flex items-center justify-center space-x-2 px-6 py-3 text-ybase font-medium rounded-lg focus:outline-none overflow-hidden transition-colors border bg-white border-blue-400 text-blue-400 cursor-not-allowed'}>
+				<div className={'flex flex-row items-center justify-center'}>
+					<span>{'Approved'}</span>
+					<svg className={'ml-2'} width={'16'} height={'16'} viewBox={'0 0 16 16'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
+						<path fillRule={'evenodd'} clipRule={'evenodd'} d={'M13.7602 3.48787C14.043 3.72358 14.0813 4.14396 13.8456 4.42681L7.17889 12.4268C6.96078 12.6885 6.58042 12.7437 6.29694 12.5547L2.29694 9.88805C1.99058 9.68382 1.9078 9.2699 2.11204 8.96355C2.31627 8.6572 2.73019 8.57442 3.03654 8.77865L6.53809 11.113L12.8213 3.57323C13.057 3.29038 13.4773 3.25216 13.7602 3.48787Z'} fill={'#00A3FF'}/>
+					</svg>
+				</div>
+			</button>
+		);
+	}
+
+	return (
+		<button
+			onClick={performApprove}
+			className={`w-full h-11 flex items-center justify-center space-x-2 px-6 py-3 text-ybase font-medium rounded-lg focus:outline-none overflow-hidden transition-colors border ${
+				disabled || transactionProcessing || (!fromAmount || Number(fromAmount) === 0) ? 'text-ygray-400 bg-white border-ygray-400 cursor-not-allowed' :
+					'bg-blue-400 border-blue-400 hover:bg-blue-300 hover:border-blue-300 text-white cursor-pointer'
+			}`}>
+			<span>{'Approve'}</span>
+		</button>
+	);
+}
+
 
 function	Index() {
 	const	{provider} = useWeb3();
 	const	{balancesOf, updateBalanceOf} = useAccount();
+	const	[modalStatusOpen, set_modalStatusOpen] = useState(false);
+
 
 	const	[fromVault, set_fromVault] = useState(USD_VAULTS[0]);
 	const	[fromCounterValue, set_fromCounterValue] = useState(0);
@@ -201,6 +193,10 @@ function	Index() {
 	const	[isFetchingExpectedReceiveAmount, set_isFetchingExpectedReceiveAmount] = useState(false);
 
 	const	debouncedFetchExpectedAmount = useDebounce(fromAmount, 500);
+
+	const	[txApproveStatus, set_txApproveStatus] = useState({none: true, pending: false, success: false, error: false});
+	const	[txSwapStatus, set_txSwapStatus] = useState({none: true, pending: false, success: false, error: false});
+
 
 	const	fetchCRVVirtualPrice = useCallback(async () => {
 		if (!provider)
@@ -256,7 +252,6 @@ function	Index() {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [fromVault.address]);
 
-
 	useEffect(() => fetchCRVVirtualPrice(), [fetchCRVVirtualPrice]);
 
 	useEffect(() => {
@@ -270,6 +265,24 @@ function	Index() {
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [debouncedFetchExpectedAmount, fromVault.address, toVault.address, fromVault.decimals]);
+
+
+	function	renderMiddlePart() {
+		const	getArgs = () => {
+			if (txApproveStatus.pending || txSwapStatus.pending)
+				return {open: true, title: 'PENDING...', color: 'bg-pending', icon: <Pending width={24} height={24} className={'mr-4'} />};
+			if (txApproveStatus.success && !txApproveStatus.hide)
+				return {open: true, title: 'APPROVE COMPLETED', color: 'bg-success', icon: <Success width={24} height={24} className={'mr-4'} />};
+			if (txApproveStatus.error)
+				return {open: true, title: 'APPROVE TRANSACTION FAILURE', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
+			if (Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals)))
+				return {open: true, title: 'EXCEEDED BALANCE LIMIT !', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
+			return {open: false, title: '', color: 'bg-blue-400', icon: <div/>};
+		};
+		return (
+			<BlockStatus {...getArgs()} />
+		);
+	}
 
 	return (
 		<section className={'mt-12 pt-16 w-full md:px-12 px-4 space-y-12 mb-64 z-10 relative'}>
@@ -288,21 +301,7 @@ function	Index() {
 							set_slippage={set_slippage} />
 
 						<div className={'flex w-full justify-center pt-4'}>
-							{Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals)) ?
-								<div className={'w-full bg-error text-yerror font-medium text-white rounded-lg h-16 flex justify-center items-center'}>
-									<svg className={'mr-4'} width={'28'} height={'24'} viewBox={'0 0 28 24'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
-										<path d={'M27.5616 18.9767L17.0397 1.67442C16.4551 0.669767 15.286 0 14 0C12.714 0 11.5449 0.669767 10.9603 1.67442L0.438413 18.9767C-0.146138 19.9814 -0.146138 21.3209 0.438413 22.3256C1.13987 23.3302 2.19207 24 3.47808 24H24.5219C25.8079 24 26.977 23.3302 27.5616 22.3256C28.1461 21.2093 28.1461 19.9814 27.5616 18.9767ZM25.5741 21.2093C25.4572 21.4326 25.2234 21.7674 24.5219 21.7674H3.47808C2.89353 21.7674 2.5428 21.3209 2.42589 21.2093C2.30898 21.0977 2.07516 20.5395 2.42589 20.093L12.9478 2.7907C13.2985 2.23256 13.7662 2.23256 14 2.23256C14.2338 2.23256 14.7015 2.23256 15.0522 2.7907L25.5741 20.093C25.8079 20.5395 25.5741 20.986 25.5741 21.2093Z'} fill={'white'}/>
-										<path d={'M14.0001 6.13953C13.2986 6.13953 12.831 6.58605 12.831 7.25581V13.9535C12.831 14.6233 13.2986 15.0698 14.0001 15.0698C14.7015 15.0698 15.1692 14.6233 15.1692 13.9535V7.25581C15.1692 6.58605 14.7015 6.13953 14.0001 6.13953Z'} fill={'white'}/>
-										<path d={'M14.0001 19.5349C14.6457 19.5349 15.1692 19.0351 15.1692 18.4186C15.1692 17.8021 14.6457 17.3023 14.0001 17.3023C13.3544 17.3023 12.831 17.8021 12.831 18.4186C12.831 19.0351 13.3544 19.5349 14.0001 19.5349Z'} fill={'white'}/>
-									</svg>
-									{'EXCEEDED BALANCE LIMIT !'}
-								</div> :
-								<div className={'w-full h-16 flex justify-center items-center'}>
-									<svg width={'30'} height={'50'} viewBox={'0 0 30 50'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
-										<path d={'M13.5858 49.4142C14.3668 50.1953 15.6332 50.1953 16.4142 49.4142L29.1421 36.6863C29.9232 35.9052 29.9232 34.6389 29.1421 33.8579C28.3611 33.0768 27.0948 33.0768 26.3137 33.8579L15 45.1716L3.68629 33.8579C2.90524 33.0768 1.63891 33.0768 0.857864 33.8579C0.0768147 34.6389 0.0768146 35.9052 0.857863 36.6863L13.5858 49.4142ZM13 26L13 48L17 48L17 26L13 26Z'} fill={'#888888'}/><circle cx={'15'} cy={'26'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'26'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'26'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'26'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'14'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'14'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'14'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'14'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'2'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'2'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'2'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'2'} r={'2'} fill={'#888888'}/>
-									</svg>
-								</div>
-							}
+							{renderMiddlePart()}
 						</div>
 
 						<SectionToVault
@@ -315,19 +314,46 @@ function	Index() {
 							balanceOf={balancesOf[toVault.address]?.toString() || '0'}
 							isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount} />
 
-						<SectionAction
-							disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals))}
-							fromVault={fromVault}
-							toVault={toVault}
-							fromAmount={fromAmount}
-							expectedReceiveAmount={expectedReceiveAmount}
-							slippage={slippage}
-							onSuccess={() => {
-								updateBalanceOf(fromVault.address);
-								updateBalanceOf(toVault.address);
-								set_fromAmount('0');
-							}}
-						/>
+						<div className={'flex flex-row justify-center pt-8 w-full space-x-4'}>
+							<ButtonApprove
+								disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals))}
+								approved={txApproveStatus.success}
+								fromVault={fromVault}
+								fromAmount={fromAmount}
+								onCallback={(type) => {
+									set_txApproveStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success'});
+									if (type === 'error') {
+										setTimeout(() => set_txApproveStatus((s) => s.error ? {none: true, pending: false, error: false, success: false} : s), 2500);
+									}
+									if (type === 'success') {
+										setTimeout(() => set_txApproveStatus({none: false, pending: false, error: false, success: true, hide: true}), 2500);
+									}
+								}} />
+							<ButtonSwap
+								disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals))}
+								approved={txApproveStatus.success}
+								fromVault={fromVault}
+								toVault={toVault}
+								fromAmount={fromAmount}
+								expectedReceiveAmount={expectedReceiveAmount}
+								slippage={slippage}
+								onCallback={(type) => {
+									set_txSwapStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success'});
+									set_modalStatusOpen(true);
+									if (type === 'success') {
+										updateBalanceOf();
+										set_fromAmount('0');
+									}
+								}}
+							/>
+						</div>
+
+						<ModalStatus
+							open={modalStatusOpen}
+							set_open={set_modalStatusOpen}
+							title={txSwapStatus.success ? 'Transaction completed' : txSwapStatus.error ? 'Transaction failed' : 'Processing transaction ...'}
+							icon={txSwapStatus.success ? <Success /> : txSwapStatus.error ? <Error /> : <Pending />}
+							color={txSwapStatus.success ? 'bg-success' : txSwapStatus.error ? 'bg-error' : 'bg-pending'} />
 					</div>
 				</div>
 			</div>

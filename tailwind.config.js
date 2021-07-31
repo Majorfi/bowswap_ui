@@ -18,13 +18,16 @@ module.exports = {
 			white: colors.white,
 			sky: colors.sky,
 			error: '#FF005E',
+			pending: '#FFB800',
+			success: '#A5DF00',
 			blue: {
+				300: '#32B5FF',
 				400: '#00A3FF',
-				500: '#0092E5',
 				900: '#006AE3'
 			},
 			ygray: {
 				background: '#E5E5E5',
+				50: '#EDEDED',
 				100: '#F2F3F5',
 				400: '#BDBDBD',
 				500: '#A5A5A5',

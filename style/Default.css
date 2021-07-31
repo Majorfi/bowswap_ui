@@ -132,6 +132,16 @@ input[type=number] {
 	letter-spacing: 0em;
 }
 
+.text-ylarge {
+	font-family: Roboto;
+	font-size: 24px;
+	font-style: normal;
+	line-height: 32px;
+	letter-spacing: 0em;
+	text-align: center;
+}
+
+
 .text-yerror {
 	font-family: SF Pro Display;
 	font-size: 14px;
@@ -143,14 +153,6 @@ input[type=number] {
 
 *, ::before, ::after {
     --tw-ring-color: transparent !important;
-}
-
-.toast {
-    word-break: break-word;
-}
-.toast div:nth-of-type(2),
-.toast:nth-child(1) {
-	align-self: flex-start !important;
 }
 
 .variant-petit-caps {

@@ -56,7 +56,9 @@ function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decima
 						const	[dec, frac] = _value.split('.');
 						if (frac) _value = `${dec}.${frac.slice(0, 10)}`;
 
-						if (_value.length > 0 && _value[0] === '-') {
+						if (_value === '.') {
+							set_value('0.');
+						} else if (_value.length > 0 && _value[0] === '-') {
 							set_value('');
 						} else if (_value.length >= 2 && _value[0] === '0' && _value[1] !== '.') {
 							set_value(_value.slice(1) || '');
@@ -71,13 +73,13 @@ function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decima
 			</label>
 			<div className={'h-4'}>
 				<div className={'flex w-full justify-between items-center relative'}>
-					<div className={'items-center text-ybase font-medium text-ygray-500'}>
+					<div className={'items-center text-ybase text-ygray-500'}>
 						<span>{`≃ $${(fromCounterValue * Number(value)).toFixed(2)}`}</span>
 					</div>
 					<div className={'flex flex-row items-center'}>
 						<button
 							onClick={() => set_value(ethers.utils.formatUnits(balanceOf, decimals))}
-							className={'items-center text-xxs font-medium py-0.5 text-white bg-blue-400 hover:bg-blue-500 focus:outline-none px-3 rounded-lg transition-colors h-5'}>
+							className={'items-center text-xxs font-medium py-0.5 text-white bg-blue-400 hover:bg-blue-300 focus:outline-none px-3 rounded-lg transition-colors h-5'}>
 							<span>{'MAX'}</span>
 						</button>
 						<PopoverSlippage slippage={slippage} set_slippage={set_slippage}/>

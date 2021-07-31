@@ -6,7 +6,6 @@
 ******************************************************************************/
 
 import	axios			from	'axios';
-import	toast			from	'react-hot-toast';
 
 export const	performGet = (url) => {
 	return (
@@ -192,9 +191,5 @@ async function	_fetchYearnVaults() {
 }
 
 export async function	fetchYearnVaults() {
-	return await toast.promise(_fetchYearnVaults(), {
-		loading: 'Fetching Vaults',
-		success: 'Vaults fetched',
-		error: 'Impossible to retrieve the CRV vaults',
-	});
+	await _fetchYearnVaults();
 }

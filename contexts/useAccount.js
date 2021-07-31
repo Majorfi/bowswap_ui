@@ -46,12 +46,13 @@ export const AccountContextApp = ({children}) => {
 		}
 	}, [nonce]);
 
-	async function	updateBalanceOf(address) {
-		const	_balanceOf = await contractInstances[address]?.balanceOf(address);
-		set_balancesOf((b) => {
-			b[address] = _balanceOf;
-			return b;
-		});
+	async function	updateBalanceOf(/*address*/) {
+		set_nonce(n => n + 1);
+		// const	_balanceOf = await contractInstances[address]?.balanceOf(address);
+		// set_balancesOf((b) => {
+		// 	b[address] = _balanceOf;
+		// 	return b;
+		// });
 	}
 
 

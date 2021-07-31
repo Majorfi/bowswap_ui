@@ -7,7 +7,6 @@
 
 import	React							from	'react';
 import	Head							from	'next/head';
-import	{Toaster}						from	'react-hot-toast';
 import	{Web3ReactProvider}				from	'@web3-react/core';
 import	{ethers}						from	'ethers';
 import	{Web3ContextApp}				from	'contexts/useWeb3';
@@ -32,7 +31,7 @@ function	AppWrapper(props) {
 				<meta name={'theme-color'} content={'#ffffff'} />
 				<meta charSet={'utf-8'} />
 			</Head>
-			<main id={'app'} className={'flex w-full h-full relative min-h-screen bg-gray-100'}>
+			<main id={'app'} className={'flex w-full h-full relative min-h-screen'} style={{backgroundColor: '#E5E5E5'}}>
 				<Navbar />
 				<div className={'w-full h-full relative max-w-screen-lg mx-auto'}>
 					<Component
@@ -42,10 +41,6 @@ function	AppWrapper(props) {
 						{...pageProps} />
 				</div>
 			</main>
-			<Toaster
-				position={'top-right'}
-				containerClassName={'-mt-2'}
-				toastOptions={{className: 'text-sm border border-gray-200 max-h-24 overflow-scroll toast'}} />
 		</>
 	);
 }
