@@ -22,13 +22,13 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 		<section aria-label={'FROM_VAULT'}>
 			<label className={'font-medium text-sm text-gray-800'}>{'From Vault'}</label>
 			<div className={'flex flex-col md:flex-row items-start justify-center space-y-2 md:space-y-0 md:space-x-4 w-full'}>
-				<div className={'w-full md:w-2/6'}>
+				<div className={'w-full md:w-4/11'}>
 					<ModalVaultList
 						vaults={vaults}
 						value={fromVault}
 						set_value={set_fromVault} />
 				</div>
-				<div className={'w-full md:w-4/6'}>
+				<div className={'w-full md:w-7/11'}>
 					<InputToken
 						balanceOf={balanceOf}
 						decimals={fromVault.decimals}
@@ -39,18 +39,6 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 						set_slippage={set_slippage} />
 				</div>
 			</div>
-			<div className={'flex flex-row items-center justify-end w-full'}>
-				<label
-					onClick={() => set_fromAmount(ethers.utils.formatUnits(balanceOf, fromVault.decimals))}
-					className={'font-normal text-xs text-gray-600 hidden md:flex flex-row items-center pl-1 mt-1 mb-1 cursor-pointer'}>
-					{`Balance: ${Number(ethers.utils.formatUnits(balanceOf, fromVault.decimals))} ${fromVault.symbol}`}
-				</label>
-				<label
-					onClick={() => set_fromAmount(ethers.utils.formatUnits(balanceOf, fromVault.decimals))}
-					className={'font-normal text-xs text-gray-600 flex flex-row items-center pl-1 mt-1 mb-1 md:hidden cursor-pointer'}>
-					{`Balance: ${Number(ethers.utils.formatUnits(balanceOf, fromVault.decimals)).toFixed(8)} ${fromVault.symbol}`}
-				</label>
-			</div>
 		</section>
 	);
 }
@@ -60,33 +48,27 @@ function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, to
 		<section aria-label={'TO_VAULT'}>
 			<label className={'font-medium text-sm text-gray-800'}>{'To Vault'}</label>
 			<div className={'flex flex-col md:flex-row items-start justify-center space-y-2 md:space-y-0 md:space-x-4 w-full'}>
-				<div className={'w-full md:w-2/6'}>
+				<div className={'w-full md:w-4/11'}>
 					<ModalVaultList
 						vaults={vaults}
 						value={toVault}
 						set_value={set_toVault} />
 				</div>
-				<div className={'w-full md:w-4/6'}>
+				<div className={'w-full md:w-7/11'}>
 					<InputTokenDisabled
 						value={expectedReceiveAmount}
 						toCounterValue={toCounterValue}
 						slippage={slippage}
+						balanceOf={balanceOf}
+						decimals={toVault.decimals}
 						isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount} />
 				</div>
-			</div>
-			<div className={'flex flex-row items-center justify-end w-full'}>
-				<label className={'font-normal text-xs text-gray-600 hidden md:flex flex-row items-center pl-1 mt-1 mb-1'}>
-					{`Balance: ${Number(ethers.utils.formatUnits(balanceOf, toVault.decimals))} ${toVault.symbol}`}
-				</label>
-				<label className={'font-normal text-xs text-gray-600 flex flex-row items-center pl-1 mt-1 mb-1 md:hidden'}>
-					{`Balance: ${Number(ethers.utils.formatUnits(balanceOf, toVault.decimals)).toFixed(8)} ${toVault.symbol}`}
-				</label>
 			</div>
 		</section>
 	);
 }
 
-function	SectionAction({fromVault, toVault, fromAmount, expectedReceiveAmount, slippage, onSuccess}) {
+function	SectionAction({fromVault, toVault, fromAmount, expectedReceiveAmount, slippage, onSuccess, disabled}) {
 	const	{provider} = useWeb3();
 	const	[txStep, set_txStep] = useState('Approve');
 	const	[txApproveStatus, set_txApproveStatus] = useState({none: true, pending: false, success: false, error: false});
@@ -105,6 +87,9 @@ function	SectionAction({fromVault, toVault, fromAmount, expectedReceiveAmount, s
 	}, [txSwapStatus]);
 
 	function	performSwap() {
+		if (disabled) {
+			return;
+		}
 		set_txSwapStatus({none: false, pending: true, success: false, error: false});
 		swapTokens({
 			provider: provider,
@@ -124,6 +109,9 @@ function	SectionAction({fromVault, toVault, fromAmount, expectedReceiveAmount, s
 	}
 
 	function	performApprove() {
+		if (disabled) {
+			return;
+		}
 		set_txApproveStatus({none: false, pending: true, success: false, error: false});
 		approveToken({
 			provider: provider,
@@ -144,33 +132,40 @@ function	SectionAction({fromVault, toVault, fromAmount, expectedReceiveAmount, s
 		<div className={'flex flex-row justify-center pt-8 w-full space-x-4'}>
 			<button
 				onClick={performApprove}
-				className={`w-full h-11 flex items-center justify-center space-x-2 px-6 py-2 text-lg rounded-lg focus:outline-none overflow-hidden transition-colors border-2 ${
-					txApproveStatus.pending ? 'text-gray-500 bg-gray-100 border-gray-100 cursor-not-allowed' :
-						txApproveStatus.success ? 'bg-green-500 border-green-500 text-white cursor-not-allowed' :
-							txApproveStatus.error ? 'bg-red-500 border-red-500 text-white cursor-not-allowed' :
-								'bg-sky-400 border-sky-400 hover:bg-sky-500 hover:border-sky-500 text-white cursor-pointer'
+				className={`w-full h-11 flex items-center justify-center space-x-2 px-6 py-3 text-ybase font-medium rounded-lg focus:outline-none overflow-hidden transition-colors border ${
+					disabled ? 'text-ygray-400 bg-white border-ygray-400 cursor-not-allowed' :
+						txApproveStatus.pending ? 'text-gray-500 bg-gray-100 border-gray-100 cursor-not-allowed' :
+							txApproveStatus.success ? 'bg-white border-blue-400 text-blue-400 cursor-not-allowed' :
+								txApproveStatus.error ? 'bg-red-500 border-red-500 text-white cursor-not-allowed' :
+									'bg-blue-400 border-blue-400 hover:bg-blue-500 hover:border-blue-500 text-white cursor-pointer'
 				}`}>
-				{txApproveStatus.none === true ? (
-					<span>{'Approve'}</span>
-				) : null}
+				{txApproveStatus.none === true ? <span>{'Approve'}</span> : null}
 				{txApproveStatus.pending === true ? (
 					<svg className={'animate-spin h-5 w-5'} xmlns={'http://www.w3.org/2000/svg'} fill={'none'} viewBox={'0 0 24 24'}>
 						<circle className={'opacity-25'} cx={'12'} cy={'12'} r={'10'} stroke={'currentColor'} strokeWidth={'4'}></circle>
 						<path className={'opacity-75'} fill={'currentColor'} d={'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'}></path>
 					</svg>
 				) : null}
-				{txApproveStatus.success === true ? <CheckIcon className={'w-5 h-5'} /> : null}
+				{txApproveStatus.success === true ?
+					<div className={'flex flex-row items-center justify-center'}>
+						<span>{'Approved'}</span>
+						<svg className={'ml-2'} width={'16'} height={'16'} viewBox={'0 0 16 16'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
+							<path fillRule={'evenodd'} clipRule={'evenodd'} d={'M13.7602 3.48787C14.043 3.72358 14.0813 4.14396 13.8456 4.42681L7.17889 12.4268C6.96078 12.6885 6.58042 12.7437 6.29694 12.5547L2.29694 9.88805C1.99058 9.68382 1.9078 9.2699 2.11204 8.96355C2.31627 8.6572 2.73019 8.57442 3.03654 8.77865L6.53809 11.113L12.8213 3.57323C13.057 3.29038 13.4773 3.25216 13.7602 3.48787Z'} fill={'#00A3FF'}/>
+						</svg>
+					</div>
+					: null}
 				{txApproveStatus.error === true ? <XIcon className={'w-5 h-5'} /> : null}
 			</button>
 
 			<button
 				onClick={performSwap}
-				className={`w-full h-11 flex items-center justify-center space-x-2 px-6 py-2 text-lg rounded-lg focus:outline-none overflow-hidden transition-colors border-2 ${
-					txStep === 'Approve' ? 'text-gray-500 bg-white border-gray-100 cursor-not-allowed' :
-						txSwapStatus.pending ? 'text-gray-500 bg-gray-100 border-gray-100 cursor-not-allowed' :
-							txSwapStatus.success ? 'bg-green-500 border-green-500 text-white cursor-not-allowed' :
-								txSwapStatus.error ? 'bg-red-500 border-red-500 text-white cursor-not-allowed' :
-									'bg-sky-400 border-sky-400 hover:bg-sky-500 hover:border-sky-500 text-white cursor-pointer'
+				className={`w-full h-11 flex items-center justify-center space-x-2 px-6 py-3 text-ybase font-medium rounded-lg focus:outline-none overflow-hidden transition-colors border ${
+					disabled ? 'text-ygray-400 bg-white border-ygray-400 cursor-not-allowed' :
+						txStep === 'Approve' ? 'text-gray-500 bg-white border-gray-100 cursor-not-allowed' :
+							txSwapStatus.pending ? 'text-gray-500 bg-gray-100 border-gray-100 cursor-not-allowed' :
+								txSwapStatus.success ? 'bg-green-500 border-green-500 text-white cursor-not-allowed' :
+									txSwapStatus.error ? 'bg-red-500 border-red-500 text-white cursor-not-allowed' :
+										'bg-blue-400 border-blue-400 hover:bg-blue-500 hover:border-blue-500 text-white cursor-pointer'
 				}`}>
 				{txSwapStatus.none === true ? (
 					<span>{'Swap'}</span>
@@ -193,14 +188,14 @@ function	Index() {
 
 	const	[fromVault, set_fromVault] = useState(USD_VAULTS[0]);
 	const	[fromCounterValue, set_fromCounterValue] = useState(0);
-	const	[fromAmount, set_fromAmount] = useState('0');
+	const	[fromAmount, set_fromAmount] = useState('');
 	const	[fromBalanceOf, set_fromBalanceOf] = useState('0');
 
 	const	[toVaultsList, set_toVaultsList] = useState(USD_VAULTS.slice(1));
 	const	[toVault, set_toVault] = useState(USD_VAULTS[1]);
 	const	[toCounterValue, set_toCounterValue] = useState(0);
 	const	[toBalanceOf, set_toBalanceOf] = useState('0');
-	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('0');
+	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('');
 
 	const	[slippage, set_slippage] = useState(0.10);
 	const	[isFetchingExpectedReceiveAmount, set_isFetchingExpectedReceiveAmount] = useState(false);
@@ -297,8 +292,8 @@ function	Index() {
 	return (
 		<section className={'mt-12 pt-16 w-full md:px-12 px-4 space-y-12 mb-64 z-10 relative'}>
 			<div className={'flex justify-center items-center'}>
-				<div className={'w-full max-w-4xl'}>
-					<div className={'bg-white rounded-xl shadow-md p-6 pt-8 w-full relative space-y-0 md:space-y-4'}>
+				<div className={'w-full max-w-2xl'}>
+					<div className={'bg-white rounded-xl shadow-md p-4 w-full relative space-y-0 md:space-y-4'}>
 						<SectionFromVault
 							vaults={[...USD_VAULTS, ...BTC_VAULTS]}
 							fromVault={fromVault}
@@ -311,7 +306,21 @@ function	Index() {
 							set_slippage={set_slippage} />
 
 						<div className={'flex w-full justify-center pt-4'}>
-							<svg aria-hidden={'true'} focusable={'false'} className={'w-8 h-8 text-gray-400'} role={'img'} xmlns={'http://www.w3.org/2000/svg'} viewBox={'0 0 320 512'}><path fill={'currentColor'} d={'M281.6 392.3l-104 112.1c-9.498 10.24-25.69 10.24-35.19 0l-104-112.1c-6.484-6.992-8.219-17.18-4.404-25.94c3.811-8.758 12.45-14.42 21.1-14.42H128V32c0-17.69 14.33-32 32-32S192 14.31 192 32v319.9h72c9.547 0 18.19 5.66 22 14.42C289.8 375.1 288.1 385.3 281.6 392.3z'}></path></svg>
+							{Number(fromAmount) > Number(ethers.utils.formatUnits(fromBalanceOf, fromVault.decimals)) ?
+								<div className={'w-full bg-error text-yerror font-medium text-white rounded-lg h-16 flex justify-center items-center'}>
+									<svg className={'mr-4'} width={'28'} height={'24'} viewBox={'0 0 28 24'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
+										<path d={'M27.5616 18.9767L17.0397 1.67442C16.4551 0.669767 15.286 0 14 0C12.714 0 11.5449 0.669767 10.9603 1.67442L0.438413 18.9767C-0.146138 19.9814 -0.146138 21.3209 0.438413 22.3256C1.13987 23.3302 2.19207 24 3.47808 24H24.5219C25.8079 24 26.977 23.3302 27.5616 22.3256C28.1461 21.2093 28.1461 19.9814 27.5616 18.9767ZM25.5741 21.2093C25.4572 21.4326 25.2234 21.7674 24.5219 21.7674H3.47808C2.89353 21.7674 2.5428 21.3209 2.42589 21.2093C2.30898 21.0977 2.07516 20.5395 2.42589 20.093L12.9478 2.7907C13.2985 2.23256 13.7662 2.23256 14 2.23256C14.2338 2.23256 14.7015 2.23256 15.0522 2.7907L25.5741 20.093C25.8079 20.5395 25.5741 20.986 25.5741 21.2093Z'} fill={'white'}/>
+										<path d={'M14.0001 6.13953C13.2986 6.13953 12.831 6.58605 12.831 7.25581V13.9535C12.831 14.6233 13.2986 15.0698 14.0001 15.0698C14.7015 15.0698 15.1692 14.6233 15.1692 13.9535V7.25581C15.1692 6.58605 14.7015 6.13953 14.0001 6.13953Z'} fill={'white'}/>
+										<path d={'M14.0001 19.5349C14.6457 19.5349 15.1692 19.0351 15.1692 18.4186C15.1692 17.8021 14.6457 17.3023 14.0001 17.3023C13.3544 17.3023 12.831 17.8021 12.831 18.4186C12.831 19.0351 13.3544 19.5349 14.0001 19.5349Z'} fill={'white'}/>
+									</svg>
+									{'EXCEEDED BALANCE LIMIT !'}
+								</div> :
+								<div className={'w-full h-16 flex justify-center items-center'}>
+									<svg width={'30'} height={'50'} viewBox={'0 0 30 50'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
+										<path d={'M13.5858 49.4142C14.3668 50.1953 15.6332 50.1953 16.4142 49.4142L29.1421 36.6863C29.9232 35.9052 29.9232 34.6389 29.1421 33.8579C28.3611 33.0768 27.0948 33.0768 26.3137 33.8579L15 45.1716L3.68629 33.8579C2.90524 33.0768 1.63891 33.0768 0.857864 33.8579C0.0768147 34.6389 0.0768146 35.9052 0.857863 36.6863L13.5858 49.4142ZM13 26L13 48L17 48L17 26L13 26Z'} fill={'#888888'}/><circle cx={'15'} cy={'26'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'26'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'26'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'26'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'14'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'14'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'14'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'14'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'2'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'2'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'2'} r={'2'} fill={'#888888'}/><circle cx={'15'} cy={'2'} r={'2'} fill={'#888888'}/>
+									</svg>
+								</div>
+							}
 						</div>
 
 						<SectionToVault
@@ -325,6 +334,7 @@ function	Index() {
 							isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount} />
 
 						<SectionAction
+							disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(fromBalanceOf, fromVault.decimals))}
 							fromVault={fromVault}
 							toVault={toVault}
 							fromAmount={fromAmount}

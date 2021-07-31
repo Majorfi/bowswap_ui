@@ -20,12 +20,24 @@ html {
 }
 
 ::placeholder {
-	color: #000;
-	opacity: .3
+	color: #C5C6C7 !important;
 }
 :-ms-input-placeholder,
 ::-ms-input-placeholder {
-	color: #000
+	color: #C5C6C7 !important;
+}
+
+.whitePlaceholder {
+	caret-color: #FFFFFF !important;
+}
+.whitePlaceholder::placeholder {
+	color: #FFFFFF !important;
+	opacity: 0.5;
+}
+.whitePlaceholder:-ms-input-placeholder,
+.whitePlaceholder::-ms-input-placeholder {
+	color: #FFFFFF !important;
+	opacity: 0.5;
 }
 
 /******************************************************************************
@@ -73,6 +85,11 @@ input {
     font-weight: normal;
     font-style: normal;
     position: relative;
+	padding: 0;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
 }
 input:focus {
 	box-shadow: none;
@@ -103,6 +120,26 @@ input[type=number] {
 .animation-delay-500 {
 	animation-delay: 1000ms !important;
 }
+.text-xxs {
+	font-size: 10px;
+	line-height: 12px;
+}
+.text-ybase {
+	font-family: Roboto;
+	font-size: 14px;
+	font-style: normal;
+	line-height: 16px;
+	letter-spacing: 0em;
+}
+
+.text-yerror {
+	font-family: SF Pro Display;
+	font-size: 14px;
+	font-style: normal;
+	line-height: 17px;
+	letter-spacing: 0em;
+}
+
 
 *, ::before, ::after {
     --tw-ring-color: transparent !important;
@@ -120,7 +157,46 @@ input[type=number] {
 	font-variant: all-petite-caps;
 }
 
-.text-xxs {
-	font-size: 0.7rem;
-	line-height: 1rem;
+.placeholder-0::before {
+	content: "0000000000";
+}
+.placeholder-1::before {
+	content: "000000000";
+}
+.placeholder-2::before {
+	content: "00000000";
+}
+.placeholder-3::before {
+	content: "0000000";
+}
+.placeholder-4::before {
+	content: "000000";
+}
+.placeholder-5::before {
+	content: "00000";
+}
+.placeholder-6::before {
+	content: "0000";
+}
+.placeholder-7::before {
+	content: "000";
+}
+.placeholder-8::before {
+	content: "00";
+}
+.placeholder-9::before {
+	content: "0";
+}
+
+::-webkit-scrollbar-track {
+    margin-bottom: 124px;
+	height: 8px;
+	max-height: 8px;
+}
+::-webkit-scrollbar-thumb {
+	border-radius: 8px;
+	background-color: #FFFFFF;
+}
+::-webkit-scrollbar {
+	width: 8px;
 }

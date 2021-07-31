@@ -5,48 +5,84 @@
 **	@Filename:				InputToken.js
 ******************************************************************************/
 
-import	React				from	'react';
-import	{ethers}			from	'ethers';
-import	PopoverSlippage		from	'components/PopoverSlippage';
+import	React, {useEffect, useRef}		from	'react';
+import	{ethers}						from	'ethers';
+import	PopoverSlippage					from	'components/PopoverSlippage';
 
 function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decimals, fromCounterValue}) {
+	const	inputRef = useRef();
+
+	useEffect(() => {
+		if (inputRef?.current) {
+			let inputWitdh = (value.length * 20) + 3;
+			if (String(value).includes('.')) {
+				inputWitdh -= 10;
+			}
+			if (value.length === 0) {
+				inputRef.current.style.width = `${1}px`;
+			} else {
+				inputRef.current.style.width = `${inputWitdh + 1}px`;
+			}
+		}
+	}, [value]);
+
 	return (
-		<div className={'w-full'}>
-			<div className={'relative w-full text-left bg-gray-100 rounded-lg cursor-default focus:outline-none flex flex-col justify-between text-gray-800 h-24 py-2'}>
-				<div className={'flex w-full h-17'}>
-					<input
-						value={value}
-						onChange={(e) => {
-							if (e.target.value.length > 0 && e.target.value[0] === '-') {
-								set_value('0');
-							} else if (Number(e.target.value) > Number(ethers.utils.formatUnits(balanceOf, decimals))) {
-								set_value(ethers.utils.formatUnits(balanceOf, decimals) || '0');
-							} else if (e.target.value.length >= 2 && e.target.value[0] === '0' && e.target.value[1] !== '.') {
-								set_value(e.target.value.slice(1) || '0');
-							} else {
-								set_value(e.target.value || '0');
-							}
-						}}
-						placeholder={''}
-						style={{background: 'transparent'}}
-						className={'block truncate w-full text-3xl font-medium h-full'}
-						type={'text'}
-						min={0} />
+		<div className={'w-full text-left bg-ygray-100 rounded-lg cursor-default focus:outline-none flex flex-col justify-between text-ygray-800 h-24 py-2 px-2 space-y-1'}>
+			<div className={'h-4'}>
+				<div className={'flex flex-row items-center justify-end w-full'}>
+					<label
+						onClick={() => set_value(ethers.utils.formatUnits(balanceOf, decimals))}
+						className={'font-normal text-ybase text-ygray-500 hidden md:flex flex-row items-center cursor-pointer'}>
+						{`Balance: ${Number(ethers.utils.formatUnits(balanceOf, decimals))}`}
+					</label>
+					<label
+						onClick={() => set_value(ethers.utils.formatUnits(balanceOf, decimals))}
+						className={'font-normal text-ybase text-ygray-500 flex flex-row items-center md:hidden cursor-pointer'}>
+						{`Balance: ${Number(ethers.utils.formatUnits(balanceOf, decimals)).toFixed(8)}`}
+					</label>
 				</div>
-				<div className={'flex w-full h-7 justify-between px-3 items-center relative'}>
-					<div className={'items-center text-xs font-medium text-gray-500'}>
+			</div>
+			<label
+				htmlFor={'fromInput'}
+				className={`with-placeholder placeholder-${value.length} flex justify-end w-full h-10 text-4xl font-medium text-ygray-900 text-opacity-20 proportional-nums cursor-text`}>
+				<input
+					ref={inputRef}
+					id={'fromInput'}
+					name={'fromInput'}
+					autoComplete={'off'}
+					value={value}
+					onChange={(e) => {
+						let		_value = e.target.value.replaceAll('..', '.').replaceAll(/[a-zA-Z]/g, '');
+						const	[dec, frac] = _value.split('.');
+						if (frac) _value = `${dec}.${frac.slice(0, 10)}`;
+
+						if (_value.length > 0 && _value[0] === '-') {
+							set_value('');
+						} else if (_value.length >= 2 && _value[0] === '0' && _value[1] !== '.') {
+							set_value(_value.slice(1) || '');
+						} else {
+							set_value(_value || '');
+						}
+					}}
+					style={{backgroundColor: 'transparent'}}
+					className={`block w-full text-4xl font-medium h-full text-right ${Number(value) > Number(ethers.utils.formatUnits(balanceOf, decimals)) ? 'text-error' : 'text-ygray-900'}`}
+					type={'text'}
+					min={0} />
+			</label>
+			<div className={'h-4'}>
+				<div className={'flex w-full justify-between items-center relative'}>
+					<div className={'items-center text-ybase font-medium text-ygray-500'}>
 						<span>{`≃ $${(fromCounterValue * Number(value)).toFixed(2)}`}</span>
 					</div>
 					<div className={'flex flex-row items-center'}>
 						<button
 							onClick={() => set_value(ethers.utils.formatUnits(balanceOf, decimals))}
-							className={'items-center text-xxs variant-petit-caps py-0.5 text-white bg-sky-400 hover:bg-sky-500 focus:outline-none px-2 rounded-lg transition-colors h-5'}>
+							className={'items-center text-xxs font-medium py-0.5 text-white bg-blue-400 hover:bg-blue-500 focus:outline-none px-3 rounded-lg transition-colors h-5'}>
 							<span>{'MAX'}</span>
 						</button>
 						<PopoverSlippage slippage={slippage} set_slippage={set_slippage}/>
 					</div>
 				</div>
-
 			</div>
 		</div>
 	);
