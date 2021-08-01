@@ -318,7 +318,7 @@ function	Index() {
 						</div>
 
 						<SectionToVault
-							disabled={!txApproveStatus.none || !txSwapStatus.none || !txSwapStatus.success}
+							disabled={!txApproveStatus.none || (!txSwapStatus.none && !txSwapStatus.success)}
 							vaults={toVaultsList}
 							toVault={toVault}
 							set_toVault={set_toVault}
