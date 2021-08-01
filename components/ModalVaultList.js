@@ -13,7 +13,7 @@ import	{Transition}							from	'@headlessui/react';
 import	useAccount								from	'contexts/useAccount';
 import	{toAddress}								from	'utils';
 
-function ModalVaultList({vaults, value, set_value}) {
+function ModalVaultList({vaults, value, set_value, disabled}) {
 	const	{balancesOf} = useAccount();
 	const	[open, set_open] = useState(false);
 	const	[filter, set_filter] = useState('');
@@ -35,8 +35,8 @@ function ModalVaultList({vaults, value, set_value}) {
 		<div className={'w-full'}>
 			<div className={'relative'}>
 				<button
-					onClick={() => set_open(true)}
-					className={'relative w-full px-4 text-left bg-ygray-100 hover:bg-ygray-50 rounded-lg focus:outline-none cursor-pointer h-24 py-2'}>
+					onClick={() => disabled ? null : set_open(true)}
+					className={`relative w-full px-4 text-left bg-ygray-100 hover:bg-ygray-50 rounded-lg focus:outline-none ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} h-24 py-2`}>
 					<div className={'flex flex-row items-center'}>
 						<Image
 							src={value.icon}
