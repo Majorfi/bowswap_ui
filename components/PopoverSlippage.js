@@ -46,7 +46,7 @@ function PopoverSlippage({slippage, set_slippage}) {
 					leaveFrom={'opacity-100 translate-y-0'}
 					leaveTo={'opacity-0 translate-y-1'}>
 					<Popover.Panel className={'absolute right-0 z-30 w-screen max-w-xs px-4 pt-2 sm:px-0'}>
-						<div className={'overflow-hidden rounded-md shadow-xl ring-1 ring-black ring-opacity-5 border border-gray-200'}>
+						<div className={'overflow-hidden rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 border border-gray-200'}>
 							<div className={'relative bg-white p-4 max-h-96 overflow-scroll'}>
 								<label className={'font-medium text-sm text-gray-800 flex flex-row items-center pb-4'}>
 									<p className={'inline'}>{'Settings'}</p>
@@ -55,14 +55,18 @@ function PopoverSlippage({slippage, set_slippage}) {
 									<div className={'mr-2'}>
 										<p className={'font-medium text-xs text-gray-600'}>{'Slippage'}</p>
 									</div>
-									<div className={'relative w-full text-left bg-white rounded-lg border cursor-default focus:outline-none flex flex-row justify-between border-gray-200 text-gray-800'}>
+									<label
+										htmlFor={'slippage'}
+										className={'relative w-full text-left bg-white rounded-md border cursor-default focus:outline-none flex flex-row justify-between border-gray-200 text-gray-800 px-3'}>
 										<input
+											id={'slippage'}
+											autoComplete={'off'}
 											value={Number(slippage).toString()}
 											onChange={(e) => {
 												set_slippage(e.target.value);
 											}}
 											style={{background: 'transparent'}}
-											className={'block truncate py-3 text-sm'}
+											className={'truncate text-sm h-8'}
 											min={0}
 											max={100}
 											step={0.01}
@@ -72,7 +76,7 @@ function PopoverSlippage({slippage, set_slippage}) {
 												{'%'}
 											</span>
 										</div>
-									</div>
+									</label>
 								</div>
 							</div>
 						</div>
