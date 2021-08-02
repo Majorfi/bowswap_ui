@@ -298,7 +298,7 @@ function	Index() {
 	}
 
 	return (
-		<section className={'mt-12 pt-16 w-full md:px-12 px-4 space-y-12 mb-64 z-10 relative'}>
+		<section className={'mt-14 pt-14 w-full md:px-12 px-4 space-y-12 mb-64 z-10 relative'}>
 			<div className={'flex justify-center items-center'}>
 				<div className={'w-full max-w-2xl'}>
 					<div className={'bg-white rounded-xl shadow-md p-4 w-full relative space-y-0 md:space-y-4'}>
