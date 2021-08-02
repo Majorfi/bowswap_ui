@@ -1,4 +1,4 @@
-# 🐼 Pandaswap
+# 🏹 Bowswap
 
 ## Setup  
 

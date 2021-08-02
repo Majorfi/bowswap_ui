@@ -9,7 +9,7 @@ import	React, {useEffect, useRef}		from	'react';
 import	{ethers}						from	'ethers';
 import	PopoverSlippage					from	'components/PopoverSlippage';
 
-function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decimals, fromCounterValue}) {
+function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decimals, fromCounterValue, disabled}) {
 	const	inputRef = useRef();
 
 	useEffect(() => {
@@ -31,27 +31,32 @@ function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decima
 			<div className={'h-4'}>
 				<div className={'flex flex-row items-center justify-end w-full'}>
 					<label
-						onClick={() => set_value(ethers.utils.formatUnits(balanceOf, decimals))}
-						className={'font-normal text-ybase text-ygray-500 hidden md:flex flex-row items-center cursor-pointer'}>
+						onClick={() => disabled ? null : set_value(ethers.utils.formatUnits(balanceOf, decimals))}
+						className={`font-normal text-ybase text-ygray-500 hidden md:flex flex-row items-center ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
 						{`Balance: ${Number(ethers.utils.formatUnits(balanceOf, decimals))}`}
 					</label>
 					<label
-						onClick={() => set_value(ethers.utils.formatUnits(balanceOf, decimals))}
-						className={'font-normal text-ybase text-ygray-500 flex flex-row items-center md:hidden cursor-pointer'}>
+						onClick={() => disabled ? null : set_value(ethers.utils.formatUnits(balanceOf, decimals))}
+						className={`font-normal text-ybase text-ygray-500 flex flex-row items-center md:hidden ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
 						{`Balance: ${Number(ethers.utils.formatUnits(balanceOf, decimals)).toFixed(8)}`}
 					</label>
 				</div>
 			</div>
 			<label
 				htmlFor={'fromInput'}
-				className={`with-placeholder placeholder-${value.length} flex justify-end w-full h-10 text-4xl font-medium text-ygray-900 text-opacity-20 proportional-nums cursor-text`}>
+				className={`with-placeholder placeholder-${value.length} flex justify-end w-full h-10 text-4xl font-medium text-ygray-900 text-opacity-20 proportional-nums cursor-text ${disabled ? 'cursor-not-allowed' : 'cursor-text'}`}>
 				<input
 					ref={inputRef}
 					id={'fromInput'}
 					name={'fromInput'}
 					autoComplete={'off'}
+					disabled={disabled}
+					readOnly={disabled}
 					value={value}
 					onChange={(e) => {
+						if (disabled) {
+							return;
+						}
 						let		_value = e.target.value.replaceAll('..', '.').replaceAll(/[a-zA-Z]/g, '');
 						const	[dec, frac] = _value.split('.');
 						if (frac) _value = `${dec}.${frac.slice(0, 10)}`;
@@ -67,7 +72,7 @@ function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decima
 						}
 					}}
 					style={{backgroundColor: 'transparent'}}
-					className={`block w-full text-4xl font-medium h-full text-right ${Number(value) > Number(ethers.utils.formatUnits(balanceOf, decimals)) ? 'text-error' : 'text-ygray-900'}`}
+					className={`block w-full text-4xl font-medium h-full text-right ${disabled ? 'cursor-not-allowed' : 'cursor-text'} ${Number(value) > Number(ethers.utils.formatUnits(balanceOf, decimals)) ? 'text-error' : 'text-ygray-900'}`}
 					type={'text'}
 					min={0} />
 			</label>
@@ -78,8 +83,8 @@ function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decima
 					</div>
 					<div className={'flex flex-row items-center'}>
 						<button
-							onClick={() => set_value(ethers.utils.formatUnits(balanceOf, decimals))}
-							className={'items-center text-xxs font-medium py-0.5 text-white bg-blue-400 hover:bg-blue-300 focus:outline-none px-3 rounded-lg transition-colors h-5'}>
+							onClick={() => disabled ? null : set_value(ethers.utils.formatUnits(balanceOf, decimals))}
+							className={`items-center text-xxs font-medium py-0.5 text-white bg-blue-400 hover:bg-blue-300 focus:outline-none px-3 rounded-lg transition-colors h-5 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
 							<span>{'MAX'}</span>
 						</button>
 						<PopoverSlippage slippage={slippage} set_slippage={set_slippage}/>
