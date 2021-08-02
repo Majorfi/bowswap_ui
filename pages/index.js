@@ -14,7 +14,6 @@ import	{approveToken, swapTokens}					from	'utils/actions';
 import	InputToken									from	'components/InputToken';
 import	InputTokenDisabled							from	'components/InputTokenDisabled';
 import	ModalVaultList								from	'components/ModalVaultList';
-import	ModalStatus									from	'components/ModalStatus';
 import	BlockStatus									from	'components/BlockStatus';
 import	Success										from	'components/Icons/Success';
 import	Error										from	'components/Icons/Error';
@@ -22,19 +21,21 @@ import	Pending										from	'components/Icons/Pending';
 import	{USD_VAULTS, BTC_VAULTS, fetchCryptoPrice}	from	'utils/API';
 import	{bigNumber}									from	'utils';
 
-function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, slippage, set_slippage, fromCounterValue, balanceOf}) {
+function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, slippage, set_slippage, fromCounterValue, balanceOf, disabled}) {
 	return (
 		<section aria-label={'FROM_VAULT'}>
 			<label className={'font-medium text-sm text-gray-800'}>{'From Vault'}</label>
 			<div className={'flex flex-col md:flex-row items-start justify-center space-y-2 md:space-y-0 md:space-x-4 w-full'}>
 				<div className={'w-full md:w-4/11'}>
 					<ModalVaultList
+						disabled={disabled}
 						vaults={vaults}
 						value={fromVault}
 						set_value={set_fromVault} />
 				</div>
 				<div className={'w-full md:w-7/11'}>
 					<InputToken
+						disabled={disabled}
 						balanceOf={balanceOf}
 						decimals={fromVault.decimals}
 						fromCounterValue={fromCounterValue}
@@ -48,13 +49,14 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 	);
 }
 
-function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, toCounterValue, balanceOf, slippage, isFetchingExpectedReceiveAmount}) {
+function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, toCounterValue, balanceOf, slippage, isFetchingExpectedReceiveAmount, disabled}) {
 	return (
 		<section aria-label={'TO_VAULT'}>
 			<label className={'font-medium text-sm text-gray-800'}>{'To Vault'}</label>
 			<div className={'flex flex-col md:flex-row items-start justify-center space-y-2 md:space-y-0 md:space-x-4 w-full'}>
 				<div className={'w-full md:w-4/11'}>
 					<ModalVaultList
+						disabled={disabled}
 						vaults={vaults}
 						value={toVault}
 						set_value={set_toVault} />
@@ -177,7 +179,6 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, onCallback}) 
 function	Index() {
 	const	{provider} = useWeb3();
 	const	{balancesOf, updateBalanceOf} = useAccount();
-	const	[modalStatusOpen, set_modalStatusOpen] = useState(false);
 
 
 	const	[fromVault, set_fromVault] = useState(USD_VAULTS[0]);
@@ -196,6 +197,14 @@ function	Index() {
 
 	const	[txApproveStatus, set_txApproveStatus] = useState({none: true, pending: false, success: false, error: false});
 	const	[txSwapStatus, set_txSwapStatus] = useState({none: true, pending: false, success: false, error: false});
+
+	function	resetStates() {
+		set_fromAmount('');
+		set_toCounterValue(0);
+		set_expectedReceiveAmount('');
+		set_slippage(0.10);
+		set_txApproveStatus({none: true, pending: false, success: false, error: false});
+	}
 
 
 	const	fetchCRVVirtualPrice = useCallback(async () => {
@@ -273,6 +282,10 @@ function	Index() {
 				return {open: true, title: 'PENDING...', color: 'bg-pending', icon: <Pending width={24} height={24} className={'mr-4'} />};
 			if (txApproveStatus.success && !txApproveStatus.hide)
 				return {open: true, title: 'APPROVE COMPLETED', color: 'bg-success', icon: <Success width={24} height={24} className={'mr-4'} />};
+			if (txSwapStatus.success)
+				return {open: true, title: 'SWAP COMPLETED', color: 'bg-success', icon: <Success width={24} height={24} className={'mr-4'} />};
+			if (txSwapStatus.error)
+				return {open: true, title: 'SWAP FAILED', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (txApproveStatus.error)
 				return {open: true, title: 'APPROVE TRANSACTION FAILURE', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals)))
@@ -290,6 +303,7 @@ function	Index() {
 				<div className={'w-full max-w-2xl'}>
 					<div className={'bg-white rounded-xl shadow-md p-4 w-full relative space-y-0 md:space-y-4'}>
 						<SectionFromVault
+							disabled={!txApproveStatus.none || (!txSwapStatus.none && !txSwapStatus.success)}
 							vaults={[...USD_VAULTS, ...BTC_VAULTS]}
 							fromVault={fromVault}
 							set_fromVault={set_fromVault}
@@ -305,6 +319,7 @@ function	Index() {
 						</div>
 
 						<SectionToVault
+							disabled={!txApproveStatus.none || (!txSwapStatus.none && !txSwapStatus.success)}
 							vaults={toVaultsList}
 							toVault={toVault}
 							set_toVault={set_toVault}
@@ -339,21 +354,17 @@ function	Index() {
 								slippage={slippage}
 								onCallback={(type) => {
 									set_txSwapStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success'});
-									set_modalStatusOpen(true);
+									if (type === 'error') {
+										setTimeout(() => set_txSwapStatus((s) => s.error ? {none: true, pending: false, error: false, success: false} : s), 2500);
+									}
 									if (type === 'success') {
+										setTimeout(() => set_txSwapStatus({none: true, pending: false, error: false, success: false}), 2500);
 										updateBalanceOf();
-										set_fromAmount('0');
+										resetStates();
 									}
 								}}
 							/>
 						</div>
-
-						<ModalStatus
-							open={modalStatusOpen}
-							set_open={set_modalStatusOpen}
-							title={txSwapStatus.success ? 'Transaction completed' : txSwapStatus.error ? 'Transaction failed' : 'Processing transaction ...'}
-							icon={txSwapStatus.success ? <Success /> : txSwapStatus.error ? <Error /> : <Pending />}
-							color={txSwapStatus.success ? 'bg-success' : txSwapStatus.error ? 'bg-error' : 'bg-pending'} />
 					</div>
 				</div>
 			</div>
