@@ -179,6 +179,7 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, onCallback}) 
 function	Index() {
 	const	{provider} = useWeb3();
 	const	{balancesOf, updateBalanceOf} = useAccount();
+	const	[nonce, set_nonce] = useState(0);
 
 	const	[fromVault, set_fromVault] = useState(USD_VAULTS[0]);
 	const	[fromCounterValue, set_fromCounterValue] = useState(0);
@@ -211,6 +212,8 @@ function	Index() {
 			return;
 		const	prices = await fetchCryptoPrice(['bitcoin'], 'usd');
 
+		console.warn(nonce);
+
 		if (fromVault) {
 			const	poolContract = new ethers.Contract(fromVault.poolAddress, ['function get_virtual_price() public view returns (uint256)'], provider);
 			const	vaultContract = new ethers.Contract(fromVault.address, ['function pricePerShare() public view returns (uint256)'], provider);
@@ -235,7 +238,8 @@ function	Index() {
 				set_toCounterValue(ethers.utils.formatUnits(scaledBalanceOf, 18));
 			}
 		}
-	}, [fromVault, provider, toVault]);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [provider, nonce]);
 
 	const	fetchEstimateOut = useCallback(async (from, to, amount) => {
 		const	fromToken = new ethers.Contract(process.env.METAPOOL_SWAPPER_ADDRESS, ['function estimate_out(address from, address to, uint256 amount) public view returns (uint256)'], provider);
@@ -250,12 +254,14 @@ function	Index() {
 			set_toVaultsList(vaultList);
 			if (fromVault.scope !== toVault.scope || fromVault.address === toVault.address)
 				set_toVault(vaultList[0]);
+			set_nonce(n => n + 1);
 		}
 		if (fromVault.scope === 'usd') {
 			const	vaultList = USD_VAULTS.filter(e => e.address !== fromVault.address);
 			set_toVaultsList(vaultList);
 			if (fromVault.scope !== toVault.scope || fromVault.address === toVault.address)
 				set_toVault(vaultList[0]);
+			set_nonce(n => n + 1);
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [fromVault.address]);
@@ -267,6 +273,7 @@ function	Index() {
 			if (Number(fromAmount) !== 0) {
 				set_isFetchingExpectedReceiveAmount(true);
 				fetchEstimateOut(fromVault.address, toVault.address, ethers.utils.parseUnits(fromAmount, fromVault.decimals));
+				set_nonce(n => n + 1);
 			} else {
 				set_expectedReceiveAmount('0');
 			}
