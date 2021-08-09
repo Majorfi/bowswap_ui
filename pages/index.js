@@ -212,8 +212,6 @@ function	Index() {
 			return;
 		const	prices = await fetchCryptoPrice(['bitcoin'], 'usd');
 
-		console.warn(nonce);
-
 		if (fromVault) {
 			const	poolContract = new ethers.Contract(fromVault.poolAddress, ['function get_virtual_price() public view returns (uint256)'], provider);
 			const	vaultContract = new ethers.Contract(fromVault.address, ['function pricePerShare() public view returns (uint256)'], provider);

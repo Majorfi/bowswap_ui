@@ -20,16 +20,21 @@ function ModalVaultList({vaults, value, set_value, disabled}) {
 	const	[filteredVaultList, set_filteredVaultList] = useState(vaults);
 
 	useEffect(() => {
+		const	_vaults = vaults.map((v) => {
+			v.balanceOf = ethers.utils.formatUnits(balancesOf[v.address]?.toString() || '0', v.decimals);
+			return (v);
+		}).sort((a, b) => b.balanceOf - a.balanceOf);
+
 		if (filter === '') {
-			set_filteredVaultList(vaults);
+			set_filteredVaultList(_vaults);
 		} else {
-			set_filteredVaultList((vaults).filter(e => (
+			set_filteredVaultList((_vaults).filter(e => (
 				(e.name).toLowerCase().includes(filter.toLowerCase()) ||
 				(e.symbol).toLowerCase().includes(filter.toLowerCase()) ||
 				toAddress(e.address).includes(toAddress(filter))
 			)));
 		}
-	}, [filter, vaults]);
+	}, [filter, vaults, balancesOf]);
 
 	return (
 		<div className={'w-full'}>
