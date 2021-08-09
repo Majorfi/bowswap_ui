@@ -190,7 +190,7 @@ function	Index() {
 	const	[toCounterValue, set_toCounterValue] = useState(0);
 	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('');
 
-	const	[slippage, set_slippage] = useState(0.10);
+	const	[slippage, set_slippage] = useState(0.01);
 	const	[isFetchingExpectedReceiveAmount, set_isFetchingExpectedReceiveAmount] = useState(false);
 
 	const	debouncedFetchExpectedAmount = useDebounce(fromAmount, 500);
@@ -294,6 +294,10 @@ function	Index() {
 				return {open: true, title: 'APPROVE TRANSACTION FAILURE', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals)))
 				return {open: true, title: 'EXCEEDED BALANCE LIMIT !', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
+			if (Number(slippage) >= 3)
+				return {open: true, title: 'HEAVY SLIPPAGE, USE IT AT YOUR OWN RISK', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
+			if (Number(slippage) === 0)
+				return {open: true, title: 'NO SLIPPAGE, USE IT AT YOUR OWN RISK', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			return {open: false, title: '', color: 'bg-blue-400', icon: <div/>};
 		};
 		return (

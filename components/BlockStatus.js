@@ -26,7 +26,7 @@ function BlockStatus({title, icon, color, open}) {
 				leave={'ease-in duration-200'}
 				leaveFrom={'opacity-100 translate-y-0 sm:scale-100'}
 				leaveTo={'opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'}>
-				<div className={`absolute inset-0 w-full ${color} text-yerror font-medium text-white rounded-lg h-16 flex justify-center items-center`}>
+				<div className={`absolute inset-0 w-full ${color} text-yerror font-medium text-white rounded-lg h-16 flex justify-center items-center font-sans`}>
 					{icon}
 					{title}
 				</div>
