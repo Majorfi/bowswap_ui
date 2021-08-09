@@ -104,7 +104,7 @@ function ModalVaultList({vaults, value, set_value, disabled}) {
 										<List
 											width={600}
 											height={280}
-											className={'focus:outline-none'}
+											className={'focus:outline-none pb-2'}
 											rowHeight={56}
 											rowRenderer={({index, key, style}) => {
 												return (
