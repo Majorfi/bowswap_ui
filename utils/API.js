@@ -156,17 +156,17 @@ export const BTC_VAULTS = [
 		'tokenAddress': '0x2fE94ea3d5d4a175184081439753DE15AeF9d614',
 		'poolAddress': '0xd81da8d904b52208541bade1bd6595d8a251f8dd'
 	},
-	// {
-	// 	'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x23D3D0f1c697247d5e0a9efB37d8b0ED0C464f7f/logo-128.png',
-	// 	'symbol': 'yvCurve-tBTC',
-	// 	'name': 'Curve tBTC Pool yVault',
-	// 	'displayName': 'crvTBTC',
-	// 	'decimals': 18,
-	// 	'scope': 'btc',
-	// 	'address': '0x23D3D0f1c697247d5e0a9efB37d8b0ED0C464f7f',
-	// 	'tokenAddress': '0x64eda51d3Ad40D56b9dFc5554E06F94e1Dd786Fd',
-	// 	'poolAddress': '0xC25099792E9349C7DD09759744ea681C7de2cb66'
-	// },
+	{
+		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x23D3D0f1c697247d5e0a9efB37d8b0ED0C464f7f/logo-128.png',
+		'symbol': 'yvCurve-tBTC',
+		'name': 'Curve tBTC Pool yVault',
+		'displayName': 'crvTBTC',
+		'decimals': 18,
+		'scope': 'btc',
+		'address': '0x23D3D0f1c697247d5e0a9efB37d8b0ED0C464f7f',
+		'tokenAddress': '0x64eda51d3Ad40D56b9dFc5554E06F94e1Dd786Fd',
+		'poolAddress': '0xC25099792E9349C7DD09759744ea681C7de2cb66'
+	},
 ];
 
 
