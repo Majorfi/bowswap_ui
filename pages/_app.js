@@ -31,7 +31,7 @@ function	AppWrapper(props) {
 				<meta name={'theme-color'} content={'#ffffff'} />
 				<meta charSet={'utf-8'} />
 			</Head>
-			<main id={'app'} className={'flex w-full h-full relative min-h-screen'} style={{backgroundColor: '#E5E5E5'}}>
+			<main id={'app'} className={'flex w-full h-full relative min-h-screen'}>
 				<Navbar />
 				<div className={'w-full h-full relative max-w-screen-lg mx-auto'}>
 					<Component
