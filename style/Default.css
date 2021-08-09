@@ -191,7 +191,6 @@ input[type=number] {
 }
 
 ::-webkit-scrollbar-track {
-    /* margin-bottom: 124px; */
 	height: 8px;
 	max-height: 8px;
 }
