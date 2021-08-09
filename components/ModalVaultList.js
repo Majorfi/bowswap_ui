@@ -99,11 +99,11 @@ function ModalVaultList({vaults, value, set_value, disabled}) {
 										</div>
 									</div>
 								</div>
-								<div className={'mt-6 h-full overflow-hidden'}>
+								<div className={'mt-6 h-full '}>
 									<div className={'list h-full'}>
 										<List
 											width={600}
-											height={384}
+											height={280}
 											className={'focus:outline-none'}
 											rowHeight={56}
 											rowRenderer={({index, key, style}) => {
