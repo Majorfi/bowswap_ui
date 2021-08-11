@@ -42,7 +42,7 @@ function	AppWrapper(props) {
 				<meta name={'theme-color'} content={'#ffffff'} />
 				<meta charSet={'utf-8'} />
 				<link rel={'preconnect'} href={'https://fonts.googleapis.com'} />
-				<link rel={'preconnect'} href={'https://fonts.gstatic.com'} crossOrigin />
+				<link rel={'preconnect'} href={'https://fonts.gstatic.com'} crossOrigin={'true'} />
 				<link href={'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap'} rel={'stylesheet'} />
 			</Head>
 			<main id={'app'} className={'flex w-full h-full relative min-h-screen'}>

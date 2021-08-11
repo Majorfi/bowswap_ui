@@ -20,6 +20,9 @@ export const	performGet = (url) => {
 	);
 };
 
+0x1C6a9783F812b3Af3aBbf7de64c3cD7CC7D1af44;
+0xA74d4B67b3368E83797a35382AFB776bAAE4F5C8;
+
 export const USD_VAULTS = [
 	{
 		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417/logo-128.png',
@@ -109,17 +112,28 @@ export const USD_VAULTS = [
 		'tokenAddress': '0x4807862AA8b2bF68830e4C8dc86D0e9A998e085a',
 		'poolAddress': '0x4807862AA8b2bF68830e4C8dc86D0e9A998e085a'
 	},
-	// {
-	// 	'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x3D27705c64213A5DcD9D26880c1BcFa72d5b6B0E/logo-128.png',
-	// 	'symbol': 'yvCurve-USDK',
-	// 	'name': 'Curve USDK Pool yVault',
-	// 	'displayName': 'crvUSDK',
-	// 	'decimals': 18,
-	// 	'scope': 'usd',
-	// 	'address': '0x3D27705c64213A5DcD9D26880c1BcFa72d5b6B0E',
-	// 	'tokenAddress': '0x97E2768e8E73511cA874545DC5Ff8067eB19B787',
-	// 	'poolAddress': '0x3E01dD8a5E1fb3481F0F589056b428Fc308AF0Fb'
-	// },
+	{
+		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x1C6a9783F812b3Af3aBbf7de64c3cD7CC7D1af44/logo-128.png',
+		'symbol': 'yvCurve-UST',
+		'name': 'Curve UST Pool yVault',
+		'decimals': 18,
+		'scope': 'usd',
+		'displayName': 'crvUST',
+		'address': '0x1C6a9783F812b3Af3aBbf7de64c3cD7CC7D1af44',
+		'tokenAddress': '0x94e131324b6054c0D789b190b2dAC504e4361b53',
+		'poolAddress': '0x890f4e345b1daed0367a877a1612f86a1f86985f'
+	},
+	{
+		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0xA74d4B67b3368E83797a35382AFB776bAAE4F5C8/logo-128.png',
+		'symbol': 'yvCurve-alUSD',
+		'name': 'Curve alUSD Pool yVault',
+		'decimals': 18,
+		'scope': 'usd',
+		'displayName': 'crvALUSD',
+		'address': '0xA74d4B67b3368E83797a35382AFB776bAAE4F5C8',
+		'tokenAddress': '0x43b4FdFD4Ff969587185cDB6f0BD875c5Fc83f8c',
+		'poolAddress': '0x43b4FdFD4Ff969587185cDB6f0BD875c5Fc83f8c'
+	}
 ];
 
 export const BTC_VAULTS = [
