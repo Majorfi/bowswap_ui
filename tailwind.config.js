@@ -53,6 +53,19 @@ module.exports = {
 			boxShadow: {
 				base: '0 10px 30px rgb(209 213 223 / 50%)'
 			},
+			animation: {
+				'scale-up-center': 'scale-up-center 0.4s cubic-bezier(0.390, 0.575, 0.565, 1.000)   both',
+			},
+			keyframes: {
+				'scale-up-center': {
+					'0%': {
+						transform: 'scale(0)'
+					},
+					to: {
+						transform: 'scale(1)'
+					}
+				}
+			}
 		},
 	},
 	variants: {

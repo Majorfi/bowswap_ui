@@ -14,6 +14,7 @@ import	{approveToken, swapTokens}					from	'utils/actions';
 import	InputToken									from	'components/InputToken';
 import	InputTokenDisabled							from	'components/InputTokenDisabled';
 import	ModalVaultList								from	'components/ModalVaultList';
+import	ModalPong									from	'components/ModalPong';
 import	BlockStatus									from	'components/BlockStatus';
 import	Success										from	'components/Icons/Success';
 import	Error										from	'components/Icons/Error';
@@ -176,10 +177,11 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, onCallback}) 
 }
 
 
-function	Index() {
+function	Index({hasSecret}) {
 	const	{provider} = useWeb3();
 	const	{balancesOf, updateBalanceOf} = useAccount();
 	const	[nonce, set_nonce] = useState(0);
+	const	[triggerPong, set_triggerPong] = useState(false);
 
 	const	[fromVault, set_fromVault] = useState(USD_VAULTS[0]);
 	const	[fromCounterValue, set_fromCounterValue] = useState(0);
@@ -205,7 +207,6 @@ function	Index() {
 		set_slippage(0.10);
 		set_txApproveStatus({none: true, pending: false, success: false, error: false});
 	}
-
 
 	const	fetchCRVVirtualPrice = useCallback(async () => {
 		if (!provider)
@@ -306,7 +307,7 @@ function	Index() {
 	}
 
 	return (
-		<section className={'mt-14 pt-14 w-full md:px-12 px-4 space-y-12 mb-64 z-10 relative'}>
+		<section className={'w-full md:px-12 px-4 space-y-12 mb-64 z-10 relative'}>
 			<div className={'flex justify-center items-center'}>
 				<div className={'w-full max-w-2xl'}>
 					<div className={'bg-white rounded-xl shadow-md p-4 w-full relative space-y-0 md:space-y-4'}>
@@ -376,7 +377,20 @@ function	Index() {
 					</div>
 				</div>
 			</div>
-
+			{hasSecret ? (
+				<div className={'flex justify-center items-center'}>
+					<div className={'w-full max-w-2xl'}>
+						<div className={'mt-4 hidden lg:flex justify-center items-center flex-col self-center absolute w-full max-w-2xl'}>
+							<div className={'flex justify-center items-center flex-col group cursor-pointer'} onClick={() => set_triggerPong(true)}>
+								<p className={'text-white font-medium text-4xl cursor-pointer'}>{'🕹'}</p>
+								<p className={'text-white font-medium text-sm group-hover:underline cursor-pointer pt-2'}>{'Play !'}</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			)
+				: null}
+			<ModalPong open={triggerPong} set_open={set_triggerPong} />
 		</section>
 	);
 }

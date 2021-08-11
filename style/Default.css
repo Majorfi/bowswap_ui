@@ -201,3 +201,8 @@ input[type=number] {
 ::-webkit-scrollbar {
 	width: 8px;
 }
+
+.bg-test{
+	transform: scale(0);
+	background-image: linear-gradient(to right, #0066e1, #0063d7, #0060ce, #005cc4, #0059bb);
+  }

@@ -8,8 +8,9 @@
 import	React, {useState}		from	'react';
 import	useWeb3					from	'contexts/useWeb3';
 import	ModalLogin				from	'components/ModalLogin';
+import Image from 'next/image';
 
-function	Navbar() {
+function	Navbar({hasSecret}) {
 	const	{active, address, ens, deactivate, onDesactivate} = useWeb3();
 	const	[ModalLoginOpen, set_ModalLoginOpen] = useState(false);
 
@@ -50,11 +51,11 @@ function	Navbar() {
 	}
 
 	return (
-		<nav className={'w-full h-16 p-6 justify-center flex flex-row fixed top-0 z-20'}>
+		<nav className={'w-full h-16 p-6 justify-center flex flex-row'}>
 			<div className={'max-w-2xl items-center justify-between flex flex-row w-full'}>
 				<div className={'flex flex-row items-center space-x-3'}>
-					<p className={'inline text-gray-800 font-extrabold text-xl'}>{'🏹'}</p>
-					<p className={'inline text-gray-800 font-extrabold text-xl'}>{'Bowswap'}</p>
+					<Image src={hasSecret ? '/yCrossbowswap.png' : '/yBowswap.png'} width={42} height={42} quality={100} loading={'eager'} />
+					<p className={`inline ${hasSecret ? 'text-white' : 'text-gray-800'} font-extrabold text-xl`}>{hasSecret ? 'Crossbowswap' : 'Bowswap'}</p>
 				</div>
 				<div>
 					{renderWalletButton()}
