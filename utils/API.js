@@ -20,9 +20,6 @@ export const	performGet = (url) => {
 	);
 };
 
-0x1C6a9783F812b3Af3aBbf7de64c3cD7CC7D1af44;
-0xA74d4B67b3368E83797a35382AFB776bAAE4F5C8;
-
 export const USD_VAULTS = [
 	{
 		'icon': 'https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417/logo-128.png',
