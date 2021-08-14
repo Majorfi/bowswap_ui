@@ -22,7 +22,7 @@ import	Pending										from	'components/Icons/Pending';
 import	{USD_VAULTS, BTC_VAULTS, fetchCryptoPrice}	from	'utils/API';
 import	{bigNumber}									from	'utils';
 
-function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, slippage, set_slippage, fromCounterValue, balanceOf, disabled}) {
+function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, slippage, set_slippage, fromCounterValue, balanceOf, disabled, yearnVaultData}) {
 	return (
 		<section aria-label={'FROM_VAULT'}>
 			<label className={'font-medium text-sm text-gray-800'}>{'From Vault'}</label>
@@ -31,6 +31,7 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 					<ModalVaultList
 						disabled={disabled}
 						vaults={vaults}
+						yearnVaultData={yearnVaultData}
 						value={fromVault}
 						set_value={set_fromVault} />
 				</div>
@@ -50,7 +51,7 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 	);
 }
 
-function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, toCounterValue, balanceOf, slippage, isFetchingExpectedReceiveAmount, disabled}) {
+function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, toCounterValue, balanceOf, slippage, isFetchingExpectedReceiveAmount, disabled, yearnVaultData}) {
 	return (
 		<section aria-label={'TO_VAULT'}>
 			<label className={'font-medium text-sm text-gray-800'}>{'To Vault'}</label>
@@ -59,6 +60,7 @@ function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, to
 					<ModalVaultList
 						disabled={disabled}
 						vaults={vaults}
+						yearnVaultData={yearnVaultData}
 						value={toVault}
 						set_value={set_toVault} />
 				</div>
@@ -177,7 +179,7 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, onCallback}) 
 }
 
 
-function	Index({hasSecret}) {
+function	Index({hasSecret, yearnVaultData}) {
 	const	{provider} = useWeb3();
 	const	{balancesOf, updateBalanceOf} = useAccount();
 	const	[nonce, set_nonce] = useState(0);
@@ -321,7 +323,8 @@ function	Index({hasSecret}) {
 							fromCounterValue={fromCounterValue}
 							balanceOf={balancesOf[fromVault.address]?.toString() || '0'}
 							slippage={slippage}
-							set_slippage={set_slippage} />
+							set_slippage={set_slippage}
+							yearnVaultData={yearnVaultData} />
 
 						<div className={'flex w-full justify-center pt-4'}>
 							{renderMiddlePart()}
@@ -336,7 +339,8 @@ function	Index({hasSecret}) {
 							toCounterValue={toCounterValue}
 							slippage={slippage}
 							balanceOf={balancesOf[toVault.address]?.toString() || '0'}
-							isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount} />
+							isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount}
+							yearnVaultData={yearnVaultData} />
 
 						<div className={'flex flex-row justify-center pt-8 w-full space-x-4'}>
 							<ButtonApprove

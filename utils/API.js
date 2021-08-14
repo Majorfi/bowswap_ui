@@ -192,8 +192,8 @@ export async function	fetchCryptoPrice(from, to) {
 	return null;
 }
 
-async function	_fetchYearnVaults() {
-	const	result = await performGet('https://api.yearn.tools/vaults/all');
+export async function	fetchYearnVaults() {
+	const	result = await performGet('https://api.yearn.finance/v1/chains/1/vaults/all');
 
 	if (result) {
 		return result;
@@ -201,6 +201,3 @@ async function	_fetchYearnVaults() {
 	return null;
 }
 
-export async function	fetchYearnVaults() {
-	await _fetchYearnVaults();
-}
