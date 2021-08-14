@@ -192,7 +192,7 @@ function	Index({hasSecret}) {
 	const	[toCounterValue, set_toCounterValue] = useState(0);
 	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('');
 
-	const	[slippage, set_slippage] = useState(0.01);
+	const	[slippage, set_slippage] = useState(0.05);
 	const	[isFetchingExpectedReceiveAmount, set_isFetchingExpectedReceiveAmount] = useState(false);
 
 	const	debouncedFetchExpectedAmount = useDebounce(fromAmount, 500);
