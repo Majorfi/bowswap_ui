@@ -29,6 +29,7 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 			<div className={'flex flex-col md:flex-row items-start justify-center space-y-2 md:space-y-0 md:space-x-4 w-full'}>
 				<div className={'w-full md:w-4/11'}>
 					<ModalVaultList
+						label={'Select from vault'}
 						disabled={disabled}
 						vaults={vaults}
 						value={fromVault}
@@ -57,6 +58,7 @@ function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, to
 			<div className={'flex flex-col md:flex-row items-start justify-center space-y-2 md:space-y-0 md:space-x-4 w-full'}>
 				<div className={'w-full md:w-4/11'}>
 					<ModalVaultList
+						label={'Select to vault'}
 						disabled={disabled}
 						vaults={vaults}
 						value={toVault}
