@@ -42,7 +42,7 @@ function	VaultList({element, onClick, style, balanceOf, vault}) {
 	);
 }
 
-function	ModalVaultList({vaults, yearnVaultData, value, set_value, disabled}) {
+function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabled}) {
 	const	{balancesOf} = useAccount();
 	const	[open, set_open] = useState(false);
 	const	[filter, set_filter] = useState('');
@@ -109,7 +109,7 @@ function	ModalVaultList({vaults, yearnVaultData, value, set_value, disabled}) {
 										<path fillRule={'evenodd'} clipRule={'evenodd'} d={'M14.8144 17.7439C14.5417 18.0556 14.0678 18.0872 13.7561 17.8144L7.75612 12.5644C7.59336 12.422 7.5 12.2163 7.5 12C7.5 11.7837 7.59336 11.578 7.75612 11.4356L13.7561 6.18558C14.0678 5.91282 14.5417 5.9444 14.8144 6.25613C15.0872 6.56786 15.0556 7.04168 14.7439 7.31444L9.38894 12L14.7439 16.6856C15.0556 16.9583 15.0872 17.4321 14.8144 17.7439Z'} fill={'white'}/>
 									</svg>
 									<h3 as={'h3'} className={'text-lg font-medium text-white'}>
-										{'Select from vault'}
+										{label}
 									</h3>
 									<div />
 								</div>
