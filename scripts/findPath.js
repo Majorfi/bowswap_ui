@@ -1,8 +1,8 @@
 /******************************************************************************
 **	@Author:				Thomas Bouder <Tbouder>
 **	@Email:					Tbouder@protonmail.com
-**	@Date:					Friday August 13th 2021
-**	@Filename:				findPath copy.js
+**	@Date:					Saturday August 14th 2021
+**	@Filename:				findPath.js
 ******************************************************************************/
 
 const {ethers} = require('ethers');
@@ -211,7 +211,6 @@ async function findPath({from, to}) {
 		}
 	}
 }
-
 
 /******************************************************************************
 **	META to 3CRV
