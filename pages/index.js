@@ -21,6 +21,7 @@ import	Error										from	'components/Icons/Error';
 import	Pending										from	'components/Icons/Pending';
 import	{USD_VAULTS, BTC_VAULTS, fetchCryptoPrice}	from	'utils/API';
 import	{bigNumber}									from	'utils';
+import Tabs from 'components/Tabs';
 
 function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, slippage, set_slippage, fromCounterValue, balanceOf, disabled}) {
 	return (
@@ -113,7 +114,7 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 			onClick={performSwap}
 			className={`w-full h-11 flex items-center justify-center space-x-2 px-6 py-3 text-ybase font-medium rounded-lg focus:outline-none overflow-hidden transition-colors border ${
 				disabled || transactionProcessing || !approved ? 'text-ygray-400 bg-white border-ygray-400 cursor-not-allowed' :
-					'bg-blue-400 border-blue-400 hover:bg-blue-300 hover:border-blue-300 text-white cursor-pointer'
+					'bg-yblue hover:bg-yblue-hover border-yblue hover:border-yblue-hover text-white cursor-pointer'
 			}`}>
 			<span>{'Swap'}</span>
 		</button>
@@ -153,7 +154,7 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, onCallback}) 
 	if (approved) {
 		return (
 			<button
-				className={'w-full h-11 flex items-center justify-center space-x-2 px-6 py-3 text-ybase font-medium rounded-lg focus:outline-none overflow-hidden transition-colors border bg-white border-blue-400 text-blue-400 cursor-not-allowed'}>
+				className={'w-full h-11 flex items-center justify-center space-x-2 px-6 py-3 text-ybase font-medium rounded-lg focus:outline-none overflow-hidden transition-colors border bg-white border-yblue text-yblue cursor-not-allowed'}>
 				<div className={'flex flex-row items-center justify-center'}>
 					<span>{'Approved'}</span>
 					<svg className={'ml-2'} width={'16'} height={'16'} viewBox={'0 0 16 16'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
@@ -169,7 +170,7 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, onCallback}) 
 			onClick={performApprove}
 			className={`w-full h-11 flex items-center justify-center space-x-2 px-6 py-3 text-ybase font-medium rounded-lg focus:outline-none overflow-hidden transition-colors border ${
 				disabled || transactionProcessing || (!fromAmount || Number(fromAmount) === 0) ? 'text-ygray-400 bg-white border-ygray-400 cursor-not-allowed' :
-					'bg-blue-400 border-blue-400 hover:bg-blue-300 hover:border-blue-300 text-white cursor-pointer'
+					'bg-yblue border-yblue hover:bg-yblue-hover hover:border-yblue-hover text-white cursor-pointer'
 			}`}>
 			<span>{'Approve'}</span>
 		</button>
@@ -299,7 +300,7 @@ function	Index({hasSecret}) {
 				return {open: true, title: 'HEAVY SLIPPAGE, USE IT AT YOUR OWN RISK', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (Number(slippage) === 0)
 				return {open: true, title: 'NO SLIPPAGE, USE IT AT YOUR OWN RISK', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
-			return {open: false, title: '', color: 'bg-blue-400', icon: <div/>};
+			return {open: false, title: '', color: 'bg-yblue', icon: <div/>};
 		};
 		return (
 			<BlockStatus {...getArgs()} />
@@ -308,7 +309,10 @@ function	Index({hasSecret}) {
 
 	return (
 		<section className={'w-full md:px-12 px-4 space-y-12 mb-64 z-10 relative'}>
-			<div className={'flex justify-center items-center'}>
+			<div className={'flex flex-col w-full justify-center items-center'}>
+				<div className={'w-full max-w-2xl mb-2'}>
+					<Tabs />
+				</div>
 				<div className={'w-full max-w-2xl'}>
 					<div className={'bg-white rounded-xl shadow-md p-4 w-full relative space-y-0 md:space-y-4'}>
 						<SectionFromVault

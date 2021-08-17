@@ -75,7 +75,7 @@ function ModalVaultList({vaults, value, set_value, disabled}) {
 				leaveTo={'opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'}>
 				<div as={'div'} className={'absolute z-50 inset-0 overflow-hidden'}>
 					<div className={'flex w-full h-full bg-white p-4 rounded-lg overflow-hidden z-10'}>
-						<div className={'inline-block bg-blue-400 rounded-lg w-full f-full z-20'}>
+						<div className={'inline-block bg-yblue rounded-lg w-full f-full z-20'}>
 							<div className={'px-6 py-7 relative h-full overflow-hidden'}>
 								<div className={'flex flex-row items-center justify-between w-full mb-6'}>
 									<svg className={'cursor-pointer'} onClick={() => set_open(false)} width={'24'} height={'24'} viewBox={'0 0 24 24'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
@@ -87,7 +87,7 @@ function ModalVaultList({vaults, value, set_value, disabled}) {
 									<div />
 								</div>
 								<div className={'py-0.5'}>
-									<div className={'w-full rounded-md bg-blue-900 text-lg p-4 relative'}>
+									<div className={'w-full rounded-md text-lg p-4 relative bg-yblue-lighter'}>
 										<input
 											type={'text'}
 											name={'vaultName_or_address'}

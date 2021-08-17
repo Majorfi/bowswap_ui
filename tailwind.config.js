@@ -20,14 +20,12 @@ module.exports = {
 			error: '#FF005E',
 			pending: '#FFB800',
 			success: '#A5DF00',
-			blue: {
-				300: '#32B5FF',
-				400: '#00A3FF',
-				900: '#006AE3'
-			},
+			yblue: '#1E6EDF',
+			'connect-hover': '#D6E7FF',
+			'yblue-lighter': '#1582FF',
+			'yblue-hover': '#3B86F0',
 			ygray: {
-				background: '#E5E5E5',
-				50: '#EDEDED',
+				50: '#EAEAEA',
 				100: '#F2F3F5',
 				400: '#BDBDBD',
 				500: '#A5A5A5',

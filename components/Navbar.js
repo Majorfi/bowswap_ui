@@ -32,7 +32,7 @@ function	Navbar({hasSecret}) {
 			return (
 				<button
 					onClick={() => set_ModalLoginOpen(true)}
-					className={'ml-8 inline-flex px-6 py-3 items-center leading-4 rounded-lg text-ybase cursor-pointer whitespace-nowrap bg-transparent text-blue-400 border border-solid border-blue-400 hover:bg-blue-300 hover:text-white transition-colors'}>
+					className={'ml-8 inline-flex px-6 py-3 items-center leading-4 rounded-lg text-ybase cursor-pointer whitespace-nowrap bg-transparent text-yblue border border-solid border-yblue hover:bg-connect-hover  transition-colors'}>
 					{'Connect wallet'}
 				</button>
 			);
@@ -55,7 +55,7 @@ function	Navbar({hasSecret}) {
 			<div className={'max-w-2xl items-center justify-between flex flex-row w-full'}>
 				<div className={'flex flex-row items-center space-x-3'}>
 					<Image src={hasSecret ? '/yCrossbowswap.png' : '/yBowswap.png'} width={42} height={42} quality={100} loading={'eager'} />
-					<p className={`inline ${hasSecret ? 'text-white' : 'text-gray-800'} font-extrabold text-xl`}>{hasSecret ? 'Crossbowswap' : 'Bowswap'}</p>
+					<p className={`inline ${hasSecret ? 'text-white' : 'text-yblue'} font-extrabold text-xl`}>{hasSecret ? 'Crossbowswap' : 'Bowswap'}</p>
 				</div>
 				<div>
 					{renderWalletButton()}

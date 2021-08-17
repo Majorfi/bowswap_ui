@@ -49,7 +49,7 @@ function	AppWrapper(props) {
 				<div className={'z-10 pointer-events-auto fixed top-0 w-full'}>
 					<Navbar />
 				</div>
-				<div className={'w-full h-full relative max-w-screen-lg mx-auto z-30 mt-28'}>
+				<div className={'w-full h-full relative max-w-screen-lg mx-auto z-30 mt-16 pt-2'}>
 					<Component
 						key={router.route}
 						element={props.element}
@@ -58,7 +58,7 @@ function	AppWrapper(props) {
 						{...pageProps} />
 				</div>
 
-				<div className={`fixed inset-0 z-20 transition-opacity ${active && hasSecretCode ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}>
+				<div className={`fixed inset-0 z-20 transition-opacity ${active && hasSecretCode ? 'pointer-events-auto opacity-100 visible' : 'pointer-events-none opacity-0 hidden'}`}>
 					<div className={`fixed -inset-96 bg-test z-20 rounded-full ${active && hasSecretCode ? 'animate-scale-up-center' : ''}`} />
 					<div className={'z-30 pointer-events-auto fixed top-0 w-full'}>
 						<Navbar hasSecret={active && hasSecretCode} />
