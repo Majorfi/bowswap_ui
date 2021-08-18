@@ -61,7 +61,7 @@ function PopoverSlippage({slippage, set_slippage}) {
 										<input
 											id={'slippage'}
 											autoComplete={'off'}
-											value={Number(slippage).toString()}
+											value={slippage}
 											onChange={(e) => {
 												set_slippage(e.target.value);
 											}}
