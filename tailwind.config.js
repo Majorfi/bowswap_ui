@@ -24,8 +24,9 @@ module.exports = {
 			'connect-hover': '#D6E7FF',
 			'yblue-lighter': '#1582FF',
 			'yblue-hover': '#3B86F0',
+			'light-hover': '#F1F4F8',
 			ygray: {
-				50: '#EAEAEA',
+				50: '#EDEDED',
 				100: '#F2F3F5',
 				400: '#BDBDBD',
 				500: '#A5A5A5',

@@ -27,7 +27,7 @@ import	YVempire from 'components/YVempire';
 function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, slippage, set_slippage, fromCounterValue, balanceOf, disabled}) {
 	return (
 		<section aria-label={'FROM_VAULT'}>
-			<label className={'font-medium text-sm text-gray-800'}>{'From Vault'}</label>
+			<label className={'font-medium text-ybase text-ygray-900 pl-0.5'}>{'From Vault'}</label>
 			<div className={'flex flex-col md:flex-row items-start justify-center space-y-2 md:space-y-0 md:space-x-4 w-full'}>
 				<div className={'w-full md:w-4/11'}>
 					<ModalVaultList
@@ -56,7 +56,7 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, toCounterValue, balanceOf, slippage, isFetchingExpectedReceiveAmount, disabled}) {
 	return (
 		<section aria-label={'TO_VAULT'}>
-			<label className={'font-medium text-sm text-gray-800'}>{'To Vault'}</label>
+			<label className={'font-medium text-ybase text-ygray-900 pl-0.5'}>{'To Vault'}</label>
 			<div className={'flex flex-col md:flex-row items-start justify-center space-y-2 md:space-y-0 md:space-x-4 w-full'}>
 				<div className={'w-full md:w-4/11'}>
 					<ModalVaultList
