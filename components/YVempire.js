@@ -360,7 +360,7 @@ function	YVempire() {
 	const	compound = elements.filter(e => e.service === 0);
 	const	aave = elements.filter(e => e.service === 1 || e.service === 2);
 	return (
-		<div className={'bg-white rounded-xl shadow-md px-4 pt-4 w-full relative'}>
+		<div className={'bg-white rounded-xl shadow-base px-4 pt-4 w-full relative'}>
 			<div className={'relative withBeforeGradient'}>
 				{elements.length > 0 ?
 					<div className={'overflow-scroll relative vampireList pb-4'} style={{minHeight: 384, maxHeight: 384}}>

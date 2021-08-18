@@ -310,7 +310,7 @@ function	LegacyBowswap() {
 
 	return (
 		<div className={'w-full max-w-2xl'}>
-			<div className={'bg-white rounded-xl shadow-md p-4 w-full relative space-y-0 md:space-y-4'}>
+			<div className={'bg-white rounded-xl shadow-base p-4 w-full relative space-y-0 md:space-y-4'}>
 				<SectionFromVault
 					disabled={!txApproveStatus.none || (!txSwapStatus.none && !txSwapStatus.success)}
 					vaults={[...USD_VAULTS, ...BTC_VAULTS]}
