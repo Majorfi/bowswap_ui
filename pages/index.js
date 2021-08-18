@@ -22,6 +22,7 @@ import	Pending										from	'components/Icons/Pending';
 import	{USD_VAULTS, BTC_VAULTS, fetchCryptoPrice}	from	'utils/API';
 import	{bigNumber}									from	'utils';
 import Tabs from 'components/Tabs';
+import	YVempire from 'components/YVempire';
 
 function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, slippage, set_slippage, fromCounterValue, balanceOf, disabled}) {
 	return (
@@ -177,12 +178,10 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, onCallback}) 
 	);
 }
 
-
-function	Index({hasSecret}) {
+function	LegacyBowswap() {
 	const	{provider} = useWeb3();
 	const	{balancesOf, updateBalanceOf} = useAccount();
 	const	[nonce, set_nonce] = useState(0);
-	const	[triggerPong, set_triggerPong] = useState(false);
 
 	const	[fromVault, set_fromVault] = useState(USD_VAULTS[0]);
 	const	[fromCounterValue, set_fromCounterValue] = useState(0);
@@ -308,77 +307,89 @@ function	Index({hasSecret}) {
 	}
 
 	return (
+		<div className={'w-full max-w-2xl'}>
+			<div className={'bg-white rounded-xl shadow-md p-4 w-full relative space-y-0 md:space-y-4'}>
+				<SectionFromVault
+					disabled={!txApproveStatus.none || (!txSwapStatus.none && !txSwapStatus.success)}
+					vaults={[...USD_VAULTS, ...BTC_VAULTS]}
+					fromVault={fromVault}
+					set_fromVault={set_fromVault}
+					fromAmount={fromAmount}
+					set_fromAmount={set_fromAmount}
+					fromCounterValue={fromCounterValue}
+					balanceOf={balancesOf[fromVault.address]?.toString() || '0'}
+					slippage={slippage}
+					set_slippage={set_slippage} />
+
+				<div className={'flex w-full justify-center pt-4'}>
+					{renderMiddlePart()}
+				</div>
+
+				<SectionToVault
+					disabled={!txApproveStatus.none || (!txSwapStatus.none && !txSwapStatus.success)}
+					vaults={toVaultsList}
+					toVault={toVault}
+					set_toVault={set_toVault}
+					expectedReceiveAmount={expectedReceiveAmount}
+					toCounterValue={toCounterValue}
+					slippage={slippage}
+					balanceOf={balancesOf[toVault.address]?.toString() || '0'}
+					isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount} />
+
+				<div className={'flex flex-row justify-center pt-8 w-full space-x-4'}>
+					<ButtonApprove
+						disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals))}
+						approved={txApproveStatus.success}
+						fromVault={fromVault}
+						fromAmount={fromAmount}
+						onCallback={(type) => {
+							set_txApproveStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success'});
+							if (type === 'error') {
+								setTimeout(() => set_txApproveStatus((s) => s.error ? {none: true, pending: false, error: false, success: false} : s), 2500);
+							}
+							if (type === 'success') {
+								setTimeout(() => set_txApproveStatus({none: false, pending: false, error: false, success: true, hide: true}), 2500);
+							}
+						}} />
+					<ButtonSwap
+						disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals))}
+						approved={txApproveStatus.success}
+						fromVault={fromVault}
+						toVault={toVault}
+						fromAmount={fromAmount}
+						expectedReceiveAmount={expectedReceiveAmount}
+						slippage={slippage}
+						onCallback={(type) => {
+							set_txSwapStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success'});
+							if (type === 'error') {
+								setTimeout(() => set_txSwapStatus((s) => s.error ? {none: true, pending: false, error: false, success: false} : s), 2500);
+							}
+							if (type === 'success') {
+								setTimeout(() => set_txSwapStatus({none: true, pending: false, error: false, success: false}), 2500);
+								updateBalanceOf();
+								resetStates();
+							}
+						}}
+					/>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+
+function	Index({hasSecret}) {
+	const	[currentTab, set_currentTab] = useState(0);
+	const	[triggerPong, set_triggerPong] = useState(false);
+
+	return (
 		<section className={'w-full md:px-12 px-4 space-y-12 mb-64 z-10 relative'}>
 			<div className={'flex flex-col w-full justify-center items-center'}>
 				<div className={'w-full max-w-2xl mb-2'}>
-					<Tabs />
+					<Tabs currentTab={currentTab} set_currentTab={set_currentTab} />
 				</div>
 				<div className={'w-full max-w-2xl'}>
-					<div className={'bg-white rounded-xl shadow-md p-4 w-full relative space-y-0 md:space-y-4'}>
-						<SectionFromVault
-							disabled={!txApproveStatus.none || (!txSwapStatus.none && !txSwapStatus.success)}
-							vaults={[...USD_VAULTS, ...BTC_VAULTS]}
-							fromVault={fromVault}
-							set_fromVault={set_fromVault}
-							fromAmount={fromAmount}
-							set_fromAmount={set_fromAmount}
-							fromCounterValue={fromCounterValue}
-							balanceOf={balancesOf[fromVault.address]?.toString() || '0'}
-							slippage={slippage}
-							set_slippage={set_slippage} />
-
-						<div className={'flex w-full justify-center pt-4'}>
-							{renderMiddlePart()}
-						</div>
-
-						<SectionToVault
-							disabled={!txApproveStatus.none || (!txSwapStatus.none && !txSwapStatus.success)}
-							vaults={toVaultsList}
-							toVault={toVault}
-							set_toVault={set_toVault}
-							expectedReceiveAmount={expectedReceiveAmount}
-							toCounterValue={toCounterValue}
-							slippage={slippage}
-							balanceOf={balancesOf[toVault.address]?.toString() || '0'}
-							isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount} />
-
-						<div className={'flex flex-row justify-center pt-8 w-full space-x-4'}>
-							<ButtonApprove
-								disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals))}
-								approved={txApproveStatus.success}
-								fromVault={fromVault}
-								fromAmount={fromAmount}
-								onCallback={(type) => {
-									set_txApproveStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success'});
-									if (type === 'error') {
-										setTimeout(() => set_txApproveStatus((s) => s.error ? {none: true, pending: false, error: false, success: false} : s), 2500);
-									}
-									if (type === 'success') {
-										setTimeout(() => set_txApproveStatus({none: false, pending: false, error: false, success: true, hide: true}), 2500);
-									}
-								}} />
-							<ButtonSwap
-								disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals))}
-								approved={txApproveStatus.success}
-								fromVault={fromVault}
-								toVault={toVault}
-								fromAmount={fromAmount}
-								expectedReceiveAmount={expectedReceiveAmount}
-								slippage={slippage}
-								onCallback={(type) => {
-									set_txSwapStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success'});
-									if (type === 'error') {
-										setTimeout(() => set_txSwapStatus((s) => s.error ? {none: true, pending: false, error: false, success: false} : s), 2500);
-									}
-									if (type === 'success') {
-										setTimeout(() => set_txSwapStatus({none: true, pending: false, error: false, success: false}), 2500);
-										updateBalanceOf();
-										resetStates();
-									}
-								}}
-							/>
-						</div>
-					</div>
+					{currentTab === 0 ? <LegacyBowswap /> : <YVempire />}
 				</div>
 			</div>
 			{hasSecret ? (
