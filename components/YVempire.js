@@ -360,10 +360,10 @@ function	YVempire() {
 	const	compound = elements.filter(e => e.service === 0);
 	const	aave = elements.filter(e => e.service === 1 || e.service === 2);
 	return (
-		<div className={'bg-white rounded-xl shadow-md p-4 w-full relative'}>
+		<div className={'bg-white rounded-xl shadow-md px-4 pt-4 w-full relative'}>
 			<div className={'relative withBeforeGradient'}>
 				{elements.length > 0 ?
-					<div className={'overflow-scroll relative vampireList pb-4'} style={{minHeight: 352, maxHeight: 352}}>
+					<div className={'overflow-scroll relative vampireList pb-4'} style={{minHeight: 384, maxHeight: 384}}>
 						{aave.length > 0 ?
 							<>
 								<Head from={'AAVE'} to={'Yearn'} />
@@ -384,7 +384,7 @@ function	YVempire() {
 							</div> : null}
 					</div>
 					: (
-						<div className={'h-64 py-12 bg-white w-full flex flex-col justify-center items-center'}>
+						<div className={'h-64 py-12 bg-white w-full flex flex-col justify-center items-center'} style={{minHeight: 384, maxHeight: 384}}>
 							<svg xmlns={'http://www.w3.org/2000/svg'} x={'0px'} y={'0px'} viewBox={'0 0 274.001 274.001'} xmlSpace={'preserve'} className={'w-64 h-64 text-gray-200'} ><g><path fill={'currentcolor'} d={'M150.905,175.061c-28.218,7.6-21.313-5.932-18.589-26.34l0,0 c-10.142,14.938-24.158,6.084-20.715-7.271c-5.529,10.365-16.657,21.303-28.558,13.391c-12.46-8.039-7.688-85-83.043-114.833 c11.459,7.41,32.063,33.354,2.302,60.66c36.499,1.346,22.635,36.253,13.426,38.675c22.66,2.598,33.872,14.784,27.071,44.2 c18.725-10.427,52.082-8.753,41.083,37.198c8.803-21.631,50.63-27.257,45.071,6.77c15.223-19.209,48.701-14.457,56.256,6.482 c-0.384-19.43,25.111-35.564,41.476-23.154c-1.149-20.68,24.084-39.162,47.316-37.398 C234.244,141.285,181.952,166.709,150.905,175.061z'}/></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg>
 							<p className={'text-gray-300 text-sm font-medium'}>{'Nothing to see here'}</p>
 						</div>
@@ -394,7 +394,7 @@ function	YVempire() {
 				</div>
 			</div>
 
-			<div className={'w-full p-6 pt-4 bg-white flex justify-center items-center'}>
+			<div className={'w-full py-4 bg-white flex justify-center items-end'}>
 				<div className={'flex flex-row justify-center w-full space-x-4'}>
 					<ButtonApproveAll
 						pairs={pairs}
