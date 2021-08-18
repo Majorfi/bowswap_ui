@@ -16,7 +16,7 @@ import	COMPOUND							from	'utils/Compound';
 const AccountContext = createContext();
 
 export const AccountContextApp = ({children}) => {
-	const	{address, provider} = useWeb3();
+	const	{active, address, provider} = useWeb3();
 	const	[nonce, set_nonce] = useState(0);
 	const	[contractInstances, set_contractInstances] = useState({});
 	const	[yVempireContractInstances, set_yVempireContractInstances] = useState({});
@@ -65,6 +65,16 @@ export const AccountContextApp = ({children}) => {
 			}, []);
 		}
 	}, [nonce]);
+
+	useEffect(() => {
+		if (!active) {
+			set_contractInstances({});
+			set_yVempireContractInstances({});
+			set_balancesOf({});
+			set_allowances({});
+			set_nonce(0);
+		}
+	}, [active]);
 
 	async function	updateBalanceOf() {
 		set_nonce(n => n + 1);
