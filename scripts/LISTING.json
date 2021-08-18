@@ -1,4 +1,308 @@
 {
+    "0x071c661B4DeefB59E2a3DdB20Db036821eeE8F4b": {
+        "name": "bBTC",
+        "address": "0x071c661B4DeefB59E2a3DdB20Db036821eeE8F4b",
+        "coins": [
+            "0x9BE89D2a4cd102D8Fecc6BF9dA793be995C22541",
+            "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3"
+        ],
+        "lpToken": "0x410e3E86ef427e30B9235497143881f717d93c2A"
+    },
+    "0xC45b2EEe6e09cA176Ca3bB5f7eEe7C47bF93c756": {
+        "name": "bBTC",
+        "address": "0xC45b2EEe6e09cA176Ca3bB5f7eEe7C47bF93c756"
+    },
+    "0x410e3E86ef427e30B9235497143881f717d93c2A": {
+        "name": "bBTC",
+        "address": "0x410e3E86ef427e30B9235497143881f717d93c2A",
+        "minter": "0x071c661B4DeefB59E2a3DdB20Db036821eeE8F4b"
+    },
+    "0x61E10659fe3aa93d036d099405224E4Ac24996d0": {
+        "name": "DUSD",
+        "address": "0x61E10659fe3aa93d036d099405224E4Ac24996d0",
+        "coins": [
+            "0x5BC25f649fc4e26069dDF4cF4010F9f706c23831",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ]
+    },
+    "0x8038C01A0390a8c547446a0b2c18fc9aEFEcc10c": {
+        "name": "DUSD",
+        "address": "0x8038C01A0390a8c547446a0b2c18fc9aEFEcc10c",
+        "coins": [
+            "0x5BC25f649fc4e26069dDF4cF4010F9f706c23831",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ],
+        "lpToken": "0x3a664Ab939FD8482048609f652f9a0B0677337B9"
+    },
+    "0x3a664Ab939FD8482048609f652f9a0B0677337B9": {
+        "name": "DUSD",
+        "address": "0x3a664Ab939FD8482048609f652f9a0B0677337B9",
+        "minter": "0x8038C01A0390a8c547446a0b2c18fc9aEFEcc10c"
+    },
+    "0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956": {
+        "name": "GUSD",
+        "address": "0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956",
+        "coins": [
+            "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ],
+        "lpToken": "0xD2967f45c4f384DEEa880F807Be904762a3DeA07"
+    },
+    "0x64448B78561690B70E17CBE8029a3e5c1bB7136e": {
+        "name": "GUSD",
+        "address": "0x64448B78561690B70E17CBE8029a3e5c1bB7136e",
+        "coins": [
+            "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ]
+    },
+    "0xD2967f45c4f384DEEa880F807Be904762a3DeA07": {
+        "name": "GUSD",
+        "address": "0xD2967f45c4f384DEEa880F807Be904762a3DeA07",
+        "coins": []
+    },
+    "0x09672362833d8f703D5395ef3252D4Bfa51c15ca": {
+        "name": "HUSD",
+        "address": "0x09672362833d8f703D5395ef3252D4Bfa51c15ca",
+        "coins": [
+            "0xdF574c24545E5FfEcb9a659c229253D4111d87e1",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ]
+    },
+    "0x3eF6A01A0f81D6046290f3e2A8c5b843e738E604": {
+        "name": "HUSD",
+        "address": "0x3eF6A01A0f81D6046290f3e2A8c5b843e738E604",
+        "coins": [
+            "0xdF574c24545E5FfEcb9a659c229253D4111d87e1",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ],
+        "lpToken": "0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858"
+    },
+    "0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858": {
+        "name": "HUSD",
+        "address": "0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858",
+        "coins": []
+    },
+    "0x1de7f0866e2c4adAC7b457c58Cc25c8688CDa1f2": {
+        "name": "LinkUSD",
+        "address": "0x1de7f0866e2c4adAC7b457c58Cc25c8688CDa1f2",
+        "coins": [
+            "0x0E2EC54fC0B509F445631Bf4b91AB8168230C752",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ]
+    },
+    "0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171": {
+        "name": "LinkUSD",
+        "address": "0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171",
+        "coins": [
+            "0x0E2EC54fC0B509F445631Bf4b91AB8168230C752",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ],
+        "lpToken": "0x6D65b498cb23deAba52db31c93Da9BFFb340FB8F"
+    },
+    "0x6D65b498cb23deAba52db31c93Da9BFFb340FB8F": {
+        "name": "LinkUSD",
+        "address": "0x6D65b498cb23deAba52db31c93Da9BFFb340FB8F",
+        "coins": []
+    },
+    "0x803A2B40c5a9BB2B86DD630B274Fa2A9202874C2": {
+        "name": "MUSD",
+        "address": "0x803A2B40c5a9BB2B86DD630B274Fa2A9202874C2",
+        "coins": [
+            "0xe2f2a5C287993345a840Db3B0845fbC70f5935a5",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ]
+    },
+    "0x8474DdbE98F5aA3179B3B3F5942D724aFcdec9f6": {
+        "name": "MUSD",
+        "address": "0x8474DdbE98F5aA3179B3B3F5942D724aFcdec9f6",
+        "coins": [
+            "0xe2f2a5C287993345a840Db3B0845fbC70f5935a5",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ],
+        "lpToken": "0x1AEf73d49Dedc4b1778d0706583995958Dc862e6"
+    },
+    "0x1AEf73d49Dedc4b1778d0706583995958Dc862e6": {
+        "name": "MUSD",
+        "address": "0x1AEf73d49Dedc4b1778d0706583995958Dc862e6",
+        "coins": []
+    },
+    "0xd5BCf53e2C81e1991570f33Fa881c49EEa570C8D": {
+        "name": "oBTC",
+        "address": "0xd5BCf53e2C81e1991570f33Fa881c49EEa570C8D",
+        "coins": [
+            "0x8064d9Ae6cDf087b1bcd5BDf3531bD5d8C537a68",
+            "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3"
+        ]
+    },
+    "0xd81dA8D904b52208541Bade1bD6595D8a251F8dd": {
+        "name": "oBTC",
+        "address": "0xd81dA8D904b52208541Bade1bD6595D8a251F8dd",
+        "coins": [
+            "0x8064d9Ae6cDf087b1bcd5BDf3531bD5d8C537a68",
+            "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3"
+        ],
+        "lpToken": "0x2fE94ea3d5d4a175184081439753DE15AeF9d614"
+    },
+    "0x2fE94ea3d5d4a175184081439753DE15AeF9d614": {
+        "name": "oBTC",
+        "address": "0x2fE94ea3d5d4a175184081439753DE15AeF9d614",
+        "minter": "0xd81dA8D904b52208541Bade1bD6595D8a251F8dd"
+    },
+    "0x11F419AdAbbFF8d595E7d5b223eee3863Bb3902C": {
+        "name": "pBTC",
+        "address": "0x11F419AdAbbFF8d595E7d5b223eee3863Bb3902C",
+        "coins": [
+            "0x5228a22e72ccC52d415EcFd199F99D0665E7733b",
+            "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3"
+        ]
+    },
+    "0x7F55DDe206dbAD629C080068923b36fe9D6bDBeF": {
+        "name": "pBTC",
+        "address": "0x7F55DDe206dbAD629C080068923b36fe9D6bDBeF",
+        "coins": [
+            "0x5228a22e72ccC52d415EcFd199F99D0665E7733b",
+            "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3"
+        ],
+        "lpToken": "0xDE5331AC4B3630f94853Ff322B66407e0D6331E8"
+    },
+    "0xDE5331AC4B3630f94853Ff322B66407e0D6331E8": {
+        "name": "pBTC",
+        "address": "0xDE5331AC4B3630f94853Ff322B66407e0D6331E8",
+        "minter": "0x7F55DDe206dbAD629C080068923b36fe9D6bDBeF"
+    },
+    "0xBE175115BF33E12348ff77CcfEE4726866A0Fbd5": {
+        "name": "RSV",
+        "address": "0xBE175115BF33E12348ff77CcfEE4726866A0Fbd5",
+        "coins": [
+            "0x196f4727526eA7FB1e17b2071B3d8eAA38486988",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ]
+    },
+    "0xC18cC39da8b11dA8c3541C598eE022258F9744da": {
+        "name": "RSV",
+        "address": "0xC18cC39da8b11dA8c3541C598eE022258F9744da",
+        "coins": [
+            "0x196f4727526eA7FB1e17b2071B3d8eAA38486988",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ],
+        "lpToken": "0xC2Ee6b0334C261ED60C72f6054450b61B8f18E35"
+    },
+    "0xC2Ee6b0334C261ED60C72f6054450b61B8f18E35": {
+        "name": "RSV",
+        "address": "0xC2Ee6b0334C261ED60C72f6054450b61B8f18E35",
+        "coins": []
+    },
+    "0xaa82ca713D94bBA7A89CEAB55314F9EfFEdDc78c": {
+        "name": "tBTC",
+        "address": "0xaa82ca713D94bBA7A89CEAB55314F9EfFEdDc78c",
+        "coins": [
+            "0x8dAEBADE922dF735c38C80C7eBD708Af50815fAa",
+            "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3"
+        ]
+    },
+    "0xC25099792E9349C7DD09759744ea681C7de2cb66": {
+        "name": "tBTC",
+        "address": "0xC25099792E9349C7DD09759744ea681C7de2cb66",
+        "coins": [
+            "0x8dAEBADE922dF735c38C80C7eBD708Af50815fAa",
+            "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3"
+        ],
+        "lpToken": "0x64eda51d3Ad40D56b9dFc5554E06F94e1Dd786Fd"
+    },
+    "0x64eda51d3Ad40D56b9dFc5554E06F94e1Dd786Fd": {
+        "name": "tBTC",
+        "address": "0x64eda51d3Ad40D56b9dFc5554E06F94e1Dd786Fd",
+        "minter": "0xC25099792E9349C7DD09759744ea681C7de2cb66"
+    },
+    "0xF1f85a74AD6c64315F85af52d3d46bF715236ADc": {
+        "name": "USDK",
+        "address": "0xF1f85a74AD6c64315F85af52d3d46bF715236ADc",
+        "coins": [
+            "0x1c48f86ae57291F7686349F12601910BD8D470bb",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ]
+    },
+    "0x3E01dD8a5E1fb3481F0F589056b428Fc308AF0Fb": {
+        "name": "USDK",
+        "address": "0x3E01dD8a5E1fb3481F0F589056b428Fc308AF0Fb",
+        "coins": [
+            "0x1c48f86ae57291F7686349F12601910BD8D470bb",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ],
+        "lpToken": "0x97E2768e8E73511cA874545DC5Ff8067eB19B787"
+    },
+    "0x97E2768e8E73511cA874545DC5Ff8067eB19B787": {
+        "name": "USDK",
+        "address": "0x97E2768e8E73511cA874545DC5Ff8067eB19B787",
+        "coins": []
+    },
+    "0x094d12e5b541784701FD8d65F11fc0598FBC6332": {
+        "name": "USDN",
+        "address": "0x094d12e5b541784701FD8d65F11fc0598FBC6332",
+        "coins": [
+            "0x674C6Ad92Fd080e4004b2312b45f796a192D27a0",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ]
+    },
+    "0x0f9cb53Ebe405d49A0bbdBD291A65Ff571bC83e1": {
+        "name": "USDN",
+        "address": "0x0f9cb53Ebe405d49A0bbdBD291A65Ff571bC83e1",
+        "coins": [
+            "0x674C6Ad92Fd080e4004b2312b45f796a192D27a0",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ],
+        "lpToken": "0x4f3E8F405CF5aFC05D68142F3783bDfE13811522"
+    },
+    "0x4f3E8F405CF5aFC05D68142F3783bDfE13811522": {
+        "name": "USDN",
+        "address": "0x4f3E8F405CF5aFC05D68142F3783bDfE13811522",
+        "coins": []
+    },
+    "0x3c8cAee4E09296800f8D29A68Fa3837e2dae4940": {
+        "name": "USDP",
+        "address": "0x3c8cAee4E09296800f8D29A68Fa3837e2dae4940",
+        "coins": [
+            "0x1456688345527bE1f37E9e627DA0837D6f08C925",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ]
+    },
+    "0x42d7025938bEc20B69cBae5A77421082407f053A": {
+        "name": "USDP",
+        "address": "0x42d7025938bEc20B69cBae5A77421082407f053A",
+        "coins": [
+            "0x1456688345527bE1f37E9e627DA0837D6f08C925",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ],
+        "lpToken": "0x7Eb40E450b9655f4B3cC4259BCC731c63ff55ae6"
+    },
+    "0x7Eb40E450b9655f4B3cC4259BCC731c63ff55ae6": {
+        "name": "USDP",
+        "address": "0x7Eb40E450b9655f4B3cC4259BCC731c63ff55ae6",
+        "minter": "0x42d7025938bEc20B69cBae5A77421082407f053A"
+    },
+    "0xB0a0716841F2Fc03fbA72A891B8Bb13584F52F2d": {
+        "name": "UST",
+        "address": "0xB0a0716841F2Fc03fbA72A891B8Bb13584F52F2d",
+        "coins": [
+            "0xa47c8bf37f92aBed4A126BDA807A7b7498661acD",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ]
+    },
+    "0x890f4e345B1dAED0367A877a1612f86A1f86985f": {
+        "name": "UST",
+        "address": "0x890f4e345B1dAED0367A877a1612f86A1f86985f",
+        "coins": [
+            "0xa47c8bf37f92aBed4A126BDA807A7b7498661acD",
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+        ],
+        "lpToken": "0x94e131324b6054c0D789b190b2dAC504e4361b53"
+    },
+    "0x94e131324b6054c0D789b190b2dAC504e4361b53": {
+        "name": "UST",
+        "address": "0x94e131324b6054c0D789b190b2dAC504e4361b53",
+        "minter": "0x890f4e345B1dAED0367A877a1612f86A1f86985f"
+    },
     "0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7": {
         "name": "3Pool",
         "address": "0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7",
@@ -215,6 +519,15 @@
         "address": "0x02d341CcB60fAaf662bC0554d13778015d1b285C",
         "minter": "0xEB16Ae0052ed37f479f7fe63849198Df1765a733"
     },
+    "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3": {
+        "name": "sBTC",
+        "address": "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3",
+		"coins": [
+            "0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D",
+            "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+            "0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6"
+        ]
+    },
     "0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714": {
         "name": "sBTC",
         "address": "0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714",
@@ -224,11 +537,6 @@
             "0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6"
         ],
         "lpToken": "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3"
-    },
-    "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3": {
-        "name": "sBTC",
-        "address": "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3",
-        "coins": []
     },
     "0xc5424B857f758E906013F3555Dad202e4bdB4567": {
         "name": "sETH",
@@ -394,5 +702,62 @@
             "0xBC6DA0FE9aD5f3b0d58160288917AA56653660E9",
             "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
         ]
+	},
+
+	"0xcee60cFa923170e4f8204AE08B4fA6A3F5656F3a": {
+		"name": "linkCRV",
+		"address": "0xcee60cFa923170e4f8204AE08B4fA6A3F5656F3a",
+		"minter": "0xF178C0b5Bb7e7aBF4e12A4838C7b7c5bA2C623c0"
+	},
+	"0xF178C0b5Bb7e7aBF4e12A4838C7b7c5bA2C623c0": {
+		"name": "linkCRV",
+		"address": "0xF178C0b5Bb7e7aBF4e12A4838C7b7c5bA2C623c0",
+		"coins": [
+		"0x514910771AF9Ca656af840dff83E8264EcF986CA",
+		"0xbBC455cb4F1B9e4bFC4B73970d360c8f032EfEE6"
+		],
+		"lpToken": "0xcee60cFa923170e4f8204AE08B4fA6A3F5656F3a"
+	},
+	"0x4807862AA8b2bF68830e4C8dc86D0e9A998e085a": {
+		"name": "BUSD3CRV-f",
+		"address": "0x4807862AA8b2bF68830e4C8dc86D0e9A998e085a",
+		"coins": [
+		"0x4Fabb145d64652a948d72533023f6E7A623C7C53",
+		"0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+		]
+	},
+	"0xEcd5e75AFb02eFa118AF914515D6521aaBd189F1": {
+		"name": "TUSD3CRV-f",
+		"address": "0xEcd5e75AFb02eFa118AF914515D6521aaBd189F1",
+		"coins": [
+		"0x0000000000085d4780B73119b644AE5ecd22b376",
+		"0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+		]
+	},
+	"0xEd279fDD11cA84bEef15AF5D39BB4d4bEE23F0cA": {
+		"name": "LUSD3CRV-f",
+		"address": "0xEd279fDD11cA84bEef15AF5D39BB4d4bEE23F0cA",
+		"coins": [
+		"0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
+		"0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+		]
+	},
+	"0xd632f22692FaC7611d2AA1C0D552930D43CAEd3B": {
+		"name": "FRAX3CRV-f",
+		"address": "0xd632f22692FaC7611d2AA1C0D552930D43CAEd3B",
+		"coins": [
+		"0x853d955aCEf822Db058eb8505911ED77F175b99e",
+		"0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+		]
+	},
+	"0xD51a44d3FaE010294C616388b506AcdA1bfAAE46": {
+		"name": "crv3crypto",
+		"address": "0xD51a44d3FaE010294C616388b506AcdA1bfAAE46",
+		"coins": [
+		"0xdAC17F958D2ee523a2206206994597C13D831ec7",
+		"0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+		"0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+		],
+		"lpToken": "0xc4AD29ba4B3c580e6D59105FFf484999997675Ff"
 	}
 }
