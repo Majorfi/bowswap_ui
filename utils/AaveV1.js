@@ -13,9 +13,9 @@ const	AAVE_V1 = [
 		cgID: 'dai',
 		underlyingAddress: '0x6b175474e89094c44da98b954eedeac495271d0f',
 		image: '/tokens/0x6b175474e89094c44da98b954eedeac495271d0f.svg',
-		aToken: {
+		uToken: {
 			name: 'aDAI - v1',
-			image: '/aTokens/0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d.svg',
+			image: '/uTokens/0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d.svg',
 			address: '0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d',
 			apy: 0,
 		},
@@ -33,9 +33,9 @@ const	AAVE_V1 = [
 		cgID: 'usd-coin',
 		underlyingAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
 		image: '/tokens/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.svg',
-		aToken: {
+		uToken: {
 			name: 'aUSDC - v1',
-			image: '/aTokens/0x9bA00D6856a4eDF4665BcA2C2309936572473B7E.svg',
+			image: '/uTokens/0x9bA00D6856a4eDF4665BcA2C2309936572473B7E.svg',
 			address: '0x9bA00D6856a4eDF4665BcA2C2309936572473B7E',
 			apy: 0,
 		},
@@ -53,9 +53,9 @@ const	AAVE_V1 = [
 		cgID: 'tether',
 		underlyingAddress: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
 		image: '/tokens/0xdAC17F958D2ee523a2206206994597C13D831ec7.svg',
-		aToken: {
+		uToken: {
 			name: 'aUSDT - v1',
-			image: '/aTokens/0x71fc860F7D3A592A4a98740e39dB31d25db65ae8.svg',
+			image: '/uTokens/0x71fc860F7D3A592A4a98740e39dB31d25db65ae8.svg',
 			address: '0x71fc860F7D3A592A4a98740e39dB31d25db65ae8',
 			apy: 0,
 		},
@@ -73,9 +73,9 @@ const	AAVE_V1 = [
 		cgID: 'ethereum',
 		underlyingAddress: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
 		image: '/tokens/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2.svg',
-		aToken: {
+		uToken: {
 			name: 'aWETH - v1',
-			image: '/aTokens/0x3a3A65aAb0dd2A17E3F1947bA16138cd37d08c04.svg',
+			image: '/uTokens/0x3a3A65aAb0dd2A17E3F1947bA16138cd37d08c04.svg',
 			address: '0x3a3A65aAb0dd2A17E3F1947bA16138cd37d08c04',
 			apy: 0,
 		},
@@ -93,9 +93,9 @@ const	AAVE_V1 = [
 		cgID: 'wrapped-bitcoin',
 		underlyingAddress: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
 		image: '/tokens/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599.svg',
-		aToken: {
+		uToken: {
 			name: 'aWBTC - v1',
-			image: '/aTokens/0xFC4B8ED459e00e5400be803A9BB3954234FD50e3.svg',
+			image: '/uTokens/0xFC4B8ED459e00e5400be803A9BB3954234FD50e3.svg',
 			address: '0xFC4B8ED459e00e5400be803A9BB3954234FD50e3',
 			apy: 0,
 		},
@@ -113,9 +113,9 @@ const	AAVE_V1 = [
 		cgID: 'nusd',
 		underlyingAddress: '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51',
 		image: '/tokens/0x57Ab1ec28D129707052df4dF418D58a2D46d5f51.svg',
-		aToken: {
+		uToken: {
 			name: 'aSUSD - v1',
-			image: '/aTokens/0x625aE63000f46200499120B906716420bd059240.svg',
+			image: '/uTokens/0x625aE63000f46200499120B906716420bd059240.svg',
 			address: '0x625aE63000f46200499120B906716420bd059240',
 			apy: 0,
 		},
@@ -133,9 +133,9 @@ const	AAVE_V1 = [
 		cgID: 'chainlink',
 		underlyingAddress: '0x514910771AF9Ca656af840dff83E8264EcF986CA',
 		image: '/tokens/0x514910771AF9Ca656af840dff83E8264EcF986CA.svg',
-		aToken: {
+		uToken: {
 			name: 'aLINK - v1',
-			image: '/aTokens/0xA64BD6C70Cb9051F6A9ba1F163Fdc07E0DfB5F84.svg',
+			image: '/uTokens/0xA64BD6C70Cb9051F6A9ba1F163Fdc07E0DfB5F84.svg',
 			address: '0xA64BD6C70Cb9051F6A9ba1F163Fdc07E0DfB5F84',
 			apy: 0,
 		},
@@ -153,9 +153,9 @@ const	AAVE_V1 = [
 		cgID: 'havven',
 		underlyingAddress: '0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F',
 		image: '/tokens/0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F.svg',
-		aToken: {
+		uToken: {
 			name: 'aSNX - v1',
-			image: '/aTokens/0x328C4c80BC7aCa0834Db37e6600A6c49E12Da4DE.svg',
+			image: '/uTokens/0x328C4c80BC7aCa0834Db37e6600A6c49E12Da4DE.svg',
 			address: '0x328C4c80BC7aCa0834Db37e6600A6c49E12Da4DE',
 			apy: 0,
 		},
@@ -173,9 +173,9 @@ const	AAVE_V1 = [
 		cgID: 'uniswap',
 		underlyingAddress: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
 		image: '/tokens/0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984.svg',
-		aToken: {
+		uToken: {
 			name: 'aUNI - v1',
-			image: '/aTokens/0xB124541127A0A657f056D9Dd06188c4F1b0e5aab.svg',
+			image: '/uTokens/0xB124541127A0A657f056D9Dd06188c4F1b0e5aab.svg',
 			address: '0xB124541127A0A657f056D9Dd06188c4F1b0e5aab',
 			apy: 0,
 		},
@@ -193,9 +193,9 @@ const	AAVE_V1 = [
 		cgID: 'yfi',
 		underlyingAddress: '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e',
 		image: '/tokens/0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e.svg',
-		aToken: {
+		uToken: {
 			name: 'aYFI - v1',
-			image: '/aTokens/0x12e51E77DAAA58aA0E9247db7510Ea4B46F9bEAd.svg',
+			image: '/uTokens/0x12e51E77DAAA58aA0E9247db7510Ea4B46F9bEAd.svg',
 			address: '0x12e51E77DAAA58aA0E9247db7510Ea4B46F9bEAd',
 			apy: 0,
 		},

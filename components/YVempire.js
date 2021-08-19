@@ -33,8 +33,8 @@ function	ButtonMigrateAll({pairs, selectedTokens, approved, disabled, onCallback
 			return;
 		}
 		const	actualSelectedTokens = Object.entries(selectedTokens).filter(([, value]) => value === true).map(([key]) => key);
-		const	selectedPairs = pairs.filter((p) => actualSelectedTokens.includes(p.aToken.address));
-		const	batch = selectedPairs.map(p => [p.service, p.aToken.address]);
+		const	selectedPairs = pairs.filter((p) => actualSelectedTokens.includes(p.uToken.address));
+		const	batch = selectedPairs.map(p => [p.service, p.uToken.address]);
 		set_transactionProcessing(false);
 		onCallback('pending');
 		try {
@@ -74,7 +74,7 @@ function	ButtonApproveAll({pairs, selectedTokens, balancesOf, allowances, approv
 
 	async function	performApprove(event) {
 		const	actualSelectedTokens = Object.entries(selectedTokens).filter(([, value]) => value === true).map(([key]) => key);
-		const	selectedPairs = pairs.filter((p) => actualSelectedTokens.includes(p.aToken.address));
+		const	selectedPairs = pairs.filter((p) => actualSelectedTokens.includes(p.uToken.address));
 		let		isBroken = false;
 		event.preventDefault();
 		event.stopPropagation();
@@ -87,18 +87,18 @@ function	ButtonApproveAll({pairs, selectedTokens, balancesOf, allowances, approv
 			if (isBroken) {
 				return;
 			}
-			const	balanceOf = balancesOf[pair.aToken.address];
-			const	allowance = allowances[pair.aToken.address];
+			const	balanceOf = balancesOf[pair.uToken.address];
+			const	allowance = allowances[pair.uToken.address];
 			if (ethers.BigNumber.from(allowance).gte(balanceOf)) {
 				//already approved
 				return;
 			}
 			const	approval = balanceOf.add(balanceOf.mul(3).div(100)); //balance + 3% because of mutable aToken balance;
 			try {
-				onStep(`APPROVING ${pair.aToken.name}...`);
+				onStep(`APPROVING ${pair.uToken.name}...`);
 				await approveToken({
 					provider: provider,
-					contractAddress: pair.aToken.address,
+					contractAddress: pair.uToken.address,
 					amount: approval,
 					from: process.env.VYEMPIRE_SWAPPER
 				}, ({error}) => {
@@ -106,7 +106,7 @@ function	ButtonApproveAll({pairs, selectedTokens, balancesOf, allowances, approv
 						isBroken = true;
 						return;
 					}
-					onStepComplete(({[pair.aToken.address]: approval}));
+					onStepComplete(({[pair.uToken.address]: approval}));
 				});	
 			} catch (error) {
 				isBroken = true;
@@ -160,7 +160,7 @@ function	Row({pair, balanceOf, set_nonce, set_selectedTokens}) {
 						set_isChecked(!isChecked);
 						set_nonce(n => n + 1);
 						set_selectedTokens((s) => {
-							s[pair.aToken.address] = !s[pair.aToken.address];
+							s[pair.uToken.address] = !s[pair.uToken.address];
 							return (s);
 						});
 					}}>
@@ -175,15 +175,15 @@ function	Row({pair, balanceOf, set_nonce, set_selectedTokens}) {
 
 							<div className={'ml-4 w-9 h-9 rounded-full flex justify-center items-center relative'} style={{minWidth: 36}}>
 								<Image
-									src={pair.aToken.image}
+									src={pair.uToken.image}
 									objectFit={'contain'}
 									loading={'eager'}
 									width={36}
 									height={36} />
 							</div>
 							<div className={'pl-4 text-left overflow-ellipsis'}>
-								<div className={'text-ybase font-medium whitespace-nowrap'}>{pair.aToken.name}</div>
-								<div className={'text-ybase text-ygray-400 overflow-ellipsis mt-1'}>{`${Number(pair.aToken.apy).toFixed(2)}%`}</div>
+								<div className={'text-ybase font-medium whitespace-nowrap'}>{pair.uToken.name}</div>
+								<div className={'text-ybase text-ygray-400 overflow-ellipsis mt-1'}>{`${Number(pair.uToken.apy).toFixed(2)}%`}</div>
 							</div>
 						</div>
 
@@ -256,9 +256,9 @@ function	Body({elements, balancesOf, set_selectedTokens, set_nonce}) {
 			<tbody>
 				{elements.map((pair) => (
 					<Row
-						key={`${pair.underlyingAddress}-${pair.aToken.address}-${pair.yvToken.address}`}
+						key={`${pair.underlyingAddress}-${pair.uToken.address}-${pair.yvToken.address}`}
 						pair={pair}
-						balanceOf={balancesOf[pair.aToken.address]}
+						balanceOf={balancesOf[pair.uToken.address]}
 						set_selectedTokens={set_selectedTokens}
 						set_nonce={set_nonce} />
 				))}
@@ -278,7 +278,7 @@ function	YVempire() {
 	const	[txApproveStatus, set_txApproveStatus] = useState({none: true, pending: false, success: false, error: false, step: ''});
 	const	[txMigrateStatus, set_txMigrateStatus] = useState({none: true, pending: false, success: false, error: false});
 
-	const	retrieveATokenBalances = useCallback(async (address) => {
+	const	retrieveUTokenBalances = useCallback(async (address) => {
 		if (!provider) {
 			return;
 		}
@@ -289,7 +289,7 @@ function	YVempire() {
 		const	_pairs = pairs;
 		await asyncForEach(_pairs, async (pair, index) => {
 			const	fromTokenContract = new ethers.Contract(
-				pair.aToken.address,
+				pair.uToken.address,
 				[
 					'function balanceOf(address user) view returns (uint256)',
 					'function supplyRatePerBlock() view returns (uint256)'
@@ -310,10 +310,10 @@ function	YVempire() {
 				const blocksPerDay = 6570;
 				const daysPerYear = 365;
 				const supplyApy = (((Math.pow((supplyRatePerBlock / ethMantissa * blocksPerDay) + 1, daysPerYear))) - 1) * 100;
-				_pairs[index].aToken.apy = supplyApy;
+				_pairs[index].uToken.apy = supplyApy;
 			} else {
 				const	reserveData = await aLendingPoolContract.getReserveData(pair.underlyingAddress);
-				_pairs[index].aToken.apy = ethers.utils.formatUnits(reserveData.currentLiquidityRate, 25);
+				_pairs[index].uToken.apy = ethers.utils.formatUnits(reserveData.currentLiquidityRate, 25);
 			}
 			set_pairs(p => {p[index] = _pairs[index]; return p;});
 			set_nonce(n => n + 1);
@@ -322,10 +322,10 @@ function	YVempire() {
 	}, [provider]);
 
 	useEffect(() => {
-		retrieveATokenBalances(address || '0x3DdfA8eC3052539b6C9549F12cEA2C295cfF5296');
-	}, [address, retrieveATokenBalances]);
+		retrieveUTokenBalances(address || '0x3DdfA8eC3052539b6C9549F12cEA2C295cfF5296');
+	}, [address, retrieveUTokenBalances]);
 
-	async function resetATokenBalances(selectedTokensList) {
+	async function resetUTokenBalances(selectedTokensList) {
 		const	migrated = {};
 		selectedTokensList.forEach(each => migrated[each] = ethers.BigNumber.from(0));
 		set_balancesOf(b => ({...b, ...migrated}));
@@ -356,7 +356,7 @@ function	YVempire() {
 		);
 	}
 
-	const	elements = pairs.filter(p => !(balancesOf[p.aToken.address] || ethers.BigNumber.from(0)).isZero());
+	const	elements = pairs.filter(p => !(balancesOf[p.uToken.address] || ethers.BigNumber.from(0)).isZero());
 	const	compound = elements.filter(e => e.service === 0);
 	const	aave = elements.filter(e => e.service === 1 || e.service === 2);
 	return (
@@ -426,7 +426,7 @@ function	YVempire() {
 							if (type === 'success') {
 								setTimeout(() => {
 									set_txMigrateStatus({none: true, pending: false, error: false, success: false});
-									resetATokenBalances(selectedTokensList);
+									resetUTokenBalances(selectedTokensList);
 								}, 2500);
 							}
 						}}

@@ -33,8 +33,8 @@ export const AccountContextApp = ({children}) => {
 				);
 			});
 			([...COMPOUND, ...AAVE_V1, ...AAVE_V2]).forEach((contract) => {
-				_yVempireContractInstances[contract.aToken.address] = new ethers.Contract(
-					contract.aToken.address,
+				_yVempireContractInstances[contract.uToken.address] = new ethers.Contract(
+					contract.uToken.address,
 					[
 						'function balanceOf(address) public view returns (uint256)',
 						'function allowance(address, address) public view returns (uint256)'
