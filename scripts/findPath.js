@@ -1,15 +1,12 @@
 /******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Saturday August 14th 2021
-**	@Filename:				findPath.js
+**	This script is used to find all the possible path from the LISTING.json
+**	file
+**	Usage: node scripts/findPath.js > _newListing.json
 ******************************************************************************/
 
 const {ethers} = require('ethers');
-// const META_POOLS = require('./METAPOOL_LISTING.json');
-// const BASE_POOLS = require('./BASEPOOL_LISTING.json');
 const LISTING = require('./LISTING.json');
-const allPools = LISTING; //{...META_POOLS, ...BASE_POOLS};
+const allPools = LISTING;
 const allPoolsAsArray = Object.values(allPools);
 
 const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
@@ -29,27 +26,13 @@ const toAddress = (address) => {
 const getIntersection = (a, ...arr) => [...new Set(a)].filter(v => arr.every(b => b.includes(v)));
 
 async function newWithBacktracking({from, to, path, i, max}) {
-	const	SHOULDLOG = path.length >= 5 &&
-	path[0][1] === '0x43b4FdFD4Ff969587185cDB6f0BD875c5Fc83f8c' &&
-	path[1][1] === '0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7' &&
-	path[2][1] === '0x80466c64868E1ab14a1Ddf27A676C3fcBE638Fe5' &&
-	path[3][1] === '0x80466c64868E1ab14a1Ddf27A676C3fcBE638Fe5' &&
-	path[4][1] === '0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714';
-
-	const	SHOULDALMOSTLOG = path.length === 3 &&
-	path[0][1] === '0x43b4FdFD4Ff969587185cDB6f0BD875c5Fc83f8c' &&
-	path[1][1] === '0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7' &&
-	path[2][1] === '0x80466c64868E1ab14a1Ddf27A676C3fcBE638Fe5';
-
-	if (SHOULDLOG) {
-		// console.log('\n\n-------- LOOP --------');
-		// console.log(`${from} => ${to}`, path);
-	}
-
 	if (path.length > 0) {
 		if (from === to) {
 			return path;
 		}
+	}
+	if (i > max) {
+		return false;
 	}
 
 	const	currentFrom = from;
@@ -63,6 +46,9 @@ async function newWithBacktracking({from, to, path, i, max}) {
 			for (let coinIndex = 0; coinIndex < element.coins.length; coinIndex++) {
 				const	coinElement = element.coins[coinIndex];
 				if (path.some(([isDeposit, addr]) => (isDeposit === 'False' && addr === element.address))) {
+					continue;
+				}
+				if (element.canWithdraw === false) {
 					continue;
 				}
 				const	result = await newWithBacktracking({
@@ -79,12 +65,7 @@ async function newWithBacktracking({from, to, path, i, max}) {
 		}
 	}
 
-
 	const	intersection = getIntersection([to], [from]);
-	if (i > max) {
-		return;
-	}
-
 	if (intersection.length > 0) {
 		for (let index = 0; index < intersection.length; index++) {
 			const coin = intersection[index];
@@ -96,6 +77,9 @@ async function newWithBacktracking({from, to, path, i, max}) {
 					continue;
 				}
 				if (path.some(([isDeposit, addr]) => (isDeposit === 'False' && addr === minterAddress))) {
+					continue;
+				}
+				if (minter.canWithdraw === false) {
 					continue;
 				}
 				const	result = await newWithBacktracking({
@@ -166,6 +150,10 @@ async function newWithBacktracking({from, to, path, i, max}) {
 				continue;
 			}
 
+			if (allPools[currentFrom]?.canWithdraw === false) {
+				continue;
+			}
+
 			const	result = await newWithBacktracking({
 				from: element,
 				to,
@@ -185,29 +173,21 @@ async function newWithBacktracking({from, to, path, i, max}) {
 
 async function findPath({from, to}) {
 	const	provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
-	// const	provider = new ethers.providers.AlchemyProvider(1, process.env.ALCHEMY_KEY);
 	const	fromVaults = new ethers.Contract(from, ['function token() public view returns (address)'], provider);
 	const	toVaults = new ethers.Contract(to, ['function token() public view returns (address)'], provider);
 	const	fromToken = toAddress(await fromVaults.token());
 	const	toToken = toAddress(await toVaults.token());
-
-	const	fromAsLPToken = allPoolsAsArray.find(e => e.lpToken === fromToken);
-	const	fromList = [fromToken, ...fromAsLPToken?.coins || ''];
 	
 	let	returnValue = undefined;
 	for (let max = 0; max < 6; max++) {
 		const	result = await newWithBacktracking({
 			from: fromToken,
-			// fromList,
-			// currentToken: fromToken,
 			to: toToken,
 			path: [],
 			i: 0,
 			max: max
 		});
 		if (result !== false) {
-			// console.log('\n\n==================== RESULT ====================');
-			// console.log(result);
 			returnValue = result;
 			break;
 		}
@@ -271,104 +251,7 @@ async function	findAllPath() {
 				// console.dir([element, secondElement, [[]]]);
 			}
 		}
-		// return; 
 	}
 }
 
-// findAllPath();
-
-
-// on s'arrete avec le token qu'on doit deposer dans le truc final
-// truc final 0x075b1bb99792c9e1041ba13afef80c91a1e70fb3
-// "coins"
-// 	"0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D",
-// 	"0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-// 	"0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6"
-
-
-// findPath({from: '0xA74d4B67b3368E83797a35382AFB776bAAE4F5C8', to: '0x8414Db07a7F743dEbaFb402070AB01a4E0d2E45e'});
-// findPath({from: '0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417', to: '0x84E13785B5a27879921D6F685f041421C7F482dA'});
-// findPath({from: '0x5f18C75AbDAe578b483E5F43f12a39cF75b973a9', to: '0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417'});
-
-// [
-// 	[ 'True', '0x43b4FdFD4Ff969587185cDB6f0BD875c5Fc83f8c', 1 ],
-// 	[ 'False', '0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7', 2 ],
-// 	[ 'True', '0x80466c64868E1ab14a1Ddf27A676C3fcBE638Fe5', 1 ],
-// 	[ 'True', '0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714', 0 ]
-//   ]
-
-// findPathAlt({from: '0xBC6DA0FE9aD5f3b0d58160288917AA56653660E9', to: '0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3'});
-// 0x43b4FdFD4Ff969587185cDB6f0BD875c5Fc83f8c
-// 0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3
-
-// "0xBC6DA0FE9aD5f3b0d58160288917AA56653660E9",
-// "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
-
-/******************************************************************************
-**	META to 3CRV
-**	[
-** 		"0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417",
-**		"0x84E13785B5a27879921D6F685f041421C7F482dA",
-**		[
-**			(False, "0x42d7025938bEc20B69cBae5A77421082407f053A", 1)
-**		]
-**	]
-******************************************************************************/
-findPath({from: '0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417', to: '0x84E13785B5a27879921D6F685f041421C7F482dA'});
-
-/******************************************************************************
-**	3CRV to META
-**	[
-** 		"0x84E13785B5a27879921D6F685f041421C7F482dA",
-**		"0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417",
-**		[
-**			(True, "0x42d7025938bEc20B69cBae5A77421082407f053A", 1)
-**		]
-**	]
-******************************************************************************/
-findPath({from: '0x84E13785B5a27879921D6F685f041421C7F482dA', to: '0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417'});
-
-/******************************************************************************
-**	USDC vault to cuve vault
-**	[
-** 		"0x5f18C75AbDAe578b483E5F43f12a39cF75b973a9",
-**		"0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417",
-**		[
-**			(True, "0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7", 1),
-**			(True, "0x42d7025938bEc20B69cBae5A77421082407f053A", 1),
-**		]
-**	]
-******************************************************************************/
-// findPath({from: '0x5f18C75AbDAe578b483E5F43f12a39cF75b973a9', to: '0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417'});
-
-/******************************************************************************
-**	cuve vault to USDC vault
-**	[
-** 		"0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417",
-**		"0x5f18C75AbDAe578b483E5F43f12a39cF75b973a9",
-**		[
-**			(False, "0x42d7025938bEc20B69cBae5A77421082407f053A", 1),
-**			(False, "0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7", 1),
-**		]
-**	]
-******************************************************************************/
-// findPath({from: '0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417', to: '0x5f18C75AbDAe578b483E5F43f12a39cF75b973a9'});
-
-/******************************************************************************
-**	USDP crv to tricrv
-**	[
-** 		"0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417",
-**		"0x3D980E50508CFd41a13837A60149927a11c03731",
-**		[
-**			(False, "0x42d7025938bEc20B69cBae5A77421082407f053A", 1),
-**			(False, "0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7", 2),
-**			(True, "0x80466c64868E1ab14a1Ddf27A676C3fcBE638Fe5", 0),
-**		]
-**	]
-******************************************************************************/
-// findPath({from: '0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417', to: '0x3D980E50508CFd41a13837A60149927a11c03731'});
-
-// 0x7eb40e450b9655f4b3cc4259bcc731c63ff55ae6
-// coins:
-// "0x1456688345527bE1f37E9e627DA0837D6f08C925",
-// "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+findAllPath();
