@@ -24,6 +24,7 @@ const useSecretCode = (secretCode) => {
 		if (count + 1 === secretCode.length) {
 			setSuccess(s => !s);
 		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [key]);
   
 	return success;

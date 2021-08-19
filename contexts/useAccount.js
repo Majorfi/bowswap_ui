@@ -64,6 +64,7 @@ export const AccountContextApp = ({children}) => {
 				instance.balanceOf(address).then(_balanceOf => set_balancesOf((b) => {b[key] = _balanceOf; return b;}));
 			}, []);
 		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [nonce]);
 
 	useEffect(() => {
