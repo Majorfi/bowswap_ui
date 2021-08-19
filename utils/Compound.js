@@ -95,7 +95,7 @@ const	COMPOUND = [
 		image: '/tokens/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599.svg',
 		aToken: {
 			name: 'cWBTC - 2',
-			image: '/aTokens/0xccf4429db6322d5c611ee964527d42e5d685dd6a.svg',
+			image: '/aTokens/0xc11b1268c1a384e55c48c2391d8d480264a3a7f4.svg',
 			address: '0xccf4429db6322d5c611ee964527d42e5d685dd6a',
 			apy: 0,
 		},
