@@ -5,7 +5,7 @@
 **	@Filename:				_app.js
 ******************************************************************************/
 
-import	React							from	'react';
+import	React, {useState}				from	'react';
 import	Head							from	'next/head';
 import	{Web3ReactProvider}				from	'@web3-react/core';
 import	{ethers}						from	'ethers';
@@ -13,6 +13,8 @@ import	FullConfetti					from	'react-confetti';
 import	useWeb3, {Web3ContextApp}		from	'contexts/useWeb3';
 import	{AccountContextApp}				from	'contexts/useAccount';
 import	Navbar							from	'components/Commons/Navbar';
+import	ModalPong						from	'components/Commons/ModalPong';
+import	Tabs							from	'components/Commons/Tabs';
 import	useSecret						from	'hook/useSecret';
 
 import	'style/Default.css';
@@ -23,6 +25,37 @@ const useSecretCode = () => {
 	const success = useSecret(secretCode);
 	return success;
 };
+
+function	WithLayout({children, hasSecret}) {
+	const	[triggerPong, set_triggerPong] = useState(false);
+
+	return (
+		<section className={'w-full md:px-12 px-4 space-y-12 mb-64 z-10 relative'}>
+			<div className={'flex flex-col w-full justify-center items-center'}>
+				<div className={'w-full max-w-2xl mb-2'}>
+					<Tabs />
+				</div>
+				<div className={'w-full max-w-2xl'}>
+					{children}
+				</div>
+			</div>
+			{hasSecret ? (
+				<div className={'flex justify-center items-center'}>
+					<div className={'w-full max-w-2xl'}>
+						<div className={'mt-4 hidden lg:flex justify-center items-center flex-col self-center absolute w-full max-w-2xl'}>
+							<div className={'flex justify-center items-center flex-col group cursor-pointer'} onClick={() => set_triggerPong(true)}>
+								<p className={'text-white font-medium text-4xl cursor-pointer'}>{'🕹'}</p>
+								<p className={'text-white font-medium text-sm group-hover:underline cursor-pointer pt-2'}>{'Play !'}</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			)
+				: null}
+			<ModalPong open={triggerPong} set_open={set_triggerPong} />
+		</section>
+	);
+}
 
 function	AppWrapper(props) {
 	const	{active} = useWeb3();
@@ -49,12 +82,14 @@ function	AppWrapper(props) {
 					<Navbar />
 				</div>
 				<div className={'w-full h-full relative max-w-screen-lg mx-auto z-30 mt-16 pt-2'}>
-					<Component
-						key={router.route}
-						element={props.element}
-						router={props.router}
-						hasSecret={active && hasSecretCode}
-						{...pageProps} />
+					<WithLayout hasSecret={active && hasSecretCode}>
+						<Component
+							key={router.route}
+							element={props.element}
+							router={props.router}
+							hasSecret={active && hasSecretCode}
+							{...pageProps} />
+					</WithLayout>
 				</div>
 
 				<div className={`fixed inset-0 z-20 transition-opacity ${active && hasSecretCode ? 'pointer-events-auto opacity-100 visible' : 'pointer-events-none opacity-0 hidden'}`}>
