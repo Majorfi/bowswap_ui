@@ -7,7 +7,7 @@
 
 import	React, {useEffect, useRef}		from	'react';
 import	{ethers}						from	'ethers';
-import	PopoverSlippage					from	'components/PopoverSlippage';
+import	PopoverSlippage					from	'components/Bowswap/PopoverSlippage';
 
 function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decimals, fromCounterValue, disabled}) {
 	const	inputRef = useRef();

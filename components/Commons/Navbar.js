@@ -6,9 +6,9 @@
 ******************************************************************************/
 
 import	React, {useState}		from	'react';
+import	Image					from	'next/image';
 import	useWeb3					from	'contexts/useWeb3';
-import	ModalLogin				from	'components/ModalLogin';
-import Image from 'next/image';
+import	ModalLogin				from	'components/Commons/ModalLogin';
 
 function	Navbar({hasSecret}) {
 	const	{active, address, ens, deactivate, onDesactivate} = useWeb3();
