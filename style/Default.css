@@ -213,7 +213,7 @@ input[type=number] {
 	z-index: 500;
 }
 .vampireList::-webkit-scrollbar {
-	width: 8px;
+	width: 4px;
 	z-index: 500;
 }
 
