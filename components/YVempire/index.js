@@ -116,7 +116,7 @@ function	YVempire() {
 		);
 	}
 
-	const	elements = pairs;//.filter(p => !(balancesOf[p.uToken.address] || ethers.BigNumber.from(0)).isZero());
+	const	elements = pairs.filter(p => !(balancesOf[p.uToken.address] || ethers.BigNumber.from(0)).isZero());
 	const	compound = elements.filter(e => e.service === 0);
 	const	aave = elements.filter(e => e.service === 1 || e.service === 2);
 	return (
