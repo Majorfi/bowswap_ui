@@ -28,219 +28,6 @@ const toAddress = (address) => {
 };
 const getIntersection = (a, ...arr) => [...new Set(a)].filter(v => arr.every(b => b.includes(v)));
 
-async function withBacktracking({from, fromList, currentToken, to, path, i, max}) {
-	const	SHOULDLOG =  (path.length >= 2 &&
-		path[0][1] === '0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7' &&
-		path[1][1] === '0x42d7025938bEc20B69cBae5A77421082407f053A');
-	// path[2][1] === '0x80466c64868E1ab14a1Ddf27A676C3fcBE638Fe5');
-
-	if (path.length > 0) {
-		const	first = path[0];
-		const	last = path[path.length - 1];
-		//TODO: CORRIGER FUNCTION D'ARRET
-		const	firstAddress = allPools[first[1]]?.address;
-		const	firstCoins = allPools[first[1]]?.coins || [];
-		const	firstLpAddress = allPools[first[1]]?.lpToken;
-		const	firstIsValid = (firstAddress === from) || firstCoins.includes(from) || firstLpAddress === from;
-
-		if (allPools[to]?.minter) {
-			const	minter = allPools[to]?.minter;
-			const	lastIsValid = (minter === last[1]);// || (correctCoin && correctIdx);
-			if (SHOULDLOG)
-				console.log({
-					minter,
-					currentToken,
-					path,
-					last3: allPools[last[1]].coins,
-					last: allPools[last[1]].coins.indexOf(currentToken),
-					all: allPoolsAsArray.find(e => e.lpToken === currentToken)
-				});
-
-			// EST-CEUX FAIRE QUELQUE CHOSE AVEC CURRENTTOKEN, PARCE QUE J'AI CURRENT TOKEN EN MAIN ?
-
-
-			if (firstIsValid && lastIsValid) {
-				return path;
-			}
-		} else {
-			const	lastIsValid = (currentToken === to);// || (lastCoins.indexOf(currentToken) === last[2] && currentToken === last[1]);
-			if (firstIsValid && lastIsValid) {
-				return path;
-			}
-		}
-	}
-
-	if (SHOULDLOG) {
-		console.log('\n\n-------- LOOP --------');
-		console.log(currentToken, path);
-	}
-
-	const	intersection = getIntersection([to], fromList);
-	if (i > max) {
-		return;
-	}
-
-	if (intersection.length > 0) {
-		for (let index = 0; index < intersection.length; index++) {
-			const coin = intersection[index];
-			if (allPools[from]?.minter) {
-				const	minterAddress = allPools[from].minter;
-				const	minter = allPools[minterAddress];
-				const	intersectionIndex = (minter.coins || []).indexOf(coin);
-				if (intersectionIndex === -1) {
-					continue;
-				}
-				if (path.some(([isDeposit, addr]) => (isDeposit === 'False' && addr === minterAddress))) {
-					continue;
-				}
-				const	result = await withBacktracking({
-					from,
-					fromList,
-					currentToken: coin,
-					to,
-					path: [...path, ['False', minterAddress, intersectionIndex]],
-					i: i + 1,
-					max,
-				});
-				if (result) {
-					return result;
-				}
-			}
-			if (allPools[to]?.minter) {
-				const	minterAddress = allPools[to].minter;
-				const	minter = allPools[minterAddress];
-				const	intersectionIndex = (minter.coins || []).indexOf(coin);
-				if (intersectionIndex === -1) {
-					continue;
-				}
-				if (path.some(([isDeposit, addr]) => (isDeposit === 'True' && addr === minterAddress))) {
-					continue;
-				}
-				const	result = await withBacktracking({
-					from,
-					fromList,
-					currentToken: coin,
-					to,
-					path: [...path, ['True', minterAddress, intersectionIndex]],
-					i: i + 1,
-					max,
-				});
-				if (result) {
-					return result;
-				}
-			}
-		}
-	}
-
-	for (let fromListIndex = 0; fromListIndex < fromList.length; fromListIndex++) {
-		const	currentFrom = fromList[fromListIndex];
-		const	whereFromIs = allPoolsAsArray.filter(each => (each.coins || []).includes(currentFrom));
-		const	whereFromIsLP = allPoolsAsArray.filter(each => each.lpToken === currentFrom);
-		const	currentFromCoins = allPools[currentFrom]?.coins || [];
-
-		if (whereFromIsLP.length > 0) {
-			for (let index = 0; index < whereFromIsLP.length; index++) {
-				const	element = whereFromIsLP[index];
-				for (let coinIndex = 0; coinIndex < element.coins.length; coinIndex++) {
-					const	coinElement = element.coins[coinIndex];
-					if (path.find(([, addr]) => addr === coinElement)) {
-						continue;
-					}
-					const	result = await withBacktracking({
-						from,
-						fromList: [coinElement],
-						currentToken: coinElement,
-						to,
-						path: [...path, ['False', element.address, coinIndex]],
-						i: i + 1,
-						max
-					});
-					if (result) {
-						return result;
-					}	
-				}
-			}
-		}
-
-		if (whereFromIs.length > 0) {
-			for (let index = 0; index < whereFromIs.length; index++) {
-				const	element = whereFromIs[index];
-				if (element.lpToken) {
-					const	lpToken = allPoolsAsArray.find(e => e.lpToken === element.lpToken);
-					const	lpTokenPool = lpToken.coins || [];
-					const	lpTokenPoolIndex = lpTokenPool.indexOf(from);
-					if (path.some(([isDeposit, addr]) => (isDeposit === 'True' && addr === element.address))) {
-						continue;
-					}
-					if (lpTokenPoolIndex > -1) {
-						const	result = await withBacktracking({
-							from,
-							fromList: [element.lpToken],
-							currentToken: element.lpToken,
-							to,
-							path: [...path, ['True', element.address, lpTokenPoolIndex]],
-							i: i + 1,
-							max,
-						});
-						if (result) {
-							return result;
-						}
-					}
-				}
-
-				const	iterationKeys = element.coins;
-				for (let coinIndex = 0; coinIndex < iterationKeys.length; coinIndex++) {
-					const	iterationKey = iterationKeys[coinIndex];
-					if (path.some(([isDeposit, addr]) => (isDeposit === 'True' && addr === element.address))) {
-						continue;
-					}
-					const	result = await withBacktracking({
-						from,
-						fromList: [iterationKey],
-						currentToken: iterationKey,
-						to,
-						path: [...path, ['True', element.address, coinIndex]],
-						i: i + 1,
-						max
-					});
-					if (result) {
-						return result;
-					}
-
-
-				}
-			}
-		}
-
-		if (currentFromCoins.length > 0) {
-			for (let index = 0; index < currentFromCoins.length; index++) {
-				const	element = currentFromCoins[index];
-				if (path.find(([, addr]) => addr === element)) {
-					continue;
-				}
-
-				const	result = await withBacktracking({
-					from,
-					fromList: [element],
-					currentToken: element,
-					to,
-					path: [...path, ['False', currentFrom, index]],
-					i: i + 1,
-					max
-				});
-				if (result) {
-					return result;
-				}
-			}
-		}
-	}
-
-	return false;
-
-}
-
-
-
 async function newWithBacktracking({from, to, path, i, max}) {
 	const	SHOULDLOG = path.length >= 5 &&
 	path[0][1] === '0x43b4FdFD4Ff969587185cDB6f0BD875c5Fc83f8c' &&
@@ -253,8 +40,6 @@ async function newWithBacktracking({from, to, path, i, max}) {
 	path[0][1] === '0x43b4FdFD4Ff969587185cDB6f0BD875c5Fc83f8c' &&
 	path[1][1] === '0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7' &&
 	path[2][1] === '0x80466c64868E1ab14a1Ddf27A676C3fcBE638Fe5';
-
-	// console.log(`${from} => ${to}`, path);
 
 	if (SHOULDLOG) {
 		// console.log('\n\n-------- LOOP --------');
@@ -295,9 +80,6 @@ async function newWithBacktracking({from, to, path, i, max}) {
 	}
 
 
-
-	// const	fromAsLPToken = allPoolsAsArray.find(e => e.lpToken === from);
-	// const	fromList = [from, ...fromAsLPToken?.coins || ''];
 	const	intersection = getIntersection([to], [from]);
 	if (i > max) {
 		return;
@@ -351,43 +133,6 @@ async function newWithBacktracking({from, to, path, i, max}) {
 		}
 	}
 
-	// for (let fromListIndex = 0; fromListIndex < fromList.length; fromListIndex++) {
-	// const	currentFrom = fromList[fromListIndex];
-	// const	currentFrom = from;
-	// const	whereFromIs = allPoolsAsArray.filter(each => (each.coins || []).includes(currentFrom));
-	// const	whereFromIsLP = allPoolsAsArray.filter(each => each.lpToken === currentFrom);
-	// const	currentFromCoins = allPools[currentFrom]?.coins || [];
-
-	// console.log('---------');
-	// console.log('---------');
-	// console.log('---------');
-	// console.log(whereFromIsLP);
-	// console.log('---------');
-	// console.log('---------');
-	// console.log('---------');
-
-	// if (whereFromIsLP.length > 0) {
-	// 	for (let index = 0; index < whereFromIsLP.length; index++) {
-	// 		const	element = whereFromIsLP[index];
-	// 		for (let coinIndex = 0; coinIndex < element.coins.length; coinIndex++) {
-	// 			const	coinElement = element.coins[coinIndex];
-	// 			if (path.some(([isDeposit, addr]) => (isDeposit === 'False' && addr === coinElement))) {
-	// 				continue;
-	// 			}
-	// 			const	result = await newWithBacktracking({
-	// 				from: coinElement,//element.lpToken,
-	// 				to,
-	// 				path: [...path, ['False', element.address, coinIndex, 'gare']],
-	// 				i: i + 1,
-	// 				max
-	// 			});
-	// 			if (result) {
-	// 				return result;
-	// 			}	
-	// 		}
-	// 	}
-	// }
-
 	if (whereFromIs.length > 0) {
 		for (let index = 0; index < whereFromIs.length; index++) {
 			const	element = whereFromIs[index];
@@ -399,11 +144,6 @@ async function newWithBacktracking({from, to, path, i, max}) {
 					continue;
 				}
 				if (lpTokenPoolIndex > -1) {
-					// if (SHOULDALMOSTLOG) {
-					// 	console.log(`${from} => ${to}`, path);
-
-					// 	console.log(element);
-					// }
 					const	result = await newWithBacktracking({
 						from: element.lpToken,
 						to,
@@ -416,33 +156,6 @@ async function newWithBacktracking({from, to, path, i, max}) {
 					}
 				}
 			}
-
-			// const	iterationKeys = element.coins;
-			// for (let coinIndex = 0; coinIndex < iterationKeys.length; coinIndex++) {
-			// 	const	iterationKey = iterationKeys[coinIndex];
-			// 	if (path.some(([isDeposit, addr]) => (isDeposit === 'True' && addr === element.address))) {
-			// 		continue;
-			// 	}
-
-
-			// 	if (SHOULDALMOSTLOG) {
-			// 		console.log(`${from} => ${to}`, path);
-			// 		console.log(element);
-			// 	}
-
-			// 	const	result = await newWithBacktracking({
-			// 		from: iterationKey,
-			// 		to,
-			// 		path: [...path, ['True', element.address, coinIndex, 'haha']],
-			// 		i: i + 1,
-			// 		max
-			// 	});
-			// 	if (result) {
-			// 		return result;
-			// 	}
-
-
-			// }
 		}
 	}
 
@@ -465,7 +178,6 @@ async function newWithBacktracking({from, to, path, i, max}) {
 			}
 		}
 	}
-	// }
 
 	return false;
 
@@ -483,7 +195,7 @@ async function findPath({from, to}) {
 	const	fromList = [fromToken, ...fromAsLPToken?.coins || ''];
 	
 	let	returnValue = undefined;
-	for (let max = 0; max < 5; max++) {
+	for (let max = 0; max < 6; max++) {
 		const	result = await newWithBacktracking({
 			from: fromToken,
 			// fromList,
@@ -563,7 +275,7 @@ async function	findAllPath() {
 	}
 }
 
-findAllPath();
+// findAllPath();
 
 
 // on s'arrete avec le token qu'on doit deposer dans le truc final
@@ -602,7 +314,7 @@ findAllPath();
 **		]
 **	]
 ******************************************************************************/
-// findPath({from: '0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417', to: '0x84E13785B5a27879921D6F685f041421C7F482dA'});
+findPath({from: '0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417', to: '0x84E13785B5a27879921D6F685f041421C7F482dA'});
 
 /******************************************************************************
 **	3CRV to META
@@ -614,7 +326,7 @@ findAllPath();
 **		]
 **	]
 ******************************************************************************/
-// findPath({from: '0x84E13785B5a27879921D6F685f041421C7F482dA', to: '0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417'});
+findPath({from: '0x84E13785B5a27879921D6F685f041421C7F482dA', to: '0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417'});
 
 /******************************************************************************
 **	USDC vault to cuve vault
