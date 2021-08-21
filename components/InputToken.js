@@ -57,7 +57,7 @@ function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decima
 						if (disabled) {
 							return;
 						}
-						let		_value = e.target.value.replaceAll('..', '.').replaceAll(/[a-zA-Z]/g, '');
+						let		_value = e.target.value.replaceAll('..', '.').replaceAll(/[^0-9.]/g, '');
 						const	[dec, frac] = _value.split('.');
 						if (frac) _value = `${dec}.${frac.slice(0, 10)}`;
 
