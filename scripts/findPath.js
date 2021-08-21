@@ -247,8 +247,6 @@ async function	findAllPath() {
 			const	result = await findPath({from: element, to: secondElement});
 			if (result) {
 				console.dir([element, secondElement, [...result]]);
-			} else {
-				// console.dir([element, secondElement, [[]]]);
 			}
 		}
 	}
