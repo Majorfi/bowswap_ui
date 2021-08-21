@@ -7,8 +7,9 @@
 
 import	React, {useContext, useState, useEffect, createContext}	from	'react';
 import	{ethers}							from	'ethers';
-import	{USD_VAULTS, BTC_VAULTS}			from	'utils/API';
 import	useWeb3								from	'contexts/useWeb3';
+import	BOWSWAP_CRV_BTC_VAULTS				from	'utils/BOWSWAP_CRV_BTC_VAULTS';
+import	BOWSWAP_CRV_USD_VAULTS				from	'utils/BOWSWAP_CRV_USD_VAULTS';
 
 const AccountContext = createContext();
 
@@ -21,7 +22,7 @@ export const AccountContextApp = ({children}) => {
 	useEffect(() => {
 		if (provider && address) {
 			const	_contractInstances = {};
-			([...USD_VAULTS, ...BTC_VAULTS]).forEach((contract) => {
+			([...BOWSWAP_CRV_USD_VAULTS, ...BOWSWAP_CRV_BTC_VAULTS]).forEach((contract) => {
 				_contractInstances[contract.address] = new ethers.Contract(
 					contract.address,
 					['function balanceOf(address) public view returns (uint256)'],
@@ -46,15 +47,9 @@ export const AccountContextApp = ({children}) => {
 		}
 	}, [nonce]);
 
-	async function	updateBalanceOf(/*address*/) {
+	async function	updateBalanceOf() {
 		set_nonce(n => n + 1);
-		// const	_balanceOf = await contractInstances[address]?.balanceOf(address);
-		// set_balancesOf((b) => {
-		// 	b[address] = _balanceOf;
-		// 	return b;
-		// });
 	}
-
 
 	return (
 		<AccountContext.Provider value={{balancesOf, updateBalanceOf}}>

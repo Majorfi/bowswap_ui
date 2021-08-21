@@ -19,8 +19,10 @@ import	BlockStatus									from	'components/BlockStatus';
 import	Success										from	'components/Icons/Success';
 import	Error										from	'components/Icons/Error';
 import	Pending										from	'components/Icons/Pending';
-import	{USD_VAULTS, BTC_VAULTS, fetchCryptoPrice}	from	'utils/API';
+import	{fetchCryptoPrice}	from	'utils/API';
 import	{bigNumber}									from	'utils';
+import	BOWSWAP_CRV_BTC_VAULTS				from	'utils/BOWSWAP_CRV_BTC_VAULTS';
+import	BOWSWAP_CRV_USD_VAULTS				from	'utils/BOWSWAP_CRV_USD_VAULTS';
 
 function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, slippage, set_slippage, fromCounterValue, balanceOf, disabled, yearnVaultData}) {
 	return (
@@ -187,12 +189,12 @@ function	Index({hasSecret, yearnVaultData}) {
 	const	[nonce, set_nonce] = useState(0);
 	const	[triggerPong, set_triggerPong] = useState(false);
 
-	const	[fromVault, set_fromVault] = useState(USD_VAULTS[0]);
+	const	[fromVault, set_fromVault] = useState(BOWSWAP_CRV_USD_VAULTS[0]);
 	const	[fromCounterValue, set_fromCounterValue] = useState(0);
 	const	[fromAmount, set_fromAmount] = useState('');
 
-	const	[toVaultsList, set_toVaultsList] = useState(USD_VAULTS.slice(1));
-	const	[toVault, set_toVault] = useState(USD_VAULTS[1]);
+	const	[toVaultsList, set_toVaultsList] = useState(BOWSWAP_CRV_USD_VAULTS.slice(1));
+	const	[toVault, set_toVault] = useState(BOWSWAP_CRV_USD_VAULTS[1]);
 	const	[toCounterValue, set_toCounterValue] = useState(0);
 	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('');
 
@@ -253,14 +255,14 @@ function	Index({hasSecret, yearnVaultData}) {
 
 	useEffect(() => {
 		if (fromVault.scope === 'btc') {
-			const	vaultList = BTC_VAULTS.filter(e => e.address !== fromVault.address);
+			const	vaultList = BOWSWAP_CRV_BTC_VAULTS.filter(e => e.address !== fromVault.address);
 			set_toVaultsList(vaultList);
 			if (fromVault.scope !== toVault.scope || fromVault.address === toVault.address)
 				set_toVault(vaultList[0]);
 			set_nonce(n => n + 1);
 		}
 		if (fromVault.scope === 'usd') {
-			const	vaultList = USD_VAULTS.filter(e => e.address !== fromVault.address);
+			const	vaultList = BOWSWAP_CRV_USD_VAULTS.filter(e => e.address !== fromVault.address);
 			set_toVaultsList(vaultList);
 			if (fromVault.scope !== toVault.scope || fromVault.address === toVault.address)
 				set_toVault(vaultList[0]);
@@ -317,7 +319,7 @@ function	Index({hasSecret, yearnVaultData}) {
 					<div className={'bg-white rounded-xl shadow-md p-4 w-full relative space-y-0 md:space-y-4'}>
 						<SectionFromVault
 							disabled={!txApproveStatus.none || (!txSwapStatus.none && !txSwapStatus.success)}
-							vaults={[...USD_VAULTS, ...BTC_VAULTS]}
+							vaults={[...BOWSWAP_CRV_USD_VAULTS, ...BOWSWAP_CRV_BTC_VAULTS]}
 							fromVault={fromVault}
 							set_fromVault={set_fromVault}
 							fromAmount={fromAmount}
