@@ -8,8 +8,8 @@
 import	React		from	'react';
 import	YVempire	from	'components/YVempire';
 
-function	FromDefi() {
-	return <YVempire />;
+function	FromDefi({yearnVaultData}) {
+	return <YVempire yearnVaultData={yearnVaultData} />;
 }
 
 export default FromDefi;

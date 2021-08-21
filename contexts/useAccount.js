@@ -8,10 +8,11 @@
 import	React, {useContext, useState, useEffect, createContext}	from	'react';
 import	{ethers}							from	'ethers';
 import	useWeb3								from	'contexts/useWeb3';
-import	{USD_VAULTS, BTC_VAULTS}			from	'utils/API';
 import	AAVE_V1								from	'utils/AaveV1';
 import	AAVE_V2								from	'utils/AaveV2';
 import	COMPOUND							from	'utils/Compound';
+import	BOWSWAP_CRV_BTC_VAULTS				from	'utils/BOWSWAP_CRV_BTC_VAULTS';
+import	BOWSWAP_CRV_USD_VAULTS				from	'utils/BOWSWAP_CRV_USD_VAULTS';
 
 const AccountContext = createContext();
 
@@ -27,7 +28,7 @@ export const AccountContextApp = ({children}) => {
 		if (provider && address) {
 			const	_contractInstances = {};
 			const	_yVempireContractInstances = {};
-			([...USD_VAULTS, ...BTC_VAULTS]).forEach((contract) => {
+			([...BOWSWAP_CRV_USD_VAULTS, ...BOWSWAP_CRV_BTC_VAULTS]).forEach((contract) => {
 				_contractInstances[contract.address] = new ethers.Contract(
 					contract.address, ['function balanceOf(address) public view returns (uint256)'], provider
 				);

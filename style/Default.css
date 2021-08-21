@@ -123,9 +123,24 @@ input[type=number] {
 	font-size: 10px;
 	line-height: 12px;
 }
+
+.text-ysm {
+	font-family: Roboto;
+	font-size: 12px;
+	font-style: normal;
+	line-height: 14px;
+	letter-spacing: 0em;
+}
 .text-ybase {
 	font-family: Roboto;
 	font-size: 14px;
+	font-style: normal;
+	line-height: 16px;
+	letter-spacing: 0em;
+}
+.text-ylg {
+	font-family: Roboto;
+	font-size: 16px;
 	font-style: normal;
 	line-height: 16px;
 	letter-spacing: 0em;

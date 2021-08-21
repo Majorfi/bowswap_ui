@@ -18,10 +18,12 @@ import	BlockStatus									from	'components/Bowswap/BlockStatus';
 import	Success										from	'components/Icons/Success';
 import	Error										from	'components/Icons/Error';
 import	Pending										from	'components/Icons/Pending';
-import	{USD_VAULTS, BTC_VAULTS, fetchCryptoPrice}	from	'utils/API';
+import	BOWSWAP_CRV_BTC_VAULTS						from	'utils/BOWSWAP_CRV_BTC_VAULTS';
+import	BOWSWAP_CRV_USD_VAULTS						from	'utils/BOWSWAP_CRV_USD_VAULTS';
+import	{fetchCryptoPrice}							from	'utils/API';
 import	{bigNumber}									from	'utils';
 
-function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, slippage, set_slippage, fromCounterValue, balanceOf, disabled}) {
+function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, slippage, set_slippage, fromCounterValue, balanceOf, disabled, yearnVaultData}) {
 	return (
 		<section aria-label={'FROM_VAULT'}>
 			<label className={'font-medium text-ybase text-ygray-900 pl-0.5'}>{'From Vault'}</label>
@@ -31,6 +33,7 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 						label={'Select from vault'}
 						disabled={disabled}
 						vaults={vaults}
+						yearnVaultData={yearnVaultData}
 						value={fromVault}
 						set_value={set_fromVault} />
 				</div>
@@ -50,7 +53,7 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 	);
 }
 
-function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, toCounterValue, balanceOf, slippage, isFetchingExpectedReceiveAmount, disabled}) {
+function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, toCounterValue, balanceOf, slippage, isFetchingExpectedReceiveAmount, disabled, yearnVaultData}) {
 	return (
 		<section aria-label={'TO_VAULT'}>
 			<label className={'font-medium text-ybase text-ygray-900 pl-0.5'}>{'To Vault'}</label>
@@ -60,6 +63,7 @@ function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, to
 						label={'Select to vault'}
 						disabled={disabled}
 						vaults={vaults}
+						yearnVaultData={yearnVaultData}
 						value={toVault}
 						set_value={set_toVault} />
 				</div>
@@ -177,17 +181,17 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, onCallback}) 
 	);
 }
 
-function	Bowswap() {
+function	Bowswap({yearnVaultData}) {
 	const	{provider} = useWeb3();
 	const	{balancesOf, updateBalanceOf} = useAccount();
 	const	[nonce, set_nonce] = useState(0);
 
-	const	[fromVault, set_fromVault] = useState(USD_VAULTS[0]);
+	const	[fromVault, set_fromVault] = useState(BOWSWAP_CRV_USD_VAULTS[0]);
 	const	[fromCounterValue, set_fromCounterValue] = useState(0);
 	const	[fromAmount, set_fromAmount] = useState('');
 
-	const	[toVaultsList, set_toVaultsList] = useState(USD_VAULTS.slice(1));
-	const	[toVault, set_toVault] = useState(USD_VAULTS[1]);
+	const	[toVaultsList, set_toVaultsList] = useState(BOWSWAP_CRV_USD_VAULTS.slice(1));
+	const	[toVault, set_toVault] = useState(BOWSWAP_CRV_USD_VAULTS[1]);
 	const	[toCounterValue, set_toCounterValue] = useState(0);
 	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('');
 
@@ -248,14 +252,14 @@ function	Bowswap() {
 
 	useEffect(() => {
 		if (fromVault.scope === 'btc') {
-			const	vaultList = BTC_VAULTS.filter(e => e.address !== fromVault.address);
+			const	vaultList = BOWSWAP_CRV_BTC_VAULTS.filter(e => e.address !== fromVault.address);
 			set_toVaultsList(vaultList);
 			if (fromVault.scope !== toVault.scope || fromVault.address === toVault.address)
 				set_toVault(vaultList[0]);
 			set_nonce(n => n + 1);
 		}
 		if (fromVault.scope === 'usd') {
-			const	vaultList = USD_VAULTS.filter(e => e.address !== fromVault.address);
+			const	vaultList = BOWSWAP_CRV_USD_VAULTS.filter(e => e.address !== fromVault.address);
 			set_toVaultsList(vaultList);
 			if (fromVault.scope !== toVault.scope || fromVault.address === toVault.address)
 				set_toVault(vaultList[0]);
@@ -310,7 +314,7 @@ function	Bowswap() {
 			<div className={'bg-white rounded-xl shadow-base p-4 w-full relative space-y-0 md:space-y-4'}>
 				<SectionFromVault
 					disabled={!txApproveStatus.none || (!txSwapStatus.none && !txSwapStatus.success)}
-					vaults={[...USD_VAULTS, ...BTC_VAULTS]}
+					vaults={[...BOWSWAP_CRV_USD_VAULTS, ...BOWSWAP_CRV_BTC_VAULTS]}
 					fromVault={fromVault}
 					set_fromVault={set_fromVault}
 					fromAmount={fromAmount}
@@ -318,7 +322,8 @@ function	Bowswap() {
 					fromCounterValue={fromCounterValue}
 					balanceOf={balancesOf[fromVault.address]?.toString() || '0'}
 					slippage={slippage}
-					set_slippage={set_slippage} />
+					set_slippage={set_slippage}
+					yearnVaultData={yearnVaultData} />
 
 				<div className={'flex w-full justify-center pt-4'}>
 					{renderMiddlePart()}
@@ -333,7 +338,8 @@ function	Bowswap() {
 					toCounterValue={toCounterValue}
 					slippage={slippage}
 					balanceOf={balancesOf[toVault.address]?.toString() || '0'}
-					isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount} />
+					isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount}
+					yearnVaultData={yearnVaultData} />
 
 				<div className={'flex flex-row justify-center pt-8 w-full space-x-4'}>
 					<ButtonApprove

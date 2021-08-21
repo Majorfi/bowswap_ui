@@ -8,8 +8,8 @@
 import	React		from	'react';
 import	Bowswap		from	'components/Bowswap';
 
-function	BetweenVaults() {
-	return <Bowswap />;
+function	BetweenVaults({yearnVaultData}) {
+	return <Bowswap yearnVaultData={yearnVaultData} />;
 }
 
 export default BetweenVaults;

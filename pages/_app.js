@@ -5,7 +5,7 @@
 **	@Filename:				_app.js
 ******************************************************************************/
 
-import	React, {useState}				from	'react';
+import	React, {useState, useEffect}	from	'react';
 import	Head							from	'next/head';
 import	{Web3ReactProvider}				from	'@web3-react/core';
 import	{ethers}						from	'ethers';
@@ -16,6 +16,7 @@ import	Navbar							from	'components/Commons/Navbar';
 import	ModalPong						from	'components/Commons/ModalPong';
 import	Tabs							from	'components/Commons/Tabs';
 import	useSecret						from	'hook/useSecret';
+import	{fetchYearnVaults}				from	'utils/API';
 
 import	'style/Default.css';
 import	'tailwindcss/tailwind.css';
@@ -61,6 +62,16 @@ function	AppWrapper(props) {
 	const	{active} = useWeb3();
 	const	{Component, pageProps, router} = props;
 	const	hasSecretCode = useSecretCode();
+	const	[yearnVaultData, set_yearnVaultData] = useState([]);
+
+	const	retrieveYearnVaults = React.useCallback(async () => {
+		const	vaults = await fetchYearnVaults();
+		set_yearnVaultData(vaults);
+	}, []);
+
+	useEffect(() => {
+		retrieveYearnVaults();
+	}, [retrieveYearnVaults]);
 
 	return (
 		<>
@@ -88,6 +99,7 @@ function	AppWrapper(props) {
 							element={props.element}
 							router={props.router}
 							hasSecret={active && hasSecretCode}
+							yearnVaultData={yearnVaultData}
 							{...pageProps} />
 					</WithLayout>
 				</div>

@@ -18,7 +18,6 @@ import	Success												from	'components/Icons/Success';
 import	Error												from	'components/Icons/Error';
 import	Pending												from	'components/Icons/Pending';
 import	{asyncForEach}										from	'utils';
-import	{fetchYearnVaults}									from	'utils/API';
 import	AAVE_V1												from	'utils/AaveV1';
 import	AAVE_V2												from	'utils/AaveV2';
 import	COMPOUND											from	'utils/Compound';
@@ -29,7 +28,7 @@ const	LENDING_POOL_ABI = [
 	{'inputs':[{'internalType':'address','name':'asset','type':'address'}],'name':'getReserveData','outputs':[{'components':[{'components':[{'internalType':'uint256','name':'data','type':'uint256'}],'internalType':'struct DataTypes.ReserveConfigurationMap','name':'configuration','type':'tuple'},{'internalType':'uint128','name':'liquidityIndex','type':'uint128'},{'internalType':'uint128','name':'variableBorrowIndex','type':'uint128'},{'internalType':'uint128','name':'currentLiquidityRate','type':'uint128'},{'internalType':'uint128','name':'currentVariableBorrowRate','type':'uint128'},{'internalType':'uint128','name':'currentStableBorrowRate','type':'uint128'},{'internalType':'uint40','name':'lastUpdateTimestamp','type':'uint40'},{'internalType':'address','name':'aTokenAddress','type':'address'},{'internalType':'address','name':'stableDebtTokenAddress','type':'address'},{'internalType':'address','name':'variableDebtTokenAddress','type':'address'},{'internalType':'address','name':'interestRateStrategyAddress','type':'address'},{'internalType':'uint8','name':'id','type':'uint8'}],'internalType':'struct DataTypes.ReserveData','name':'','type':'tuple'}],'stateMutability':'view','type':'function'}
 ];
 
-function	YVempire() {
+function	YVempire({yearnVaultData}) {
 	const	{provider, address} = useWeb3();
 	const	{balancesOf, allowances, set_balancesOf, set_allowances} = useAccount();
 	const	[pairs, set_pairs] = useState(PAIRS);
@@ -43,7 +42,7 @@ function	YVempire() {
 		if (!provider) {
 			return;
 		}
-		const	yearnVaults = await fetchYearnVaults();
+		const	yearnVaults = yearnVaultData;
 		const	aLendingPoolContract = new ethers.Contract(LENDING_POOL_ADDRESS, LENDING_POOL_ABI, provider);
 		const	_pairs = pairs;
 

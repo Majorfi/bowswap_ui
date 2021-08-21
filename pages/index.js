@@ -8,8 +8,8 @@
 import	React		from	'react';
 import	Bowswap		from	'components/Bowswap';
 
-function	Index() {
-	return <Bowswap />;
+function	Index({yearnVaultData}) {
+	return <Bowswap yearnVaultData={yearnVaultData}/>;
 }
 
 export default Index;
