@@ -20,6 +20,8 @@ import	Error										from	'components/Icons/Error';
 import	Pending										from	'components/Icons/Pending';
 import	BOWSWAP_CRV_BTC_VAULTS						from	'utils/BOWSWAP_CRV_BTC_VAULTS';
 import	BOWSWAP_CRV_USD_VAULTS						from	'utils/BOWSWAP_CRV_USD_VAULTS';
+import	BOWSWAP_CRV_V2_VAULTS						from	'utils/BOWSWAP_CRV_V2_VAULTS';
+import	V2_PATHS									from	'utils/currentPaths';
 import	{fetchCryptoPrice}							from	'utils/API';
 import	{bigNumber}									from	'utils';
 
@@ -54,6 +56,7 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 }
 
 function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, toCounterValue, balanceOf, slippage, isFetchingExpectedReceiveAmount, disabled, yearnVaultData}) {
+	console.log(vaults);
 	return (
 		<section aria-label={'TO_VAULT'}>
 			<label className={'font-medium text-ybase text-ygray-900 pl-0.5'}>{'To Vault'}</label>
@@ -190,6 +193,7 @@ function	Bowswap({yearnVaultData}) {
 	const	[fromCounterValue, set_fromCounterValue] = useState(0);
 	const	[fromAmount, set_fromAmount] = useState('');
 
+	const	[toVaultsListV2, set_toVaultsListV2] = useState(V2_PATHS.filter(e => e[0] === BOWSWAP_CRV_USD_VAULTS[0]));
 	const	[toVaultsList, set_toVaultsList] = useState(BOWSWAP_CRV_USD_VAULTS.slice(1));
 	const	[toVault, set_toVault] = useState(BOWSWAP_CRV_USD_VAULTS[1]);
 	const	[toCounterValue, set_toCounterValue] = useState(0);
@@ -265,6 +269,8 @@ function	Bowswap({yearnVaultData}) {
 				set_toVault(vaultList[0]);
 			set_nonce(n => n + 1);
 		}
+		const	V2Paths = V2_PATHS.filter(e => e[0] === fromVault.address).map(e => e[1]);
+		set_toVaultsListV2(BOWSWAP_CRV_V2_VAULTS.filter(e => V2Paths.includes(e.address)));
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [fromVault.address]);
 
@@ -331,7 +337,7 @@ function	Bowswap({yearnVaultData}) {
 
 				<SectionToVault
 					disabled={!txApproveStatus.none || (!txSwapStatus.none && !txSwapStatus.success)}
-					vaults={toVaultsList}
+					vaults={[...toVaultsList, ...toVaultsListV2]}
 					toVault={toVault}
 					set_toVault={set_toVault}
 					expectedReceiveAmount={expectedReceiveAmount}

@@ -27,7 +27,8 @@ module.exports = ({
 	},
 	images: {
 		domains: [
-			'raw.githubusercontent.com'
+			'raw.githubusercontent.com',
+			'rawcdn.githack.com'
 		],
 	},
 	webpack: (config, {webpack}) => {
