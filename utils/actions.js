@@ -65,3 +65,50 @@ export async function	swapTokens({provider, contractAddress, from, to, amount, m
 		callback({error: true, data: undefined});
 	}
 }
+
+
+export async function	migrateTokens({provider, contractAddress, service, coinAddress}, callback) {
+	const	abi = ['function migrate(tuple(uint8 service, address coin)[] swap)'];
+	const	signer = provider.getSigner();
+	const	contract = new ethers.Contract(contractAddress, abi, signer);
+
+	/**********************************************************************
+	**	If the call is successful, try to perform the actual TX
+	**********************************************************************/
+	try {
+		const	swap = [[service, coinAddress]];
+		const	transaction = await contract.migrate(swap);
+		const	transactionResult = await transaction.wait();
+		if (transactionResult.status === 1) {
+			callback({error: false, data: undefined});
+		} else {
+			callback({error: true, data: undefined});
+		}
+	} catch (error) {
+		console.error(error);
+		callback({error: true, data: undefined});
+	}
+}
+
+export async function	migrateBachTokens({provider, contractAddress, batch}, callback) {
+	const	abi = ['function migrate(tuple(uint8 service, address coin)[] swap)'];
+	const	signer = provider.getSigner();
+	const	contract = new ethers.Contract(contractAddress, abi, signer);
+
+	/**********************************************************************
+	**	If the call is successful, try to perform the actual TX
+	**********************************************************************/
+	try {
+
+		const	transaction = await contract.migrate(batch);
+		const	transactionResult = await transaction.wait();
+		if (transactionResult.status === 1) {
+			callback({error: false, data: undefined});
+		} else {
+			callback({error: true, data: undefined});
+		}
+	} catch (error) {
+		console.error(error);
+		callback({error: true, data: undefined});
+	}
+}

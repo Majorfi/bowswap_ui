@@ -7,7 +7,7 @@
 
 import	React, {Fragment}		from	'react';
 import	{Transition}			from	'@headlessui/react';
-import	Pong					from	'components/Pong';
+import	Pong					from	'components/Commons/Pong';
 
 function	ModalLogin({open, set_open}) {
 
@@ -15,6 +15,7 @@ function	ModalLogin({open, set_open}) {
 		if (open && typeof(document) !== 'undefined') {
 			setTimeout(() => Pong.initialize(), 100);
 		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [open, typeof(document) !== 'undefined']);
 
 	return (

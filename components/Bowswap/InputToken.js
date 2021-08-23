@@ -7,7 +7,7 @@
 
 import	React, {useEffect, useRef}		from	'react';
 import	{ethers}						from	'ethers';
-import	PopoverSlippage					from	'components/PopoverSlippage';
+import	PopoverSlippage					from	'components/Bowswap/PopoverSlippage';
 
 function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decimals, fromCounterValue, disabled}) {
 	const	inputRef = useRef();
@@ -57,7 +57,7 @@ function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decima
 						if (disabled) {
 							return;
 						}
-						let		_value = e.target.value.replaceAll('..', '.').replaceAll(/[a-zA-Z]/g, '');
+						let		_value = e.target.value.replaceAll('..', '.').replaceAll(/[^0-9.]/g, '');
 						const	[dec, frac] = _value.split('.');
 						if (frac) _value = `${dec}.${frac.slice(0, 10)}`;
 
@@ -84,7 +84,7 @@ function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decima
 					<div className={'flex flex-row items-center'}>
 						<button
 							onClick={() => disabled ? null : set_value(ethers.utils.formatUnits(balanceOf, decimals))}
-							className={`items-center text-xxs font-medium py-0.5 text-white bg-blue-400 hover:bg-blue-300 focus:outline-none px-3 rounded-lg transition-colors h-5 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+							className={`items-center text-xxs font-medium py-0.5 text-white bg-yblue hover:bg-yblue-hover focus:outline-none px-3 rounded-lg transition-colors h-5 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
 							<span>{'MAX'}</span>
 						</button>
 						<PopoverSlippage slippage={slippage} set_slippage={set_slippage}/>

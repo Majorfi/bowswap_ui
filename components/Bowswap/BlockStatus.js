@@ -13,7 +13,7 @@ function BlockStatus({title, icon, color, open}) {
 	return (
 		<div className={'relative w-full'}>
 			<div className={'w-full h-16 flex justify-center items-center'}>
-				<Arrow />
+				<Arrow className={'w-8 h-8 text-ygray-400 transform rotate-90'} />
 			</div>
 			<Transition
 				show={open}

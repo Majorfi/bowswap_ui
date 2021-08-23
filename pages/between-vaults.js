@@ -2,14 +2,14 @@
 **	@Author:				Thomas Bouder <Tbouder>
 **	@Email:					Tbouder@protonmail.com
 **	@Date:					Sunday July 4th 2021
-**	@Filename:				index.js
+**	@Filename:				between-vaults.js
 ******************************************************************************/
 
 import	React		from	'react';
 import	Bowswap		from	'components/Bowswap';
 
-function	Index({yearnVaultData}) {
-	return <Bowswap yearnVaultData={yearnVaultData}/>;
+function	BetweenVaults({yearnVaultData}) {
+	return <Bowswap yearnVaultData={yearnVaultData} />;
 }
 
-export default Index;
+export default BetweenVaults;
