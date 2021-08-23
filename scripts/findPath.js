@@ -5,6 +5,7 @@
 ******************************************************************************/
 
 const {ethers} = require('ethers');
+const fs = require('fs');
 const LISTING = require('./LISTING.json');
 const allPools = LISTING;
 const allPoolsAsArray = Object.values(allPools);
@@ -25,6 +26,11 @@ const toAddress = (address) => {
 };
 const getIntersection = (a, ...arr) => [...new Set(a)].filter(v => arr.every(b => b.includes(v)));
 
+async function asyncForEach(array, callback) {
+	for (let index = 0; index < array.length; index++) {
+		await callback(array[index], index, array);
+	}
+}
 async function newWithBacktracking({from, to, path, i, max}) {
 	if (path.length > 0) {
 		if (from === to) {
@@ -236,20 +242,25 @@ async function	findAllPath() {
 		'0x25212Df29073FfFA7A67399AcEfC2dd75a831A1A',
 		'0xC4dAf3b5e2A9e93861c3FBDd25f1e943B8D87417',
 	];
+	const	results = [];
 
-	for (let vaultIndex = 0; vaultIndex < VAULT_ADDRESSES.length; vaultIndex++) {
-		const element = VAULT_ADDRESSES[vaultIndex];
-		for (let secondVaultIndex = 0; secondVaultIndex < VAULT_ADDRESSES.length; secondVaultIndex++) {
-			const secondElement = VAULT_ADDRESSES[secondVaultIndex];
+	await asyncForEach(VAULT_ADDRESSES, async (element) => {
+		await asyncForEach(VAULT_ADDRESSES, async (secondElement) => {
 			if (element === secondElement) {
-				continue;
+				return;
 			}
 			const	result = await findPath({from: element, to: secondElement});
 			if (result) {
-				console.dir([element, secondElement, [...result]]);
+				results.push([element, secondElement, [...result]]);
 			}
+		});
+	});
+	const toJSON = JSON.stringify(results, null, 0).replaceAll('"False"', 'False').replaceAll('"True"', 'True');
+	fs.writeFile(`${__dirname}/ALL_PAIRS.py`, `ALL_PAIRS = ${toJSON}`, 'utf8', (err) => {
+		if (err) {
+			throw 'Impossible to update ALL_PAIRS.json';
 		}
-	}
+	});
 }
 
 findAllPath();
