@@ -224,7 +224,7 @@ function	Bowswap({yearnVaultData, prices}) {
 	const	[slippage, set_slippage] = useState(0.05);
 	const	[isFetchingExpectedReceiveAmount, set_isFetchingExpectedReceiveAmount] = useState(false);
 
-	const	debouncedFetchExpectedAmount = useDebounce(fromAmount, 500);
+	const	debouncedFetchExpectedAmount = useDebounce(fromAmount, 750);
 
 	const	[txApproveStatus, set_txApproveStatus] = useState({none: true, pending: false, success: false, error: false});
 	const	[txSwapStatus, set_txSwapStatus] = useState({none: true, pending: false, success: false, error: false});
@@ -258,12 +258,10 @@ function	Bowswap({yearnVaultData, prices}) {
 				amount,
 				V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2]
 			);
-			// await fetchCRVVirtualPrice();
 			set_expectedReceiveAmount(ethers.utils.formatUnits(estimate_out, toVault.decimals));
 			set_isFetchingExpectedReceiveAmount(false);
 		} else {
 			const	metapool_estimate_out = await fromToken.metapool_estimate_out(from, to, amount);
-			// await fetchCRVVirtualPrice();
 			set_expectedReceiveAmount(ethers.utils.formatUnits(metapool_estimate_out, toVault.decimals));
 			set_isFetchingExpectedReceiveAmount(false);
 		}
@@ -395,14 +393,12 @@ function	Bowswap({yearnVaultData, prices}) {
 	**	plus when the `FROM` vault changes or the `TO` vault changes
 	**************************************************************************/
 	useEffect(() => {
-		if (debouncedFetchExpectedAmount) {
-			if (Number(fromAmount) !== 0) {
-				set_isFetchingExpectedReceiveAmount(true);
-				fetchEstimateOut(fromVault.address, toVault.address, ethers.utils.parseUnits(fromAmount, fromVault.decimals));
-				set_nonce(n => n + 1);
-			} else {
-				set_expectedReceiveAmount('0');
-			}
+		if (Number(fromAmount) !== 0) {
+			set_isFetchingExpectedReceiveAmount(true);
+			fetchEstimateOut(fromVault.address, toVault.address, ethers.utils.parseUnits(fromAmount, fromVault.decimals));
+			set_nonce(n => n + 1);
+		} else {
+			set_expectedReceiveAmount('');
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [debouncedFetchExpectedAmount, fromVault.address, toVault.address, fromVault.decimals]);

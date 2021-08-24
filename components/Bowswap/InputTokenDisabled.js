@@ -28,10 +28,10 @@ function	InputTokenDisabled({value, toCounterValue, slippage, isFetchingExpected
 					htmlFor={'fromInput'}
 					className={`with-placeholder placeholder-${value.length} flex justify-end w-full h-10 text-4xl font-medium text-ygray-700 text-opacity-20 proportional-nums cursor-text`}>
 					<input
-						value={(Number(value) - ((Number(value) * slippage / 100)) > 0 ? `${(Number(value) - ((Number(value) * slippage / 100))).toFixed(6)}` : '')}
+						value={(Number(value) !== 0 ? `${(Number(value) - ((Number(value) * slippage / 100))).toFixed(6)}` : '')}
 						disabled
 						readOnly
-						style={{backgroundColor: 'transparent', width: value === '' ? '1px': 'auto'}}
+						style={{backgroundColor: 'transparent', width: Number(value) === 0 ? '1px': 'auto'}}
 						className={'block w-full text-4xl font-medium h-full text-right text-ygray-700'}
 						type={'text'}
 						min={0} />
