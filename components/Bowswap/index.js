@@ -345,6 +345,10 @@ function	Bowswap({yearnVaultData, prices}) {
 	**	@TRIGGER : any time the `FROM` vault changes
 	**************************************************************************/
 	useEffect(() => {
+		const	V2Paths = V2_PATHS.filter(e => toAddress(e[0]) === toAddress(fromVault.address)).map(e => e[1]);
+		const	V2VaultList = BOWSWAP_CRV_V2_VAULTS.filter(e => V2Paths.includes(toAddress(e.address)));
+		set_toVaultsListV2(V2VaultList);
+
 		if (fromVault.scope === 'btc') {
 			const	vaultList = BOWSWAP_CRV_BTC_VAULTS.filter(e => e.address !== fromVault.address);
 			set_toVaultsList(vaultList);
@@ -355,10 +359,11 @@ function	Bowswap({yearnVaultData, prices}) {
 			set_toVaultsList(vaultList);
 			if (fromVault.scope !== toVault.scope || fromVault.address === toVault.address)
 				set_toVault(vaultList[0]);
+		} else {
+			set_toVaultsList([]);
+			set_toVault(V2VaultList[0]);
 		}
 
-		const	V2Paths = V2_PATHS.filter(e => toAddress(e[0]) === toAddress(fromVault.address)).map(e => e[1]);
-		set_toVaultsListV2(BOWSWAP_CRV_V2_VAULTS.filter(e => V2Paths.includes(e.address)));
 		if (provider)
 			fetchFromVaultVirtualPrice();
 		set_nonce(n => n + 1);

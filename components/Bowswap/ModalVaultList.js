@@ -45,15 +45,25 @@ function	VaultList({element, onClick, style, balanceOf, vault}) {
 function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabled}) {
 	const	{balancesOf} = useAccount();
 	const	[open, set_open] = useState(false);
+	const	[nonce, set_nonce] = useState(0);
 	const	[searchFilter, set_searchFilter] = useState('');
 	const	[filteredVaultList, set_filteredVaultList] = useState(vaults);
+
+	useEffect(() => {
+		set_filteredVaultList(vaults);
+	}, [nonce]);
+
+	useEffect(() => {
+		if (!open) {
+			set_searchFilter('');
+		}
+	}, [open]);
 
 	useEffect(() => {
 		const	_vaults = vaults.map((v) => {
 			v.balanceOf = ethers.utils.formatUnits(balancesOf[v.address]?.toString() || '0', v.decimals);
 			return (v);
 		}).filter((v, i, a) => a.findIndex( t => (t.address === v.address)) === i).sort((a, b) => b.balanceOf - a.balanceOf);
-
 
 		if (searchFilter === '') {
 			set_filteredVaultList(_vaults);
@@ -72,7 +82,12 @@ function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabl
 		<div className={'w-full'}>
 			<div className={'relative'}>
 				<button
-					onClick={() => disabled ? null : set_open(true)}
+					onClick={() => {
+						if (!disabled) {
+							set_nonce(n => n + 1);
+							set_open(true);
+						}
+					}}
 					className={`relative w-full px-4 text-left bg-ygray-100 hover:bg-ygray-50 rounded-lg focus:outline-none ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} h-24 py-2`}>
 					<div className={'flex flex-row items-center'}>
 						<Image
