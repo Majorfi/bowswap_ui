@@ -237,30 +237,12 @@ function	Bowswap({yearnVaultData, prices}) {
 		set_txApproveStatus({none: true, pending: false, success: false, error: false});
 	}
 
-	async function computeTriCryptoPrice({priceWBTC, priceWETH}) {
+	async function computeTriCryptoPrice() {
 		const	LP_TOKEN = '0xcA3d75aC011BF5aD07a98d02f18225F9bD9A6BDF';
-		const	LP_TOKEN_MINTER = '0x80466c64868e1ab14a1ddf27a676c3fcbe638fe5';
-
-		const	lpTokenContract = new ethers.Contract(LP_TOKEN, ['function totalSupply() public view returns (uint256)'], provider);
-		const	totalSupply = await lpTokenContract.totalSupply();
-
-		const	lpMinterContract = new ethers.Contract(LP_TOKEN_MINTER, ['function balances(uint256) public view returns (uint256)'], provider);
-		const	[USDTBalance, WBTCBalance, WETHBalance] = await Promise.all([
-			lpMinterContract.balances(0),
-			lpMinterContract.balances(1),
-			lpMinterContract.balances(2)
-		]);
-
-		const	totalSupplyFormated = ethers.utils.formatUnits(totalSupply, 18);
-		const	USDTBalanceFormated = ethers.utils.formatUnits(USDTBalance, 6);
-		const	WBTCBalanceFormated = ethers.utils.formatUnits(WBTCBalance, 8);
-		const	WETHBalanceFormated = ethers.utils.formatUnits(WETHBalance, 18);
-
-		const	USDTPerLPToken = (USDTBalanceFormated / totalSupplyFormated);
-		const	WBTCPerLPToken = (WBTCBalanceFormated / totalSupplyFormated);
-		const	WETHPerLPToken = (WETHBalanceFormated / totalSupplyFormated);
-
-		return (USDTPerLPToken + (WBTCPerLPToken * priceWBTC) + (WETHPerLPToken * priceWETH));
+		const	magicAddress = '0x83d95e0D5f402511dB06817Aff3f9eA88224B030';
+		const	magicContract = new ethers.Contract(magicAddress, ['function getNormalizedValueUsdc(address, uint256) public view returns (uint256)'], provider);
+		const	priceUSDC = await magicContract.getNormalizedValueUsdc(LP_TOKEN, '1000000000000000000');
+		return	ethers.utils.formatUnits(priceUSDC, 6);
 	}
 
 	const	fetchEstimateOut = useCallback(async (from, to, amount) => {
@@ -315,7 +297,7 @@ function	Bowswap({yearnVaultData, prices}) {
 		} else if (fromVault.scope === 'v2' && fromVault.type === 'aave') {
 			set_fromCounterValue(prices.aave.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else if (fromVault.scope === 'v2' && fromVault.type === 'tri') {
-			const	price = await computeTriCryptoPrice({priceWBTC: prices.bitcoin.usd, priceWETH: prices.ethereum.usd});
+			const	price = await computeTriCryptoPrice();
 			set_fromCounterValue(price * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else {
 			set_fromCounterValue(ethers.utils.formatUnits(scaledBalanceOf, 18));
@@ -347,7 +329,7 @@ function	Bowswap({yearnVaultData, prices}) {
 		} else if (toVault.scope === 'v2' && toVault.type === 'aave') {
 			set_toCounterValue(prices.aave.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else if (toVault.scope === 'v2' && toVault.type === 'tri') {
-			const	price = await computeTriCryptoPrice({priceWBTC: prices.bitcoin.usd, priceWETH: prices.ethereum.usd});
+			const	price = await computeTriCryptoPrice();
 			set_toCounterValue(price * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else {
 			set_toCounterValue(ethers.utils.formatUnits(scaledBalanceOf, 18));
