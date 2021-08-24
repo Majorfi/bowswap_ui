@@ -1,27 +1,5 @@
 [
     {
-        "icon": "https://rawcdn.githack.com/yearn/yearn-assets/3fa15c2e51ff3ed4dac8bd124a7bfa8888b3b78c/icons/tokens/0xdCD90C7f6324cfa40d7169ef80b12031770B4325/logo-128.png",
-        "symbol": "yvCurve-stETH",
-        "name": "yvCurve-stETH 0.3.0",
-        "decimals": 18,
-        "scope": "v2",
-        "type": "eth",
-        "address": "0xdCD90C7f6324cfa40d7169ef80b12031770B4325",
-        "tokenAddress": "0x06325440D014e39736583c165C2963BA99fAf14E",
-        "poolAddress": "0xdc24316b9ae028f1497c275eb9192a3ea0f67022"
-    },
-    {
-        "icon": "https://rawcdn.githack.com/yearn/yearn-assets/3fa15c2e51ff3ed4dac8bd124a7bfa8888b3b78c/icons/tokens/0x986b4AFF588a109c09B50A03f42E4110E29D353F/logo-128.png",
-        "symbol": "yvCurve-sETH",
-        "name": "yvCurve-sETH 0.3.2",
-        "decimals": 18,
-        "scope": "v2",
-        "type": "eth",
-        "address": "0x986b4AFF588a109c09B50A03f42E4110E29D353F",
-        "tokenAddress": "0xA3D87FffcE63B53E0d54fAa1cc983B7eB0b74A9c",
-        "poolAddress": "0xc5424b857f758e906013f3555dad202e4bdb4567"
-    },
-    {
         "icon": "https://rawcdn.githack.com/yearn/yearn-assets/3fa15c2e51ff3ed4dac8bd124a7bfa8888b3b78c/icons/tokens/0x625b7DF2fa8aBe21B0A976736CDa4775523aeD1E/logo-128.png",
         "symbol": "yvCurve-HBTC",
         "name": "yvCurve-HBTC 0.3.3",
@@ -273,28 +251,6 @@
         "address": "0xA74d4B67b3368E83797a35382AFB776bAAE4F5C8",
         "tokenAddress": "0x43b4FdFD4Ff969587185cDB6f0BD875c5Fc83f8c",
 		"poolAddress": "0x43b4FdFD4Ff969587185cDB6f0BD875c5Fc83f8c"
-    },
-    {
-        "icon": "https://rawcdn.githack.com/yearn/yearn-assets/3fa15c2e51ff3ed4dac8bd124a7bfa8888b3b78c/icons/tokens/0xBfedbcbe27171C418CDabC2477042554b1904857/logo-128.png",
-        "symbol": "yvCurve-rETH",
-        "name": "yvCurve-rETH 0.3.5",
-        "decimals": 18,
-        "scope": "v2",
-        "type": "eth",
-        "address": "0xBfedbcbe27171C418CDabC2477042554b1904857",
-        "tokenAddress": "0x53a901d48795C58f485cBB38df08FA96a24669D5",
-        "poolAddress": "0xf9440930043eb3997fc70e1339dbb11f341de7a8"
-    },
-    {
-        "icon": "https://rawcdn.githack.com/yearn/yearn-assets/3fa15c2e51ff3ed4dac8bd124a7bfa8888b3b78c/icons/tokens/0x132d8D2C76Db3812403431fAcB00F3453Fc42125/logo-128.png",
-        "symbol": "yvCurve-ankrETH",
-        "name": "yvCurve-ankrETH 0.3.5",
-        "decimals": 18,
-        "scope": "v2",
-        "type": "eth",
-        "address": "0x132d8D2C76Db3812403431fAcB00F3453Fc42125",
-        "tokenAddress": "0xaA17A236F2bAdc98DDc0Cf999AbB47D47Fc0A6Cf",
-        "poolAddress": "0xa96a65c051bf88b4095ee1f2451c2a9d43f53ae2"
     },
     {
         "icon": "https://rawcdn.githack.com/yearn/yearn-assets/3fa15c2e51ff3ed4dac8bd124a7bfa8888b3b78c/icons/tokens/0x39CAF13a104FF567f71fd2A4c68C026FDB6E740B/logo-128.png",
