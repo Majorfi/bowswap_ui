@@ -45,25 +45,28 @@ function	VaultList({element, onClick, style, balanceOf, vault}) {
 function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabled}) {
 	const	{balancesOf} = useAccount();
 	const	[open, set_open] = useState(false);
-	const	[filter, set_filter] = useState('');
+	const	[searchFilter, set_searchFilter] = useState('');
 	const	[filteredVaultList, set_filteredVaultList] = useState(vaults);
 
 	useEffect(() => {
 		const	_vaults = vaults.map((v) => {
 			v.balanceOf = ethers.utils.formatUnits(balancesOf[v.address]?.toString() || '0', v.decimals);
 			return (v);
-		}).sort((a, b) => b.balanceOf - a.balanceOf);
+		}).filter((v, i, a) => a.findIndex( t => (t.address === v.address)) === i).sort((a, b) => b.balanceOf - a.balanceOf);
 
-		if (filter === '') {
+
+		if (searchFilter === '') {
 			set_filteredVaultList(_vaults);
 		} else {
+			const	searchFilterLower = searchFilter.toLowerCase();
 			set_filteredVaultList((_vaults).filter(e => (
-				(e.name).toLowerCase().includes(filter.toLowerCase()) ||
-				(e.symbol).toLowerCase().includes(filter.toLowerCase()) ||
-				toAddress(e.address).includes(toAddress(filter))
+				(e.name).toLowerCase().includes(searchFilterLower) ||
+				(e.symbol).toLowerCase().includes(searchFilterLower) ||
+				toAddress(e.address).includes(toAddress(searchFilterLower))
 			)));
 		}
-	}, [filter, vaults, balancesOf]);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [searchFilter, balancesOf]);
 
 	return (
 		<div className={'w-full'}>
@@ -116,11 +119,15 @@ function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabl
 								<div className={'py-0.5'}>
 									<div className={'w-full rounded-md text-lg p-4 relative bg-yblue-lighter'}>
 										<input
+											key={'input_vault'}
 											type={'text'}
 											name={'vaultName_or_address'}
 											id={'vaultName_or_address'}
-											value={filter}
-											onChange={(e) => set_filter(e.target.value)}
+											autoComplete={'off'}
+											value={searchFilter}
+											onChange={(e) => {
+												set_searchFilter(e.target.value);
+											}}
 											placeholder={'Filter or address'}
 											style={{backgroundColor: 'transparent', opacity: 1}}
 											className={'whitePlaceholder block w-full text-white'} />

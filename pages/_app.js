@@ -9,6 +9,7 @@ import	React, {useState, useEffect}	from	'react';
 import	Head							from	'next/head';
 import	{Web3ReactProvider}				from	'@web3-react/core';
 import	{ethers}						from	'ethers';
+import	useSWR							from	'swr';
 import	FullConfetti					from	'react-confetti';
 import	useWeb3, {Web3ContextApp}		from	'contexts/useWeb3';
 import	{AccountContextApp}				from	'contexts/useAccount';
@@ -20,6 +21,8 @@ import	{fetchYearnVaults}				from	'utils/API';
 
 import	'style/Default.css';
 import	'tailwindcss/tailwind.css';
+
+const fetcher = (...args) => fetch(...args).then(res => res.json());
 
 const useSecretCode = () => {
 	const secretCode = process.env.SECRET.split(',');
@@ -63,6 +66,7 @@ function	AppWrapper(props) {
 	const	{Component, pageProps, router} = props;
 	const	hasSecretCode = useSecretCode();
 	const	[yearnVaultData, set_yearnVaultData] = useState([]);
+	const	{data} = useSWR(`https://api.coingecko.com/api/v3/simple/price?ids=${['bitcoin', 'ethereum', 'aave']}&vs_currencies=usd`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, refreshInterval: 30000, shouldRetryOnError: true, dedupingInterval: 1000, focusThrottleInterval: 5000});
 
 	const	retrieveYearnVaults = React.useCallback(async () => {
 		const	vaults = await fetchYearnVaults();
@@ -99,6 +103,7 @@ function	AppWrapper(props) {
 							element={props.element}
 							router={props.router}
 							hasSecret={active && hasSecretCode}
+							prices={data}
 							yearnVaultData={yearnVaultData}
 							{...pageProps} />
 					</WithLayout>

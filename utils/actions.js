@@ -42,11 +42,12 @@ export async function	approveToken({provider, contractAddress, amount, from}, ca
 	}
 }
 
-export async function	swapTokens({provider, contractAddress, from, to, amount, minAmountOut}, callback) {
+//BowswapV1
+export async function	metapoolSwapTokens({provider, contractAddress, from, to, amount, minAmountOut}, callback) {
 	const	signer = provider.getSigner();
 	const	contract = new ethers.Contract(
 		contractAddress,
-		['function swap(address from, address to, uint256 amount, uint256 min_amount_out)'],
+		['function metapool_swap(address from, address to, uint256 amount, uint256 min_amount_out)'],
 		signer
 	);
 
@@ -54,7 +55,7 @@ export async function	swapTokens({provider, contractAddress, from, to, amount, m
 	**	If the call is successful, try to perform the actual TX
 	**********************************************************************/
 	try {
-		const	transaction = await contract.swap(from, to, amount, minAmountOut);
+		const	transaction = await contract.metapool_swap(from, to, amount, minAmountOut);
 		const	transactionResult = await transaction.wait();
 		if (transactionResult.status === 1) {
 			callback({error: false, data: amount});
@@ -66,30 +67,32 @@ export async function	swapTokens({provider, contractAddress, from, to, amount, m
 	}
 }
 
-
-export async function	migrateTokens({provider, contractAddress, service, coinAddress}, callback) {
-	const	abi = ['function migrate(tuple(uint8 service, address coin)[] swap)'];
+//BowswapV2
+export async function	swapTokens({provider, contractAddress, from, to, amount, minAmountOut, instructions}, callback) {
 	const	signer = provider.getSigner();
-	const	contract = new ethers.Contract(contractAddress, abi, signer);
+	const	contract = new ethers.Contract(
+		contractAddress,
+		['function swap(address from, address to, uint256 amount, uint256 min_amount_out, tuple(bool deposit, address pool, uint128 n)[] instructions)'],
+		signer
+	);
 
 	/**********************************************************************
 	**	If the call is successful, try to perform the actual TX
 	**********************************************************************/
 	try {
-		const	swap = [[service, coinAddress]];
-		const	transaction = await contract.migrate(swap);
+		const	transaction = await contract.swap(from, to, amount, minAmountOut, instructions);
 		const	transactionResult = await transaction.wait();
 		if (transactionResult.status === 1) {
-			callback({error: false, data: undefined});
+			callback({error: false, data: amount});
 		} else {
 			callback({error: true, data: undefined});
 		}
 	} catch (error) {
-		console.error(error);
 		callback({error: true, data: undefined});
 	}
 }
 
+//YVempire
 export async function	migrateBachTokens({provider, contractAddress, batch}, callback) {
 	const	abi = ['function migrate(tuple(uint8 service, address coin)[] swap)'];
 	const	signer = provider.getSigner();
