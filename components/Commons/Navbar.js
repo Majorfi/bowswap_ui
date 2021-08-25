@@ -9,6 +9,7 @@ import	React, {useState}		from	'react';
 import	Image					from	'next/image';
 import	useWeb3					from	'contexts/useWeb3';
 import	ModalLogin				from	'components/Commons/ModalLogin';
+import Link from 'next/link';
 
 function	Navbar({hasSecret, shouldInitialPopup}) {
 	const	{active, address, ens, deactivate, onDesactivate} = useWeb3();
@@ -65,10 +66,12 @@ function	Navbar({hasSecret, shouldInitialPopup}) {
 	return (
 		<nav className={'w-full h-16 p-6 justify-center flex flex-row'}>
 			<div className={'max-w-2xl items-center justify-between flex flex-row w-full'}>
-				<div className={'flex flex-row items-center space-x-3'}>
-					<Image src={hasSecret ? '/yCrossbowswap.png' : '/yBowswap.png'} width={42} height={42} quality={100} loading={'eager'} />
-					<p className={`inline ${hasSecret ? 'text-white' : 'text-yblue'} font-extrabold text-xl`}>{hasSecret ? 'Crossbowswap' : 'Bowswap'}</p>
-				</div>
+				<Link href={active ? '/swap' : '/'}>
+					<div className={'flex flex-row items-center space-x-3 cursor-pointer'}>
+						<Image src={hasSecret ? '/yCrossbowswap.png' : '/yBowswap.png'} width={42} height={42} quality={100} loading={'eager'} />
+						<p className={`inline ${hasSecret ? 'text-white' : 'text-yblue'} font-extrabold text-xl`}>{hasSecret ? 'Crossbowswap' : 'Bowswap'}</p>
+					</div>
+				</Link>
 				<div>
 					{renderWalletButton()}
 				</div>

@@ -38,9 +38,21 @@ module.exports = {
 			fontFamily: {
 				sans: ['Roboto', ...defaultTheme.fontFamily.sans],
 			},
+			rotate: {
+				60: '60deg',
+			},
+			inset: {
+				'-18': '-4.5rem',
+			},
+			blur: {
+				xs: '2px',
+				md: '3px',
+				lg: '10px'
+			},
 			height: {
 				'17': '68px',
 				'xxl': '520px',
+				104: '26rem'
 			},
 			maxWidth: {
 				'2xl': '680px'
@@ -48,6 +60,7 @@ module.exports = {
 			width: {
 				'4/11': '36.3636%',
 				'7/11': '63.6363%',
+				150: '37.5rem'
 			},
 			boxShadow: {
 				base: '0px 16px 56px 0px #001D2D1A'

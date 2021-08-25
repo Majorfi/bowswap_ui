@@ -13,6 +13,7 @@ import	useSWR							from	'swr';
 import	FullConfetti					from	'react-confetti';
 import	useWeb3, {Web3ContextApp}		from	'contexts/useWeb3';
 import	{AccountContextApp}				from	'contexts/useAccount';
+import	Credits							from	'components/Credits';
 import	Navbar							from	'components/Commons/Navbar';
 import	ModalPong						from	'components/Commons/ModalPong';
 import	Tabs							from	'components/Commons/Tabs';
@@ -62,11 +63,18 @@ function	WithLayout({children, hasSecret}) {
 }
 
 function	AppWrapper(props) {
-	const	{active} = useWeb3();
+	const	{active, address} = useWeb3();
 	const	{Component, pageProps, router} = props;
 	const	hasSecretCode = useSecretCode();
 	const	[yearnVaultData, set_yearnVaultData] = useState([]);
 	const	{data} = useSWR(`https://api.coingecko.com/api/v3/simple/price?ids=${['bitcoin', 'ethereum', 'aave']}&vs_currencies=usd`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, refreshInterval: 30000, shouldRetryOnError: true, dedupingInterval: 1000, focusThrottleInterval: 5000});
+
+	useEffect(() => {
+		if ((active || address) && router.asPath === '/') {
+			router.push('/swap');
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [active, address]);
 
 	const	retrieveYearnVaults = React.useCallback(async () => {
 		const	vaults = await fetchYearnVaults();
@@ -92,38 +100,53 @@ function	AppWrapper(props) {
 				<link rel={'preconnect'} href={'https://fonts.gstatic.com'} crossOrigin={'true'} />
 				<link href={'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap'} rel={'stylesheet'} />
 			</Head>
-			<main id={'app'} className={'flex flex-col w-full h-full relative min-h-screen'}>
-				<div className={'z-10 pointer-events-auto w-full'}>
-					<Navbar shouldInitialPopup/>
-				</div>
-				<div className={'w-full h-full relative max-w-screen-lg mx-auto z-30 pt-2'}>
-					<WithLayout hasSecret={active && hasSecretCode}>
-						<Component
-							key={router.route}
-							element={props.element}
-							router={props.router}
-							hasSecret={active && hasSecretCode}
-							prices={data}
-							yearnVaultData={yearnVaultData}
-							{...pageProps} />
-					</WithLayout>
-				</div>
-
-				<div className={`fixed inset-0 z-20 transition-opacity ${active && hasSecretCode ? 'pointer-events-auto opacity-100 visible' : 'pointer-events-none opacity-0 hidden'}`}>
-					<div className={`fixed -inset-96 bg-test z-20 rounded-full ${active && hasSecretCode ? 'animate-scale-up-center' : ''}`} />
-					<div className={'z-30 pointer-events-auto w-full absolute top-0'}>
-						<Navbar hasSecret={active && hasSecretCode} shouldInitialPopup={false} />
+			{router.asPath === '/' ?
+				<main id={'app'} className={'flex w-full h-full relative min-h-screen'} style={{background: '#F2F3F5'}}>
+					<div className={'w-full h-full'}>
+						<div className={'w-full h-full relative mx-auto mt-0 lg:mt-32'}>
+							<Component
+								key={router.route}
+								element={props.element}
+								router={props.router}
+								{...pageProps} />
+						</div>
+						<Credits />
 					</div>
-					{active && hasSecretCode ?
-						<div className={'z-50 pointer-events-none fixed inset-0'}>
-							<FullConfetti
-								recycle={false}
-								numberOfPieces={600}
-								width={typeof(window) !== 'undefined' && window.innerWidth || 1920}
-								height={typeof(window) !== 'undefined' && window.innerHeight || 1080} />
-						</div> : null}
-				</div>
-			</main>
+				</main>
+				:
+				<main id={'app'} className={'flex flex-col w-full h-full relative min-h-screen'}>
+					<div className={'z-10 pointer-events-auto w-full'}>
+						<Navbar shouldInitialPopup/>
+					</div>
+					<div className={'w-full h-full relative max-w-screen-lg mx-auto z-30 pt-2'}>
+						<WithLayout hasSecret={active && hasSecretCode}>
+							<Component
+								key={router.route}
+								element={props.element}
+								router={props.router}
+								hasSecret={active && hasSecretCode}
+								prices={data}
+								yearnVaultData={yearnVaultData}
+								{...pageProps} />
+						</WithLayout>
+					</div>
+
+					<div className={`fixed inset-0 z-20 transition-opacity ${active && hasSecretCode ? 'pointer-events-auto opacity-100 visible' : 'pointer-events-none opacity-0 hidden'}`}>
+						<div className={`fixed -inset-96 bg-test z-20 rounded-full ${active && hasSecretCode ? 'animate-scale-up-center' : ''}`} />
+						<div className={'z-30 pointer-events-auto w-full absolute top-0'}>
+							<Navbar hasSecret={active && hasSecretCode} shouldInitialPopup={false} />
+						</div>
+						{active && hasSecretCode ?
+							<div className={'z-50 pointer-events-none fixed inset-0'}>
+								<FullConfetti
+									recycle={false}
+									numberOfPieces={600}
+									width={typeof(window) !== 'undefined' && window.innerWidth || 1920}
+									height={typeof(window) !== 'undefined' && window.innerHeight || 1080} />
+							</div> : null}
+					</div>
+				</main>
+			}
 		</>
 	);
 }
