@@ -132,13 +132,19 @@ function	YVempire({yearnVaultData, yVempireData, set_yVempireData}) {
 						balancesOf={balancesOf}
 						selectedTokens={selectedTokens}
 						onSelectToken={(selectedAddress) => {
-							if (!selectedTokens[selectedAddress]) {
+							const	_selectedTokens = selectedTokens;
+							_selectedTokens[selectedAddress] = !_selectedTokens[selectedAddress];
+							if (_selectedTokens[selectedAddress]) {
 								set_txApproveStatus({none: true, pending: false, success: false, error: false, step: ''});
 							}
-							set_selectedTokens((s) => {
-								s[selectedAddress] = !s[selectedAddress];
-								return (s);
-							});
+							if (txApproveStatus.success) {
+								const	someSelected = Object.values(selectedTokens).some(e => e === true);
+								if (!someSelected) {
+									set_txApproveStatus({none: true, pending: false, success: false, error: false, step: ''});
+								}
+							}
+
+							set_selectedTokens(_selectedTokens);
 						}}
 						yearnVaultData={yearnVaultData}
 						isApproved={txApproveStatus.success}
