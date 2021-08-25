@@ -55,7 +55,6 @@ function	YVempire({yearnVaultData, yVempireData, set_yVempireData}) {
 		if (now - lastReload < 10000) {
 			return;
 		}
-		console.log({'reloading': lastReload});
 		lastReload = now;
 		set_isUpdating(true);
 		const	yearnVaults = yearnVaultData;

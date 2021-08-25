@@ -13,13 +13,17 @@ import	{formatAmount}				from	'utils';
 
 function	TableRow({pair, balanceOf, yearnVaultData, set_nonce, set_selectedTokens}) {
 	const	[isChecked, set_isChecked] = useState(false);
+	const	disabled = balanceOf?.isZero() || !balanceOf;
 
 	return (
 		<tr className={'bg-white z-10 relative'}>
 			<td>
 				<div
-					className={'w-full cursor-pointer'}
+					className={`w-full ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
 					onClick={() => {
+						if (disabled) {
+							return;
+						}
 						set_isChecked(!isChecked);
 						set_nonce(n => n + 1);
 						set_selectedTokens((s) => {
@@ -27,11 +31,12 @@ function	TableRow({pair, balanceOf, yearnVaultData, set_nonce, set_selectedToken
 							return (s);
 						});
 					}}>
-					<div className={`flex flex-row w-full items-center hover:bg-light-hover cursor-pointer rounded-lg pl-2 pr-6 py-2 ${balanceOf?.isZero() || !balanceOf ? 'filter grayscale' : ''}`}>
+					<div className={`flex flex-row w-full items-center hover:bg-light-hover rounded-lg pl-2 pr-6 py-2 ${disabled ? 'filter grayscale cursor-not-allowed' : 'cursor-pointer'}`}>
 						<div className={'flex flex-row w-1/3 items-center'}>
 							<input
 								type={'checkbox'}
-								className={'focus:ring-yblue text-yblue border-yblue border-2 rounded'}
+								className={`focus:ring-yblue text-yblue border-yblue border-2 rounded ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+								disabled={disabled}
 								style={{width: 22, height: 22}}
 								checked={isChecked}
 								onChange={() => null} />
