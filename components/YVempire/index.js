@@ -31,7 +31,6 @@ function	YVempire({yearnVaultData, yVempireData, set_yVempireData}) {
 	const	[, set_nonce] = useState(0);
 	const	[isUpdating, set_isUpdating] = useState(false);
 	const	[selectedTokens, set_selectedTokens] = useState([]);
-	const	[approvedTokens, set_approvedTokens] = useState([]);
 
 	const	[txApproveStatus, set_txApproveStatus] = useState({none: true, pending: false, success: false, error: false, step: ''});
 	const	[txMigrateStatus, set_txMigrateStatus] = useState({none: true, pending: false, success: false, error: false});
