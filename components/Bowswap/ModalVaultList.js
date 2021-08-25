@@ -13,32 +13,42 @@ import	{Transition}							from	'@headlessui/react';
 import	useAccount								from	'contexts/useAccount';
 import	{toAddress}								from	'utils';
 
-function	VaultList({element, onClick, style, balanceOf, vault}) {
+function	VaultList({element, onClick, style, balanceOf, vault, previousElement}) {
+	const	isFirstV2 = previousElement && (previousElement.scope !== 'v2' && element.scope === 'v2');
 	return (
-		<div
-			onClick={onClick}
-			style={style}
-			className={'flex flex-row justify-between hover:bg-white hover:bg-opacity-20 cursor-pointer items-center rounded-lg p-2 pr-4 focus:outline-none'}>
-			<div className={'flex flex-row items-center'}>
-				<Image
-					src={element?.icon || ''}
-					alt={element?.displayName || element?.name}
-					objectFit={'contain'}
-					loading={'eager'}
-					width={40}
-					height={40} />
-				<span className={'content block truncate ml-2 text-white text-ybase font-bold'}>
-					{element?.symbol}
-				</span>
+		<>
+			<div
+				onClick={onClick}
+				style={style}
+				className={''}>
+				{isFirstV2 ? (
+					<div style={{height: '1px'}} className={'pl-3 pr-4'}>
+						<div className={'bg-white w-full h-full'} />
+					</div>
+				) : <div />}
+				<div className={'flex flex-row justify-between hover:bg-white hover:bg-opacity-20 cursor-pointer items-center rounded-lg p-2 pr-4 focus:outline-none'}>
+					<div className={'flex flex-row items-center'}>
+						<Image
+							src={element?.icon || ''}
+							alt={element?.displayName || element?.name}
+							objectFit={'contain'}
+							loading={'eager'}
+							width={40}
+							height={40} />
+						<span className={'content block truncate ml-2 text-white text-ybase font-bold'}>
+							{element?.symbol}
+						</span>
+					</div>
+					<span className={'text-white text-ylg font-bold text-right'}>
+						<p className={'pb-1'}>{ethers.utils.formatUnits(balanceOf?.toString() || '0', element.decimals)}</p>
+						<span className={'text-white text-xxs'}>
+							<p className={'inline opacity-70 text-xxs'}>{'APY: '}</p>
+							<p className={'inline opacity-100 text-ysm'}>{`${((vault?.apy?.net_apy || 0) * 100).toFixed(2) || '--'}%`}</p>
+						</span>
+					</span>
+				</div>
 			</div>
-			<span className={'text-white text-ylg font-bold text-right'}>
-				<p className={'pb-1'}>{ethers.utils.formatUnits(balanceOf?.toString() || '0', element.decimals)}</p>
-				<span className={'text-white text-xxs'}>
-					<p className={'inline opacity-70 text-xxs'}>{'APY: '}</p>
-					<p className={'inline opacity-100 text-ysm'}>{`${((vault?.apy?.net_apy || 0) * 100).toFixed(2) || '--'}%`}</p>
-				</span>
-			</span>
-		</div>
+		</>
 	);
 }
 
@@ -159,12 +169,13 @@ function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabl
 											width={600}
 											height={280}
 											className={'modalList focus:outline-none pb-2'}
-											rowHeight={56}
+											rowHeight={58}
 											rowRenderer={({index, key, style}) => (
 												<VaultList
 													key={key}
 													style={style}
 													element={filteredVaultList[index]}
+													previousElement={index > 0 ? filteredVaultList[index - 1] : null}
 													balanceOf={balancesOf[filteredVaultList[index].address]}
 													vault={yearnVaultData.find(v => v.address === filteredVaultList[index].address)}
 													onClick={() => {

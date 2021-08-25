@@ -213,7 +213,7 @@ input[type=number] {
 	background-color: #FFFFFF;
 }
 .modalList::-webkit-scrollbar {
-	width: 8px;
+	width: 4px;
 }
 
 .vampireList::-webkit-scrollbar-track {
