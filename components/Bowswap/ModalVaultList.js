@@ -54,7 +54,12 @@ function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabl
 	const	[filteredVaultList, set_filteredVaultList] = useState(vaults);
 
 	useEffect(() => {
-		set_filteredVaultList(vaults);
+		const	_vaults = [...vaults].map((v) => {
+			v.balanceOf = ethers.utils.formatUnits(balancesOf[v.address]?.toString() || '0', v.decimals);
+			return (v);
+		}).filter((v, i, a) => a.findIndex(t => (toAddress(t.address) === toAddress(v.address))) === i).sort((a, b) => b.balanceOf - a.balanceOf);
+		set_filteredVaultList(_vaults);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [nonce]);
 
 	useEffect(() => {
@@ -64,10 +69,10 @@ function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabl
 	}, [open]);
 
 	useEffect(() => {
-		const	_vaults = vaults.map((v) => {
+		const	_vaults = [...vaults].map((v) => {
 			v.balanceOf = ethers.utils.formatUnits(balancesOf[v.address]?.toString() || '0', v.decimals);
 			return (v);
-		}).filter((v, i, a) => a.findIndex( t => (t.address === v.address)) === i).sort((a, b) => b.balanceOf - a.balanceOf);
+		}).filter((v, i, a) => a.findIndex(t => (toAddress(t.address) === toAddress(v.address))) === i).sort((a, b) => b.balanceOf - a.balanceOf);
 
 		if (searchFilter === '') {
 			set_filteredVaultList(_vaults);
