@@ -20,7 +20,7 @@ function	ButtonMigrate({pairs, selectedTokens, approved, disabled, onCallback}) 
 		const	actualSelectedTokens = Object.entries(selectedTokens).filter(([, value]) => value === true).map(([key]) => key);
 		const	selectedPairs = pairs.filter((p) => actualSelectedTokens.includes(p.uToken.address));
 		const	batch = selectedPairs.map(p => [p.service, p.uToken.address]);
-		set_transactionProcessing(false);
+		set_transactionProcessing(true);
 		onCallback('pending');
 		try {
 			migrateBachTokens({

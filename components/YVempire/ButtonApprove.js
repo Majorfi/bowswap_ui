@@ -33,7 +33,7 @@ function	ButtonApprove({pairs, selectedTokens, balancesOf, allowances, approved,
 			}
 			const	balanceOf = balancesOf[pair.uToken.address];
 			const	allowance = allowances[pair.uToken.address];
-			if (ethers.BigNumber.from(allowance).gte(balanceOf)) {
+			if (ethers.BigNumber.from(allowance || 0).gte(balanceOf)) {
 				return; //already approved
 			}
 			const	approval = balanceOf.add(balanceOf.mul(3).div(100)); //balance + 3% because of mutable aToken balance;
@@ -59,7 +59,7 @@ function	ButtonApprove({pairs, selectedTokens, balancesOf, allowances, approved,
 						isBroken = true;
 						return;
 					}
-					onStepComplete(({[pair.uToken.address]: approval}));
+					onStepComplete({[pair.uToken.address]: approval}, pair.uToken.address);
 				});	
 			} catch (error) {
 				isBroken = true;

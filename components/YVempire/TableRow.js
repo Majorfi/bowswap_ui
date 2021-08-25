@@ -11,7 +11,7 @@ import	{ethers}					from	'ethers';
 import	Arrow						from	'components/Icons/Arrow';
 import	{formatAmount}				from	'utils';
 
-function	TableRow({pair, balanceOf, yearnVaultData, selectedTokens, set_nonce, set_selectedTokens}) {
+function	TableRow({pair, balanceOf, yearnVaultData, selectedTokens, set_nonce, onSelectToken}) {
 	const	[isChecked, set_isChecked] = useState(false); //used to update the localstate
 	const	disabled = balanceOf?.isZero() || !balanceOf;
 
@@ -26,10 +26,7 @@ function	TableRow({pair, balanceOf, yearnVaultData, selectedTokens, set_nonce, s
 						}
 						set_isChecked(!isChecked);
 						set_nonce(n => n + 1);
-						set_selectedTokens((s) => {
-							s[pair.uToken.address] = !s[pair.uToken.address];
-							return (s);
-						});
+						onSelectToken(pair.uToken.address);
 					}}>
 					<div className={`flex flex-row w-full items-center hover:bg-light-hover rounded-lg pl-2 pr-6 py-2 ${disabled ? 'filter grayscale cursor-not-allowed' : 'cursor-pointer'}`}>
 						<div className={'flex flex-row w-1/3 items-center'}>

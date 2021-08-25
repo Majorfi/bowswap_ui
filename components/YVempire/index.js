@@ -31,6 +31,7 @@ function	YVempire({yearnVaultData, yVempireData, set_yVempireData}) {
 	const	[, set_nonce] = useState(0);
 	const	[isUpdating, set_isUpdating] = useState(false);
 	const	[selectedTokens, set_selectedTokens] = useState([]);
+	const	[approvedTokens, set_approvedTokens] = useState([]);
 
 	const	[txApproveStatus, set_txApproveStatus] = useState({none: true, pending: false, success: false, error: false, step: ''});
 	const	[txMigrateStatus, set_txMigrateStatus] = useState({none: true, pending: false, success: false, error: false});
@@ -88,6 +89,7 @@ function	YVempire({yearnVaultData, yVempireData, set_yVempireData}) {
 		retrieveUTokenBalances();
 	}, [retrieveUTokenBalances]);
 
+
 	async function resetUTokenBalances(selectedTokensList) {
 		const	migrated = {};
 		selectedTokensList.forEach(each => migrated[each] = ethers.BigNumber.from(0));
@@ -130,8 +132,17 @@ function	YVempire({yearnVaultData, yVempireData, set_yVempireData}) {
 						elements={yVempireData}
 						balancesOf={balancesOf}
 						selectedTokens={selectedTokens}
-						set_selectedTokens={set_selectedTokens}
+						onSelectToken={(selectedAddress) => {
+							if (!selectedTokens[selectedAddress]) {
+								set_txApproveStatus({none: true, pending: false, success: false, error: false, step: ''});
+							}
+							set_selectedTokens((s) => {
+								s[selectedAddress] = !s[selectedAddress];
+								return (s);
+							});
+						}}
 						yearnVaultData={yearnVaultData}
+						isApproved={txApproveStatus.success}
 						set_nonce={set_nonce} />
 				</div>
 				<div className={'absolute inset-0 z-50 pointer-events-none'}>

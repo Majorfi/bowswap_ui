@@ -9,7 +9,7 @@ import	React		from	'react';
 import	TableRow	from	'components/YVempire/TableRow';
 import {ethers} from 'ethers';
 
-function	TableBody({elements, balancesOf, yearnVaultData, selectedTokens, set_selectedTokens, set_nonce}) {
+function	TableBody({elements, balancesOf, yearnVaultData, selectedTokens, onSelectToken, set_nonce}) {
 	return (
 		<table className={'w-full table-fixed whitespace-normal mt-3'}>
 			<colgroup>
@@ -28,7 +28,7 @@ function	TableBody({elements, balancesOf, yearnVaultData, selectedTokens, set_se
 						yearnVaultData={yearnVaultData.find(yv => yv.address === pair.yvToken.address)}
 						balanceOf={balancesOf[pair.uToken.address]}
 						selectedTokens={selectedTokens}
-						set_selectedTokens={set_selectedTokens}
+						onSelectToken={onSelectToken}
 						set_nonce={set_nonce} />
 				))}
 			</tbody> 
@@ -36,5 +36,3 @@ function	TableBody({elements, balancesOf, yearnVaultData, selectedTokens, set_se
 	);
 }
 export default TableBody;
-
-// {elements.sort((a, b) => Number(b.uToken?.normalizedBalanceOf) - Number(a.uToken?.normalizedBalanceOf)).map((pair) => 
