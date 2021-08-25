@@ -13,19 +13,13 @@ import	{Transition}							from	'@headlessui/react';
 import	useAccount								from	'contexts/useAccount';
 import	{toAddress}								from	'utils';
 
-function	VaultList({element, onClick, style, balanceOf, vault, previousElement}) {
-	const	isFirstV2 = previousElement && (previousElement.scope !== 'v2' && element.scope === 'v2');
+function	VaultList({element, onClick, style, balanceOf, vault}) {
 	return (
 		<>
 			<div
 				onClick={onClick}
 				style={style}
 				className={''}>
-				{isFirstV2 ? (
-					<div style={{height: '1px'}} className={'pl-3 pr-4'}>
-						<div className={'bg-white w-full h-full'} />
-					</div>
-				) : <div />}
 				<div className={'flex flex-row justify-between hover:bg-white hover:bg-opacity-20 cursor-pointer items-center rounded-lg p-2 pr-4 focus:outline-none'}>
 					<div className={'flex flex-row items-center'}>
 						<Image
@@ -169,13 +163,12 @@ function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabl
 											width={600}
 											height={280}
 											className={'modalList focus:outline-none pb-2'}
-											rowHeight={58}
+											rowHeight={56}
 											rowRenderer={({index, key, style}) => (
 												<VaultList
 													key={key}
 													style={style}
 													element={filteredVaultList[index]}
-													previousElement={index > 0 ? filteredVaultList[index - 1] : null}
 													balanceOf={balancesOf[filteredVaultList[index].address]}
 													vault={yearnVaultData.find(v => v.address === filteredVaultList[index].address)}
 													onClick={() => {
