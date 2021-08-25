@@ -29,7 +29,7 @@ const	LENDING_POOL_ABI = [
 ];
 
 function	YVempire({yearnVaultData}) {
-	const	{provider, address} = useWeb3();
+	const	{active, provider, address} = useWeb3();
 	const	{balancesOf, allowances, set_balancesOf, set_allowances} = useAccount();
 	const	[pairs, set_pairs] = useState(PAIRS);
 	const	[, set_nonce] = useState(0);
@@ -39,6 +39,9 @@ function	YVempire({yearnVaultData}) {
 	const	[txMigrateStatus, set_txMigrateStatus] = useState({none: true, pending: false, success: false, error: false});
 
 	const	retrieveUTokenBalances = useCallback(async (address) => {
+		if (!active) {
+			return;
+		}
 		if (!provider) {
 			return;
 		}
