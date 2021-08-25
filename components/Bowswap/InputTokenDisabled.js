@@ -5,29 +5,10 @@
 **	@Filename:				InputTokenDisabled.js
 ******************************************************************************/
 
-import	React, {useEffect, useState, useRef}	from	'react';
-import	{ethers}								from	'ethers';
+import	React				from	'react';
+import	{ethers}			from	'ethers';
 
 function	InputTokenDisabled({value, toCounterValue, slippage, isFetchingExpectedReceiveAmount, balanceOf, decimals}) {
-	const	inputRef = useRef();
-	const	[formatedValue, set_formatedValue] = useState(value);
-
-	useEffect(() => {
-		let		_formatedValue = value;
-		const	[dec, frac] = _formatedValue.split('.');
-		if (frac) _formatedValue = `${dec}.${frac.slice(0, 10)}`;
-
-		if (inputRef?.current) {
-			let inputWitdh = (_formatedValue.length * 20) + 3;
-			if (_formatedValue.length === 0) {
-				inputRef.current.style.width = `${1}px`;
-			} else {
-				inputRef.current.style.width = `${inputWitdh + 1}px`;
-			}
-			set_formatedValue(_formatedValue);
-		}
-	}, [value]);
-
 	return (
 		<div className={'relative w-full text-left bg-white border border-ygray-100 rounded-lg cursor-default focus:outline-none flex flex-col justify-between text-ygray-800 h-24 py-2 px-2 space-y-1'}>
 			<div className={'h-4'}>
@@ -47,11 +28,10 @@ function	InputTokenDisabled({value, toCounterValue, slippage, isFetchingExpected
 					htmlFor={'fromInput'}
 					className={`with-placeholder placeholder-${value.length} flex justify-end w-full h-10 text-4xl font-medium text-ygray-700 text-opacity-20 proportional-nums cursor-text`}>
 					<input
-						ref={inputRef}
-						value={formatedValue}
+						value={(Number(value) !== 0 ? `${(Number(value) - ((Number(value) * slippage / 100))).toFixed(6)}` : '')}
 						disabled
 						readOnly
-						style={{backgroundColor: 'transparent'}}
+						style={{backgroundColor: 'transparent', width: Number(value) === 0 ? '1px': 'auto'}}
 						className={'block w-full text-4xl font-medium h-full text-right text-ygray-700'}
 						type={'text'}
 						min={0} />
@@ -61,9 +41,6 @@ function	InputTokenDisabled({value, toCounterValue, slippage, isFetchingExpected
 				<div className={`flex w-full justify-between items-center ${isFetchingExpectedReceiveAmount ? 'hidden' : ''}`}>
 					<div className={'items-center text-ybase text-ygray-500'}>
 						<span>{`≃ $${(toCounterValue * Number(value)).toFixed(2)}`}</span>
-					</div>
-					<div className={'items-center text-ybase text-ygray-500'}>
-						<span>{`Slippage: ≥ ${(Number(value) - ((Number(value) * slippage / 100))).toFixed(6)}`}</span>
 					</div>
 				</div>
 			</div>

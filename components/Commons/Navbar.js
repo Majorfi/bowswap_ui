@@ -6,13 +6,26 @@
 ******************************************************************************/
 
 import	React, {useState}		from	'react';
+import	Image					from	'next/image';
 import	useWeb3					from	'contexts/useWeb3';
-import	ModalLogin				from	'components/ModalLogin';
-import Image from 'next/image';
+import	ModalLogin				from	'components/Commons/ModalLogin';
+import Link from 'next/link';
 
-function	Navbar({hasSecret}) {
+function	Navbar({hasSecret, shouldInitialPopup}) {
 	const	{active, address, ens, deactivate, onDesactivate} = useWeb3();
-	const	[ModalLoginOpen, set_ModalLoginOpen] = useState(false);
+	const	[modalLoginOpen, set_modalLoginOpen] = useState(false);
+	const	[initialPopup, set_initialPopup] = useState(false);
+
+	React.useEffect(() => {
+		if (initialPopup || !shouldInitialPopup)
+			return;
+
+		if (!address) {
+			set_modalLoginOpen(true);
+		}
+		set_initialPopup(true);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [address]);
 
 	const stringToColour = function(str) {
 		let hash = 0;
@@ -31,8 +44,8 @@ function	Navbar({hasSecret}) {
 		if (!active) {
 			return (
 				<button
-					onClick={() => set_ModalLoginOpen(true)}
-					className={'ml-8 inline-flex px-6 py-3 items-center leading-4 rounded-lg text-ybase cursor-pointer whitespace-nowrap bg-transparent text-blue-400 border border-solid border-blue-400 hover:bg-blue-300 hover:text-white transition-colors'}>
+					onClick={() => set_modalLoginOpen(true)}
+					className={'ml-8 inline-flex px-6 py-3 items-center leading-4 rounded-lg text-ybase cursor-pointer whitespace-nowrap bg-transparent text-yblue border border-solid border-yblue hover:bg-connect-hover  transition-colors'}>
 					{'Connect wallet'}
 				</button>
 			);
@@ -53,15 +66,17 @@ function	Navbar({hasSecret}) {
 	return (
 		<nav className={'w-full h-16 p-6 justify-center flex flex-row'}>
 			<div className={'max-w-2xl items-center justify-between flex flex-row w-full'}>
-				<div className={'flex flex-row items-center space-x-3'}>
-					<Image src={hasSecret ? '/yCrossbowswap.png' : '/yBowswap.png'} width={42} height={42} quality={100} loading={'eager'} />
-					<p className={`inline ${hasSecret ? 'text-white' : 'text-gray-800'} font-extrabold text-xl`}>{hasSecret ? 'Crossbowswap' : 'Bowswap'}</p>
-				</div>
+				<Link href={active ? '/swap' : '/'}>
+					<div className={'flex flex-row items-center space-x-3 cursor-pointer'}>
+						<Image src={hasSecret ? '/yCrossbowswap.png' : '/yBowswap.png'} width={42} height={42} quality={100} loading={'eager'} />
+						<p className={`inline ${hasSecret ? 'text-white' : 'text-yblue'} font-extrabold text-xl`}>{hasSecret ? 'Crossbowswap' : 'Bowswap'}</p>
+					</div>
+				</Link>
 				<div>
 					{renderWalletButton()}
 				</div>
 			</div>
-			<ModalLogin open={ModalLoginOpen} set_open={set_ModalLoginOpen} />
+			<ModalLogin open={modalLoginOpen} set_open={set_modalLoginOpen} />
 		</nav>
 	);
 }

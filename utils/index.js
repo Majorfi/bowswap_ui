@@ -37,3 +37,11 @@ export async function asyncForEach(array, callback) {
 		await callback(array[index], index, array);
 	}
 }
+
+export function	formatAmount(amount, decimals = 2) {
+	return (new Intl.NumberFormat('en-US', {minimumFractionDigits: 0, maximumFractionDigits: decimals}).format(amount));
+}
+
+export function	formatValue(value, decimals = 2) {
+	return (new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: decimals}).format(value));
+}

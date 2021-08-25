@@ -15,61 +15,83 @@ import	{toAddress}								from	'utils';
 
 function	VaultList({element, onClick, style, balanceOf, vault}) {
 	return (
-		<div
-			onClick={onClick}
-			style={style}
-			className={'flex flex-row justify-between hover:bg-white hover:bg-opacity-20 cursor-pointer items-center rounded-lg p-2 pr-4 focus:outline-none'}>
-			<div className={'flex flex-row items-center'}>
-				<Image
-					src={element?.icon || ''}
-					alt={element?.displayName || element?.name}
-					objectFit={'contain'}
-					loading={'eager'}
-					width={40}
-					height={40} />
-				<span className={'content block truncate ml-2 text-white text-ybase font-bold'}>
-					{element?.symbol}
-				</span>
+		<>
+			<div
+				onClick={onClick}
+				style={style}
+				className={''}>
+				<div className={'flex flex-row justify-between hover:bg-white hover:bg-opacity-20 cursor-pointer items-center rounded-lg p-2 pr-4 focus:outline-none'}>
+					<div className={'flex flex-row items-center'}>
+						<Image
+							src={element?.icon || ''}
+							alt={element?.displayName || element?.name}
+							objectFit={'contain'}
+							loading={'eager'}
+							width={40}
+							height={40} />
+						<span className={'content block truncate ml-2 text-white text-ybase font-bold'}>
+							{element?.symbol}
+						</span>
+					</div>
+					<span className={'text-white text-ylg font-bold text-right'}>
+						<p className={'pb-1'}>{ethers.utils.formatUnits(balanceOf?.toString() || '0', element.decimals)}</p>
+						<span className={'text-white text-xxs'}>
+							<p className={'inline opacity-70 text-xxs'}>{'APY: '}</p>
+							<p className={'inline opacity-100 text-ysm'}>{`${((vault?.apy?.net_apy || 0) * 100).toFixed(2) || '--'}%`}</p>
+						</span>
+					</span>
+				</div>
 			</div>
-			<span className={'text-white text-ylg font-bold text-right'}>
-				<p className={'pb-1'}>{ethers.utils.formatUnits(balanceOf?.toString() || '0', element.decimals)}</p>
-				<span className={'text-white text-xxs'}>
-					<p className={'inline opacity-70 text-xxs'}>{'APY: '}</p>
-					<p className={'inline opacity-100 text-ysm'}>{`${((vault?.apy?.net_apy || 0) * 100).toFixed(2) || '--'}%`}</p>
-				</span>
-			</span>
-		</div>
+		</>
 	);
 }
 
 function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabled}) {
 	const	{balancesOf} = useAccount();
 	const	[open, set_open] = useState(false);
-	const	[filter, set_filter] = useState('');
+	const	[nonce, set_nonce] = useState(0);
+	const	[searchFilter, set_searchFilter] = useState('');
 	const	[filteredVaultList, set_filteredVaultList] = useState(vaults);
+
+	useEffect(() => {
+		set_filteredVaultList(vaults);
+	}, [nonce]);
+
+	useEffect(() => {
+		if (!open) {
+			set_searchFilter('');
+		}
+	}, [open]);
 
 	useEffect(() => {
 		const	_vaults = vaults.map((v) => {
 			v.balanceOf = ethers.utils.formatUnits(balancesOf[v.address]?.toString() || '0', v.decimals);
 			return (v);
-		}).sort((a, b) => b.balanceOf - a.balanceOf);
+		}).filter((v, i, a) => a.findIndex( t => (t.address === v.address)) === i).sort((a, b) => b.balanceOf - a.balanceOf);
 
-		if (filter === '') {
+		if (searchFilter === '') {
 			set_filteredVaultList(_vaults);
 		} else {
+			const	searchFilterLower = searchFilter.toLowerCase();
 			set_filteredVaultList((_vaults).filter(e => (
-				(e.name).toLowerCase().includes(filter.toLowerCase()) ||
-				(e.symbol).toLowerCase().includes(filter.toLowerCase()) ||
-				toAddress(e.address).includes(toAddress(filter))
+				(e.name).toLowerCase().includes(searchFilterLower) ||
+				(e.symbol).toLowerCase().includes(searchFilterLower) ||
+				toAddress(e.address).includes(toAddress(searchFilterLower))
 			)));
 		}
-	}, [filter, vaults, balancesOf]);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [searchFilter, balancesOf]);
 
 	return (
 		<div className={'w-full'}>
 			<div className={'relative'}>
 				<button
-					onClick={() => disabled ? null : set_open(true)}
+					onClick={() => {
+						if (!disabled) {
+							set_nonce(n => n + 1);
+							set_open(true);
+						}
+					}}
 					className={`relative w-full px-4 text-left bg-ygray-100 hover:bg-ygray-50 rounded-lg focus:outline-none ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} h-24 py-2`}>
 					<div className={'flex flex-row items-center'}>
 						<Image
@@ -102,7 +124,7 @@ function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabl
 				leaveTo={'opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'}>
 				<div as={'div'} className={'absolute z-50 inset-0 overflow-hidden'}>
 					<div className={'flex w-full h-full bg-white p-4 rounded-lg overflow-hidden z-10'}>
-						<div className={'inline-block bg-blue-400 rounded-lg w-full f-full z-20'}>
+						<div className={'inline-block bg-yblue rounded-lg w-full f-full z-20'}>
 							<div className={'px-6 py-7 relative h-full overflow-hidden'}>
 								<div className={'flex flex-row items-center justify-between w-full mb-6'}>
 									<svg className={'cursor-pointer'} onClick={() => set_open(false)} width={'24'} height={'24'} viewBox={'0 0 24 24'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
@@ -114,13 +136,17 @@ function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabl
 									<div />
 								</div>
 								<div className={'py-0.5'}>
-									<div className={'w-full rounded-md bg-blue-900 text-lg p-4 relative'}>
+									<div className={'w-full rounded-md text-lg p-4 relative bg-yblue-lighter'}>
 										<input
+											key={'input_vault'}
 											type={'text'}
 											name={'vaultName_or_address'}
 											id={'vaultName_or_address'}
-											value={filter}
-											onChange={(e) => set_filter(e.target.value)}
+											autoComplete={'off'}
+											value={searchFilter}
+											onChange={(e) => {
+												set_searchFilter(e.target.value);
+											}}
 											placeholder={'Filter or address'}
 											style={{backgroundColor: 'transparent', opacity: 1}}
 											className={'whitePlaceholder block w-full text-white'} />
@@ -136,7 +162,7 @@ function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabl
 										<List
 											width={600}
 											height={280}
-											className={'focus:outline-none pb-2'}
+											className={'modalList focus:outline-none pb-2'}
 											rowHeight={56}
 											rowRenderer={({index, key, style}) => (
 												<VaultList

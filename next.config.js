@@ -14,6 +14,7 @@ module.exports = ({
 	env: {
 		ALCHEMY_KEY: process.env.ALCHEMY_KEY,
 		METAPOOL_SWAPPER_ADDRESS: process.env.METAPOOL_SWAPPER_ADDRESS,
+		VYEMPIRE_SWAPPER: process.env.VYEMPIRE_SWAPPER,
 		SECRET: process.env.SECRET,
 	},
 	optimization: {
@@ -26,7 +27,8 @@ module.exports = ({
 	},
 	images: {
 		domains: [
-			'raw.githubusercontent.com'
+			'raw.githubusercontent.com',
+			'rawcdn.githack.com'
 		],
 	},
 	webpack: (config, {webpack}) => {

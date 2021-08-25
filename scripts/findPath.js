@@ -203,6 +203,9 @@ async function findPath({from, to}) {
 
 async function	findAllPath() {
 	const	VAULT_ADDRESSES = [
+		'0xb4d1be44bff40ad6e506edf43156577a3f8672ec',
+
+		'0xdCD90C7f6324cfa40d7169ef80b12031770B4325',
 		'0xA74d4B67b3368E83797a35382AFB776bAAE4F5C8',
 		'0x8414Db07a7F743dEbaFb402070AB01a4E0d2E45e',
 		'0x2a38B9B0201Ca39B17B460eD2f11e4929559071E',
@@ -211,7 +214,6 @@ async function	findAllPath() {
 		'0xf2db9a7c0ACd427A680D640F02d90f6186E71725',
 		'0x84E13785B5a27879921D6F685f041421C7F482dA',
 		'0x132d8D2C76Db3812403431fAcB00F3453Fc42125',
-		'0xdCD90C7f6324cfa40d7169ef80b12031770B4325',
 		'0x986b4AFF588a109c09B50A03f42E4110E29D353F',
 		'0x6Ede7F19df5df6EF23bD5B9CeDb651580Bdf56Ca',
 		'0xBfedbcbe27171C418CDabC2477042554b1904857',
@@ -256,7 +258,7 @@ async function	findAllPath() {
 		});
 	});
 	const toJSON = JSON.stringify(results, null, 0).replaceAll('"False"', 'False').replaceAll('"True"', 'True');
-	fs.writeFile(`${__dirname}/ALL_PAIRS.py`, `ALL_PAIRS = ${toJSON}`, 'utf8', (err) => {
+	fs.writeFile(`${__dirname}/ALL_PAIRS_TMP.py`, `ALL_PAIRS = ${toJSON}`, 'utf8', (err) => {
 		if (err) {
 			throw 'Impossible to update ALL_PAIRS.json';
 		}
