@@ -11,8 +11,8 @@ import	{ethers}					from	'ethers';
 import	Arrow						from	'components/Icons/Arrow';
 import	{formatAmount}				from	'utils';
 
-function	TableRow({pair, balanceOf, yearnVaultData, set_nonce, set_selectedTokens}) {
-	const	[isChecked, set_isChecked] = useState(false);
+function	TableRow({pair, balanceOf, yearnVaultData, selectedTokens, set_nonce, set_selectedTokens}) {
+	const	[isChecked, set_isChecked] = useState(false); //used to update the localstate
 	const	disabled = balanceOf?.isZero() || !balanceOf;
 
 	return (
@@ -38,7 +38,7 @@ function	TableRow({pair, balanceOf, yearnVaultData, set_nonce, set_selectedToken
 								className={`focus:ring-yblue text-yblue border-yblue border-2 rounded ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
 								disabled={disabled}
 								style={{width: 22, height: 22}}
-								checked={isChecked}
+								checked={selectedTokens[pair.uToken.address]}
 								onChange={() => null} />
 
 							<div className={'ml-4 w-9 h-9 rounded-full flex justify-center items-center relative'} style={{minWidth: 36}}>

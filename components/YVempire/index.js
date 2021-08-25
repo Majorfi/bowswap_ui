@@ -129,6 +129,7 @@ function	YVempire({yearnVaultData, yVempireData, set_yVempireData}) {
 					<TableBody 
 						elements={yVempireData}
 						balancesOf={balancesOf}
+						selectedTokens={selectedTokens}
 						set_selectedTokens={set_selectedTokens}
 						yearnVaultData={yearnVaultData}
 						set_nonce={set_nonce} />
@@ -149,8 +150,6 @@ function	YVempire({yearnVaultData, yVempireData, set_yVempireData}) {
 						onStepComplete={approval => set_allowances(b => ({...b, ...approval}))}
 						onStep={step => set_txApproveStatus(status => ({...status, step}))}
 						onCallback={(type, message) => {
-							console.log(message);
-							console.warn(type);
 							set_txApproveStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success', message});
 							if (type === 'error') {
 								setTimeout(() => set_txApproveStatus((s) => s.error ? {none: true, pending: false, error: false, success: false} : s), 2500);
