@@ -90,7 +90,7 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 		if (disabled || transactionProcessing || !approved) {
 			return;
 		}
-		set_transactionProcessing(false);
+		set_transactionProcessing(true);
 		onCallback('pending');
 		if (toVault.scope === 'v2') {
 			try {
