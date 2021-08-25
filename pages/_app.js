@@ -101,7 +101,7 @@ function	AppWrapper(props) {
 				<link href={'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap'} rel={'stylesheet'} />
 			</Head>
 			{router.asPath === '/' ?
-				<main id={'app'} className={'flex w-full h-full relative min-h-screen'} style={{background: '#F2F3F5'}}>
+				<main id={'app'} className={'flex w-full h-full relative min-h-screen'} style={{background: '#F2F3F5', overflow: 'hidden'}}>
 					<div className={'w-full h-full'}>
 						<div className={'w-full h-full relative mx-auto mt-0 lg:mt-32'}>
 							<Component

@@ -214,6 +214,7 @@ input[type=number] {
 }
 .modalList::-webkit-scrollbar {
 	width: 4px;
+	height: 4px;
 }
 
 .vampireList::-webkit-scrollbar-track {
@@ -229,6 +230,7 @@ input[type=number] {
 }
 .vampireList::-webkit-scrollbar {
 	width: 4px;
+	height: 4px;
 	z-index: 500;
 }
 

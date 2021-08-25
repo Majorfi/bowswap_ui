@@ -37,24 +37,24 @@ function	Index() {
 	}, [typeof(window)]);
 
 	return (
-		<section className={'mt-14 pt-14 w-full flex justify-center md:px-12 px-4 space-y-12 mb-64 z-10 relative'}>
-			<div className={'w-150 h-104 relative'}>
+		<section className={'mt-14 pt-0 md:pt-14 w-full flex justify-center md:px-12 px-4 space-y-12 mb-0 md:mb-64 z-10 relative max-w-full'}>
+			<div className={'max-w-xs md:max-w-full w-150 h-104 relative'}>
 				<div className={'absolute -top-24 -right-24 z-30 filter-blur-4'}>
 					<div data-relative-input={'false'} id={'target1'}>
-						<div data-depth={'0.2'}>
+						<div data-depth={'0.4'}>
 							<Target />
 						</div>
 					</div>
 				</div>
 				<div className={'absolute -bottom-52 -left-52 z-30 filter-blur-20 -rotate-90 transform'}>
 					<div data-relative-input={'false'} id={'bow1'}>
-						<div data-depth={'0.2'}>
+						<div data-depth={'0.4'}>
 							<Bow width={322} height={322} />
 						</div>
 					</div>
 				</div>
 
-				<div className={'flex justify-center items-center flex-col bg-white bg-opacity-50 backdrop-blur-md rounded-2xl px-24 pt-8 pb-10 z-20 border-2 border-solid border-white border-opacity-70 border-r-0 border-b-0'}>
+				<div className={'flex justify-center items-center flex-col bg-white bg-opacity-50 backdrop-blur-md rounded-2xl px-12 md:px-24 pt-8 pb-10 z-20 border-2 border-solid border-white border-opacity-70 border-r-0 border-b-0'}>
 					<Image src={'/yBowswap.png'} width={56} height={56} quality={95} loading={'eager'} />
 
 					<div className={'text-center mt-4 lg:mt-10'}>
@@ -75,14 +75,14 @@ function	Index() {
 
 				<div className={'absolute -bottom-14 -right-12 filter-blur-12 rotate-60 transform'} style={{zIndex: -10,}}>
 					<div data-relative-input={'false'} id={'target2'}>
-						<div data-depth={'0.2'}>
+						<div data-depth={'0.4'}>
 							<Target width={88} height={88} />
 						</div>
 					</div>
 				</div>
 				<div className={'absolute -top-18 -left-18 filter-blur-12'} style={{zIndex: -10}}>
 					<div data-relative-input={'false'} id={'bow2'}>
-						<div data-depth={'0.2'}>
+						<div data-depth={'0.4'}>
 							<Bow />
 						</div>
 					</div>
