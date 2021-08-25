@@ -38,6 +38,18 @@ function	YVempire({yearnVaultData}) {
 	const	[txApproveStatus, set_txApproveStatus] = useState({none: true, pending: false, success: false, error: false, step: ''});
 	const	[txMigrateStatus, set_txMigrateStatus] = useState({none: true, pending: false, success: false, error: false});
 
+	/**************************************************************************
+	**	Reset the state of this componant on address change
+	**
+	**	@TRIGGER : any time the address changes.
+	**************************************************************************/
+	useEffect(() => {
+		set_selectedTokens([]);
+		set_txApproveStatus({none: true, pending: false, success: false, error: false, step: ''});
+		set_txMigrateStatus({none: true, pending: false, success: false, error: false});
+		set_nonce(n => n + 1);
+	}, [address]);
+
 	const	retrieveUTokenBalances = useCallback(async (address) => {
 		if (!active) {
 			return;
