@@ -350,12 +350,12 @@ function	Bowswap({yearnVaultData, prices}) {
 		if (fromVault.scope === 'btc') {
 			const	vaultList = BOWSWAP_CRV_BTC_VAULTS.filter(e => e.address !== fromVault.address);
 			set_toVaultsList(vaultList);
-			if (fromVault.scope !== toVault.scope || fromVault.address === toVault.address)
+			if (toVault.scope === 'usd' || fromVault.address === toVault.address)
 				set_toVault(vaultList[0]);
 		} else if (fromVault.scope === 'usd') {
 			const	vaultList = BOWSWAP_CRV_USD_VAULTS.filter(e => e.address !== fromVault.address);
 			set_toVaultsList(vaultList);
-			if (fromVault.scope !== toVault.scope || fromVault.address === toVault.address)
+			if (toVault.scope === 'btc' || fromVault.address === toVault.address)
 				set_toVault(vaultList[0]);
 		} else {
 			set_toVaultsList([]);
