@@ -5,12 +5,10 @@
 **	@Filename:				InputTokenDisabled.js
 ******************************************************************************/
 
-import	React, {useRef}			from	'react';
-import	{ethers}				from	'ethers';
+import	React				from	'react';
+import	{ethers}			from	'ethers';
 
 function	InputTokenDisabled({value, toCounterValue, slippage, isFetchingExpectedReceiveAmount, balanceOf, decimals}) {
-	const	inputRef = useRef();
-
 	return (
 		<div className={'relative w-full text-left bg-white border border-ygray-100 rounded-lg cursor-default focus:outline-none flex flex-col justify-between text-ygray-800 h-24 py-2 px-2 space-y-1'}>
 			<div className={'h-4'}>
@@ -30,12 +28,10 @@ function	InputTokenDisabled({value, toCounterValue, slippage, isFetchingExpected
 					htmlFor={'fromInput'}
 					className={`with-placeholder placeholder-${value.length} flex justify-end w-full h-10 text-4xl font-medium text-ygray-700 text-opacity-20 proportional-nums cursor-text`}>
 					<input
-						ref={inputRef}
-						// value={formatedValue}
-						value={`${(Number(value) - ((Number(value) * slippage / 100))).toFixed(6)}`}
+						value={(Number(value) !== 0 ? `${(Number(value) - ((Number(value) * slippage / 100))).toFixed(6)}` : '')}
 						disabled
 						readOnly
-						style={{backgroundColor: 'transparent'}}
+						style={{backgroundColor: 'transparent', width: Number(value) === 0 ? '1px': 'auto'}}
 						className={'block w-full text-4xl font-medium h-full text-right text-ygray-700'}
 						type={'text'}
 						min={0} />

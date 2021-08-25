@@ -11,29 +11,31 @@ import	{ethers}					from	'ethers';
 import	Arrow						from	'components/Icons/Arrow';
 import	{formatAmount}				from	'utils';
 
-function	TableRow({pair, balanceOf, set_nonce, set_selectedTokens}) {
-	const	[isChecked, set_isChecked] = useState(false);
+function	TableRow({pair, balanceOf, yearnVaultData, selectedTokens, set_nonce, onSelectToken}) {
+	const	[isChecked, set_isChecked] = useState(false); //used to update the localstate
+	const	disabled = balanceOf?.isZero() || !balanceOf;
 
 	return (
 		<tr className={'bg-white z-10 relative'}>
 			<td>
 				<div
-					className={'w-full cursor-pointer'}
+					className={`w-full ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
 					onClick={() => {
+						if (disabled) {
+							return;
+						}
 						set_isChecked(!isChecked);
 						set_nonce(n => n + 1);
-						set_selectedTokens((s) => {
-							s[pair.uToken.address] = !s[pair.uToken.address];
-							return (s);
-						});
+						onSelectToken(pair.uToken.address);
 					}}>
-					<div className={'flex flex-row w-full items-center hover:bg-light-hover cursor-pointer rounded-lg pl-2 pr-6 py-2'}>
+					<div className={`flex flex-row w-full items-center hover:bg-light-hover rounded-lg pl-2 pr-6 py-2 ${disabled ? 'filter grayscale cursor-not-allowed' : 'cursor-pointer'}`}>
 						<div className={'flex flex-row w-1/3 items-center'}>
 							<input
 								type={'checkbox'}
-								className={'focus:ring-yblue text-yblue border-yblue border-2 rounded'}
+								className={`focus:ring-yblue text-yblue border-yblue border-2 rounded ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+								disabled={disabled}
 								style={{width: 22, height: 22}}
-								checked={isChecked}
+								checked={selectedTokens[pair.uToken.address]}
 								onChange={() => null} />
 
 							<div className={'ml-4 w-9 h-9 rounded-full flex justify-center items-center relative'} style={{minWidth: 36}}>
@@ -66,7 +68,7 @@ function	TableRow({pair, balanceOf, set_nonce, set_selectedTokens}) {
 								</div>
 								<div className={'pl-4 text-left overflow-ellipsis'}>
 									<div className={'text-ybase font-medium whitespace-nowrap'}>{pair.yvToken.name}</div>
-									<div className={'text-ybase font-medium text-yblue overflow-ellipsis mt-1'}>{`${Number(pair.yvToken.apy).toFixed(2)}%`}</div>
+									<div key={pair.yvToken.apy} className={'text-ybase font-medium text-yblue overflow-ellipsis mt-1'}>{`${Number((yearnVaultData?.apy?.net_apy || 0) * 100).toFixed(2)}%`}</div>
 								</div>
 							</div>
 						</div>

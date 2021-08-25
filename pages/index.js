@@ -6,10 +6,10 @@
 ******************************************************************************/
 
 import	React		from	'react';
-import	Bowswap		from	'components/Bowswap';
+import	Landing		from	'components/Landing';
 
-function	Index({yearnVaultData}) {
-	return <Bowswap yearnVaultData={yearnVaultData}/>;
+function	Index() {
+	return <Landing />;
 }
 
 export default Index;

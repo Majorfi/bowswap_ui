@@ -161,8 +161,7 @@ export const Web3ContextApp = ({children}) => {
 				chainID,
 				active,
 				initialized,
-
-				provider,
+				provider: active ? provider : getProvider(),
 				getProvider,
 				currentRPCProvider: provider
 			}}>

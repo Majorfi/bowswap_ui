@@ -13,6 +13,7 @@ import	AAVE_V2								from	'utils/AaveV2';
 import	COMPOUND							from	'utils/Compound';
 import	BOWSWAP_CRV_BTC_VAULTS				from	'utils/BOWSWAP_CRV_BTC_VAULTS';
 import	BOWSWAP_CRV_USD_VAULTS				from	'utils/BOWSWAP_CRV_USD_VAULTS';
+import	BOWSWAP_CRV_V2_VAULTS				from	'utils/BOWSWAP_CRV_V2_VAULTS';
 
 const AccountContext = createContext();
 
@@ -28,9 +29,11 @@ export const AccountContextApp = ({children}) => {
 		if (provider && address) {
 			const	_contractInstances = {};
 			const	_yVempireContractInstances = {};
-			([...BOWSWAP_CRV_USD_VAULTS, ...BOWSWAP_CRV_BTC_VAULTS]).forEach((contract) => {
-				_contractInstances[contract.address] = new ethers.Contract(
-					contract.address, ['function balanceOf(address) public view returns (uint256)'], provider
+			const	crvVaults = [...BOWSWAP_CRV_USD_VAULTS, ...BOWSWAP_CRV_BTC_VAULTS, ...BOWSWAP_CRV_V2_VAULTS].map(e => e.address);
+			const	crvVaultsNoDuplicates = [...new Set(crvVaults)];
+			(crvVaultsNoDuplicates).forEach((vaultAddress) => {
+				_contractInstances[vaultAddress] = new ethers.Contract(
+					vaultAddress, ['function balanceOf(address) public view returns (uint256)'], provider
 				);
 			});
 			([...COMPOUND, ...AAVE_V1, ...AAVE_V2]).forEach((contract) => {
@@ -78,12 +81,23 @@ export const AccountContextApp = ({children}) => {
 		}
 	}, [active]);
 
-	async function	updateBalanceOf() {
-		set_nonce(n => n + 1);
+	// async function	updateBalanceOf() {
+	// 	set_nonce(n => n + 1);
+	// }
+	async function	updateBalanceOf(addresses) {
+		addresses.forEach((addr) => {
+			const	instance = contractInstances[addr];
+			if (instance) {
+				instance.balanceOf(address).then((_balanceOf) => {
+					set_balancesOf((b) => {b[addr] = _balanceOf; return b;});
+					set_nonce(n => n + 1);
+				});
+			}
+		});
 	}
 
 	return (
-		<AccountContext.Provider value={{balancesOf, updateBalanceOf, allowances, set_balancesOf, set_allowances}}>
+		<AccountContext.Provider value={{balancesOf, updateBalanceOf, allowances, set_balancesOf, set_allowances, balancesNonce: nonce}}>
 			{children}
 		</AccountContext.Provider>
 	);

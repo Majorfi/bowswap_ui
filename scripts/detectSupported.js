@@ -33,8 +33,9 @@ function sleep(ms) {
  
 async function	checkTokens() {
 	const	finalDoc = LISTING;
+	const	API_KEY = '';
 	await asyncForEach((Object.values(LISTING)), async (token) => {
-		const	{result} = await performGet(`https://api.etherscan.io/api?module=contract&action=getabi&address=${token.address}&apikey=${'1QJIBHW3HCXNV3MMB2MC23NKYVP2AIMVPU'}`);
+		const	{result} = await performGet(`https://api.etherscan.io/api?module=contract&action=getabi&address=${token.address}&apikey=${API_KEY}`);
 		const	iface = new ethers.utils.Interface(result)?.format(ethers.utils.FormatTypes.minimal);
 		const	hasRemoveLiquidityOneCoin = iface.some((method) => {
 			return method.startsWith('function remove_liquidity_one_coin(');

@@ -8,7 +8,7 @@
 *******************************************************************************/
 
 html {
-	background-color: #F0F1F3;
+	background-color: #F2F3F5;
 }
 * {
 	scroll-behavior: smooth;
@@ -213,7 +213,8 @@ input[type=number] {
 	background-color: #FFFFFF;
 }
 .modalList::-webkit-scrollbar {
-	width: 8px;
+	width: 4px;
+	height: 4px;
 }
 
 .vampireList::-webkit-scrollbar-track {
@@ -229,6 +230,7 @@ input[type=number] {
 }
 .vampireList::-webkit-scrollbar {
 	width: 4px;
+	height: 4px;
 	z-index: 500;
 }
 
@@ -243,7 +245,7 @@ input[type=number] {
     position: absolute;
     height: 2rem;
     width: 98%;
-    bottom: 16px;
+    bottom: 0px;
     left: 0;
     z-index: 40;
     background-image: -webkit-gradient(linear,left top,left bottom,from(hsla(0,0%,100%,0)),to(#fff));
@@ -260,3 +262,7 @@ input[type=number] {
     background-image: -webkit-gradient(linear,left bottom,left top,from(hsla(0,0%,100%,0)),to(#fff));
     background-image: linear-gradient(0deg, hsla(0,0%,100%,0),#fff);
 }
+
+.filter-blur-4 {filter: blur(2px);}
+.filter-blur-12 {filter: blur(6px);}
+.filter-blur-20 {filter: blur(10px);}
