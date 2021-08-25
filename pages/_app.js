@@ -94,7 +94,7 @@ function	AppWrapper(props) {
 			</Head>
 			<main id={'app'} className={'flex flex-col w-full h-full relative min-h-screen'}>
 				<div className={'z-10 pointer-events-auto w-full'}>
-					<Navbar />
+					<Navbar shouldInitialPopup/>
 				</div>
 				<div className={'w-full h-full relative max-w-screen-lg mx-auto z-30 pt-2'}>
 					<WithLayout hasSecret={active && hasSecretCode}>
@@ -112,7 +112,7 @@ function	AppWrapper(props) {
 				<div className={`fixed inset-0 z-20 transition-opacity ${active && hasSecretCode ? 'pointer-events-auto opacity-100 visible' : 'pointer-events-none opacity-0 hidden'}`}>
 					<div className={`fixed -inset-96 bg-test z-20 rounded-full ${active && hasSecretCode ? 'animate-scale-up-center' : ''}`} />
 					<div className={'z-30 pointer-events-auto w-full absolute top-0'}>
-						<Navbar hasSecret={active && hasSecretCode} />
+						<Navbar hasSecret={active && hasSecretCode} shouldInitialPopup={false} />
 					</div>
 					{active && hasSecretCode ?
 						<div className={'z-50 pointer-events-none fixed inset-0'}>

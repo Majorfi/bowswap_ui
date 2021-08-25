@@ -10,9 +10,21 @@ import	Image					from	'next/image';
 import	useWeb3					from	'contexts/useWeb3';
 import	ModalLogin				from	'components/Commons/ModalLogin';
 
-function	Navbar({hasSecret}) {
+function	Navbar({hasSecret, shouldInitialPopup}) {
 	const	{active, address, ens, deactivate, onDesactivate} = useWeb3();
-	const	[ModalLoginOpen, set_ModalLoginOpen] = useState(false);
+	const	[modalLoginOpen, set_modalLoginOpen] = useState(false);
+	const	[initialPopup, set_initialPopup] = useState(false);
+
+	React.useEffect(() => {
+		if (initialPopup || !shouldInitialPopup)
+			return;
+
+		if (!address) {
+			set_modalLoginOpen(true);
+		}
+		set_initialPopup(true);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [address]);
 
 	const stringToColour = function(str) {
 		let hash = 0;
@@ -31,7 +43,7 @@ function	Navbar({hasSecret}) {
 		if (!active) {
 			return (
 				<button
-					onClick={() => set_ModalLoginOpen(true)}
+					onClick={() => set_modalLoginOpen(true)}
 					className={'ml-8 inline-flex px-6 py-3 items-center leading-4 rounded-lg text-ybase cursor-pointer whitespace-nowrap bg-transparent text-yblue border border-solid border-yblue hover:bg-connect-hover  transition-colors'}>
 					{'Connect wallet'}
 				</button>
@@ -61,7 +73,7 @@ function	Navbar({hasSecret}) {
 					{renderWalletButton()}
 				</div>
 			</div>
-			<ModalLogin open={ModalLoginOpen} set_open={set_ModalLoginOpen} />
+			<ModalLogin open={modalLoginOpen} set_open={set_modalLoginOpen} />
 		</nav>
 	);
 }
