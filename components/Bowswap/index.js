@@ -499,7 +499,7 @@ function	Bowswap({yearnVaultData, prices}) {
 							}
 							if (type === 'success') {
 								setTimeout(() => set_txSwapStatus({none: true, pending: false, error: false, success: false}), 2500);
-								updateBalanceOf();
+								updateBalanceOf([fromVault.address, toVault.address]);
 								resetStates();
 							}
 						}}

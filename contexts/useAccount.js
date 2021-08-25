@@ -81,8 +81,19 @@ export const AccountContextApp = ({children}) => {
 		}
 	}, [active]);
 
-	async function	updateBalanceOf() {
-		set_nonce(n => n + 1);
+	// async function	updateBalanceOf() {
+	// 	set_nonce(n => n + 1);
+	// }
+	async function	updateBalanceOf(addresses) {
+		addresses.forEach((addr) => {
+			const	instance = contractInstances[addr];
+			if (instance) {
+				instance.balanceOf(address).then((_balanceOf) => {
+					set_balancesOf((b) => {b[addr] = _balanceOf; return b;});
+					set_nonce(n => n + 1);
+				});
+			}
+		});
 	}
 
 	return (
