@@ -359,7 +359,9 @@ function	Bowswap({yearnVaultData, prices}) {
 				set_toVault(vaultList[0]);
 		} else {
 			set_toVaultsList([]);
-			set_toVault(V2VaultList[0]);
+			if (!V2Paths.includes(toVault.address)) {
+				set_toVault(V2VaultList[0]);
+			}
 		}
 
 		if (provider)
