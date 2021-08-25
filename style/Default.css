@@ -245,7 +245,7 @@ input[type=number] {
     position: absolute;
     height: 2rem;
     width: 98%;
-    bottom: 16px;
+    bottom: 0px;
     left: 0;
     z-index: 40;
     background-image: -webkit-gradient(linear,left top,left bottom,from(hsla(0,0%,100%,0)),to(#fff));

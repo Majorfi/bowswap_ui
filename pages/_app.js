@@ -19,13 +19,16 @@ import	ModalPong						from	'components/Commons/ModalPong';
 import	Tabs							from	'components/Commons/Tabs';
 import	useSecret						from	'hook/useSecret';
 import	{fetchYearnVaults}				from	'utils/API';
+import	AAVE_V1							from	'utils/AaveV1';
+import	AAVE_V2							from	'utils/AaveV2';
+import	COMPOUND						from	'utils/Compound';
 
 import	'style/Default.css';
 import	'tailwindcss/tailwind.css';
 
-const fetcher = (...args) => fetch(...args).then(res => res.json());
-
-const useSecretCode = () => {
+const	PAIRS = [...COMPOUND, ...AAVE_V1, ...AAVE_V2];
+const	fetcher = (...args) => fetch(...args).then(res => res.json());
+const	useSecretCode = () => {
 	const secretCode = process.env.SECRET.split(',');
 	const success = useSecret(secretCode);
 	return success;
@@ -67,6 +70,8 @@ function	AppWrapper(props) {
 	const	{Component, pageProps, router} = props;
 	const	hasSecretCode = useSecretCode();
 	const	[yearnVaultData, set_yearnVaultData] = useState([]);
+	const	[yVempireData, set_yVempireData] = useState(PAIRS);
+
 	const	{data} = useSWR(`https://api.coingecko.com/api/v3/simple/price?ids=${['bitcoin', 'ethereum', 'aave']}&vs_currencies=usd`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, refreshInterval: 30000, shouldRetryOnError: true, dedupingInterval: 1000, focusThrottleInterval: 5000});
 
 	useEffect(() => {
@@ -127,6 +132,8 @@ function	AppWrapper(props) {
 								hasSecret={active && hasSecretCode}
 								prices={data}
 								yearnVaultData={yearnVaultData}
+								yVempireData={yVempireData}
+								set_yVempireData={set_yVempireData}
 								{...pageProps} />
 						</WithLayout>
 					</div>

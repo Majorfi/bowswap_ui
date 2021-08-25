@@ -11,7 +11,7 @@ import	{ethers}					from	'ethers';
 import	Arrow						from	'components/Icons/Arrow';
 import	{formatAmount}				from	'utils';
 
-function	TableRow({pair, balanceOf, set_nonce, set_selectedTokens}) {
+function	TableRow({pair, balanceOf, yearnVaultData, set_nonce, set_selectedTokens}) {
 	const	[isChecked, set_isChecked] = useState(false);
 
 	return (
@@ -27,7 +27,7 @@ function	TableRow({pair, balanceOf, set_nonce, set_selectedTokens}) {
 							return (s);
 						});
 					}}>
-					<div className={'flex flex-row w-full items-center hover:bg-light-hover cursor-pointer rounded-lg pl-2 pr-6 py-2'}>
+					<div className={`flex flex-row w-full items-center hover:bg-light-hover cursor-pointer rounded-lg pl-2 pr-6 py-2 ${balanceOf?.isZero() || !balanceOf ? 'filter grayscale' : ''}`}>
 						<div className={'flex flex-row w-1/3 items-center'}>
 							<input
 								type={'checkbox'}
@@ -66,7 +66,7 @@ function	TableRow({pair, balanceOf, set_nonce, set_selectedTokens}) {
 								</div>
 								<div className={'pl-4 text-left overflow-ellipsis'}>
 									<div className={'text-ybase font-medium whitespace-nowrap'}>{pair.yvToken.name}</div>
-									<div className={'text-ybase font-medium text-yblue overflow-ellipsis mt-1'}>{`${Number(pair.yvToken.apy).toFixed(2)}%`}</div>
+									<div key={pair.yvToken.apy} className={'text-ybase font-medium text-yblue overflow-ellipsis mt-1'}>{`${Number((yearnVaultData?.apy?.net_apy || 0) * 100).toFixed(2)}%`}</div>
 								</div>
 							</div>
 						</div>
