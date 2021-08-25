@@ -16,6 +16,9 @@ function	ButtonApprove({pairs, selectedTokens, balancesOf, allowances, approved,
 	const	[transactionProcessing, set_transactionProcessing] = useState(false);
 
 	async function	performApprove(event) {
+		if (!Object.values(selectedTokens).some(Boolean) || transactionProcessing) {
+			return;
+		}
 		const	actualSelectedTokens = Object.entries(selectedTokens).filter(([, value]) => value === true).map(([key]) => key);
 		const	selectedPairs = pairs.filter((p) => actualSelectedTokens.includes(p.uToken.address));
 		let		isBroken = false;

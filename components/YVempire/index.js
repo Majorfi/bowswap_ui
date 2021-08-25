@@ -185,9 +185,10 @@ function	YVempire({yearnVaultData, yVempireData, set_yVempireData}) {
 								setTimeout(() => set_txMigrateStatus((s) => s.error ? {none: true, pending: false, error: false, success: false} : s), 2500);
 							}
 							if (type === 'success') {
+								resetUTokenBalances(selectedTokensList);
+								set_txApproveStatus({none: true, pending: false, success: false, error: false, step: ''});
 								setTimeout(() => {
 									set_txMigrateStatus({none: true, pending: false, error: false, success: false});
-									resetUTokenBalances(selectedTokensList);
 								}, 2500);
 							}
 						}}
