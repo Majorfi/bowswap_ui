@@ -70,7 +70,7 @@ function	AppWrapper(props) {
 	const	{data} = useSWR(`https://api.coingecko.com/api/v3/simple/price?ids=${['bitcoin', 'ethereum', 'aave']}&vs_currencies=usd`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, refreshInterval: 30000, shouldRetryOnError: true, dedupingInterval: 1000, focusThrottleInterval: 5000});
 
 	useEffect(() => {
-		if ((active || address) && router.asPath === '/') {
+		if (active && router.asPath === '/') {
 			router.push('/swap');
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
