@@ -21,7 +21,8 @@ export default function Tabs() {
 			<div
 				onClick={() => router.push('/from-defi')}
 				className={`${router.pathname === '/from-defi' ? 'bg-ygray-50 text-opacity-100 font-bold' : 'bg-white text-opacity-50 font-normal cursor-pointer hover:bg-ygray-50 hover:bg-opacity-50 hover:text-opacity-70'} transition-all text-yblue w-full text-ybase rounded-lg focus:outline-none py-4 flex justify-center items-center tracking-wide`}>
-				{'From DeFi to Yearn Vault'}
+				<p className={'hidden md:inline'}>{'From DeFi to Yearn Vault'}</p>
+				<p className={'inline md:hiddden'}>{'From DeFi'}</p>
 			</div>
 		</div>
 	);

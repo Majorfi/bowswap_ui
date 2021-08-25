@@ -92,11 +92,11 @@ function	AppWrapper(props) {
 				<link rel={'preconnect'} href={'https://fonts.gstatic.com'} crossOrigin={'true'} />
 				<link href={'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap'} rel={'stylesheet'} />
 			</Head>
-			<main id={'app'} className={'flex w-full h-full relative min-h-screen'}>
-				<div className={'z-10 pointer-events-auto fixed top-0 w-full'}>
+			<main id={'app'} className={'flex flex-col w-full h-full relative min-h-screen'}>
+				<div className={'z-10 pointer-events-auto w-full'}>
 					<Navbar />
 				</div>
-				<div className={'w-full h-full relative max-w-screen-lg mx-auto z-30 mt-16 pt-2'}>
+				<div className={'w-full h-full relative max-w-screen-lg mx-auto z-30 pt-2'}>
 					<WithLayout hasSecret={active && hasSecretCode}>
 						<Component
 							key={router.route}
@@ -111,7 +111,7 @@ function	AppWrapper(props) {
 
 				<div className={`fixed inset-0 z-20 transition-opacity ${active && hasSecretCode ? 'pointer-events-auto opacity-100 visible' : 'pointer-events-none opacity-0 hidden'}`}>
 					<div className={`fixed -inset-96 bg-test z-20 rounded-full ${active && hasSecretCode ? 'animate-scale-up-center' : ''}`} />
-					<div className={'z-30 pointer-events-auto fixed top-0 w-full'}>
+					<div className={'z-30 pointer-events-auto w-full absolute top-0'}>
 						<Navbar hasSecret={active && hasSecretCode} />
 					</div>
 					{active && hasSecretCode ?
