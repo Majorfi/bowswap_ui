@@ -19,6 +19,7 @@ function	ButtonApprove({pairs, selectedTokens, balancesOf, allowances, approved,
 		const	actualSelectedTokens = Object.entries(selectedTokens).filter(([, value]) => value === true).map(([key]) => key);
 		const	selectedPairs = pairs.filter((p) => actualSelectedTokens.includes(p.uToken.address));
 		let		isBroken = false;
+		let		message = undefined;
 		event.preventDefault();
 		event.stopPropagation();
 		if (disabled || transactionProcessing) {
@@ -33,12 +34,21 @@ function	ButtonApprove({pairs, selectedTokens, balancesOf, allowances, approved,
 			const	balanceOf = balancesOf[pair.uToken.address];
 			const	allowance = allowances[pair.uToken.address];
 			if (ethers.BigNumber.from(allowance).gte(balanceOf)) {
-				//already approved
-				return;
+				return; //already approved
 			}
 			const	approval = balanceOf.add(balanceOf.mul(3).div(100)); //balance + 3% because of mutable aToken balance;
 			try {
 				onStep(`APPROVING ${pair.uToken.name}...`);
+				const	toVaultContract = new ethers.Contract(pair.yvToken.address, ['function depositLimit() view returns (uint256)'], provider);
+				const	depositLimit = await toVaultContract.depositLimit();
+
+				if (depositLimit.lt(approval)) {
+					isBroken = true;
+					set_transactionProcessing(false);
+					message = 'Not enough limit in Vault. Please complain to Facu.';
+					return;
+				}
+
 				await approveToken({
 					provider: provider,
 					contractAddress: pair.uToken.address,
@@ -58,7 +68,7 @@ function	ButtonApprove({pairs, selectedTokens, balancesOf, allowances, approved,
 		});
 		if (isBroken) {
 			set_transactionProcessing(false);
-			return onCallback('error');
+			return onCallback('error', message);
 		}
 		set_transactionProcessing(false);
 		onCallback('success');

@@ -65,7 +65,6 @@ function	YVempire({yearnVaultData, yVempireData, set_yVempireData}) {
 			const	fromTokenContract = new ethers.Contract(pair.uToken.address, ['function supplyRatePerBlock() view returns (uint256)'], provider);
 			const	currentYearnVault = yearnVaults.find(yv => yv.address === pair.yvToken.address);
 			_yVempireData[index].yvToken.apy = (currentYearnVault?.apy?.net_apy || 0) * 100;
-			console.log(currentYearnVault);
 
 			if (pair.service === 0) {
 				const	supplyRatePerBlock = await fromTokenContract.supplyRatePerBlock();
@@ -109,6 +108,8 @@ function	YVempire({yearnVaultData, yVempireData, set_yVempireData}) {
 				return {open: true, title: 'APPROVE COMPLETED', color: 'bg-success', icon: <Success width={24} height={24} className={'mr-4'} />};
 			if (txMigrateStatus.success)
 				return {open: true, title: 'MIGRATION COMPLETED', color: 'bg-success', icon: <Success width={24} height={24} className={'mr-4'} />};
+			if (txApproveStatus.error && txApproveStatus.message)
+				return {open: true, title: txApproveStatus.message.toUpperCase(), color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (txMigrateStatus.error)
 				return {open: true, title: 'MIGRATION FAILED', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (txApproveStatus.error)
@@ -140,15 +141,17 @@ function	YVempire({yearnVaultData, yVempireData, set_yVempireData}) {
 			<div className={'w-full py-4 bg-white flex justify-center items-end'}>
 				<div className={'flex flex-row justify-center w-full space-x-4'}>
 					<ButtonApprove
-						yVempireData={yVempireData}
+						pairs={yVempireData}
 						selectedTokens={selectedTokens}
 						balancesOf={balancesOf}
 						allowances={allowances}
 						approved={txApproveStatus.success}
 						onStepComplete={approval => set_allowances(b => ({...b, ...approval}))}
 						onStep={step => set_txApproveStatus(status => ({...status, step}))}
-						onCallback={(type) => {
-							set_txApproveStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success'});
+						onCallback={(type, message) => {
+							console.log(message);
+							console.warn(type);
+							set_txApproveStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success', message});
 							if (type === 'error') {
 								setTimeout(() => set_txApproveStatus((s) => s.error ? {none: true, pending: false, error: false, success: false} : s), 2500);
 							}
@@ -158,7 +161,7 @@ function	YVempire({yearnVaultData, yVempireData, set_yVempireData}) {
 						}}
 					/>
 					<ButtonMigrate
-						yVempireData={yVempireData}
+						pairs={yVempireData}
 						selectedTokens={selectedTokens}
 						approved={txApproveStatus.success}
 						onCallback={(type, selectedTokensList) => {
