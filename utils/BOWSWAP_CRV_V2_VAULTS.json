@@ -317,5 +317,27 @@
         "address": "0xE537B5cc158EB71037D4125BDD7538421981E6AA",
         "tokenAddress": "0xc4AD29ba4B3c580e6D59105FFf484999997675Ff",
         "poolAddress": "0xd51a44d3fae010294c616388b506acda1bfaae46"
+    },
+    {
+        "icon": "https://rawcdn.githack.com/yearn/yearn-assets/df22a6c775d3c969ac0ba2bc831a59598d62be68/icons/tokens/0xf2db9a7c0ACd427A680D640F02d90f6186E71725/logo-128.png",
+        "symbol": "yvCurve-LINK",
+        "name": "yvCurve-LINK 0.3.5",
+        "decimals": 18,
+        "scope": "v2",
+        "type": "link",
+        "address": "0xf2db9a7c0ACd427A680D640F02d90f6186E71725",
+        "tokenAddress": "0xcee60cFa923170e4f8204AE08B4fA6A3F5656F3a",
+        "poolAddress": "0xf178c0b5bb7e7abf4e12a4838c7b7c5ba2c623c0"
+    },
+    {
+        "icon": "https://rawcdn.githack.com/yearn/yearn-assets/df22a6c775d3c969ac0ba2bc831a59598d62be68/icons/tokens/0x671a912C10bba0CFA74Cfc2d6Fba9BA1ed9530B2/logo-128.png",
+        "symbol": "yvLINK",
+        "name": "yvLINK 0.4.2",
+        "decimals": 18,
+        "scope": "v2",
+        "type": "link",
+        "address": "0x671a912C10bba0CFA74Cfc2d6Fba9BA1ed9530B2",
+        "tokenAddress": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+        "poolAddress": "0xf178c0b5bb7e7abf4e12a4838c7b7c5ba2c623c0"
     }
 ]
