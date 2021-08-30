@@ -155,7 +155,7 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, onCallback}) 
 	const	[transactionProcessing, set_transactionProcessing] = useState(false);
 
 	function	performApprove() {
-		if (disabled || transactionProcessing) {
+		if (disabled || transactionProcessing || (!fromAmount || Number(fromAmount) === 0)) {
 			return;
 		}
 		set_transactionProcessing(true);
@@ -472,7 +472,7 @@ function	Bowswap({yearnVaultData, prices}) {
 
 				<div className={'flex flex-row justify-center pt-8 w-full space-x-4'}>
 					<ButtonApprove
-						disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals))}
+						disabled={(Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals)) || txApproveStatus.success || isAllowed )}
 						approved={txApproveStatus.success || isAllowed}
 						fromVault={fromVault}
 						fromAmount={fromAmount}
