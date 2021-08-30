@@ -437,7 +437,7 @@ function	Bowswap({yearnVaultData, prices}) {
 		);
 	}
 
-	const	isAllowed = fromAmount !== '' && ethers.BigNumber.from(allowances?.[fromVault.address] || 0)?.gte(ethers.utils.parseUnits(fromAmount || '0', fromVault.decimals || 18));
+	const	isAllowed = fromAmount !== '' && Number(fromAmount) > 0 && ethers.BigNumber.from(allowances?.[fromVault.address] || 0)?.gte(ethers.utils.parseUnits(fromAmount || '0', fromVault.decimals || 18));
 	return (
 		<div className={'w-full max-w-2xl'}>
 			<div className={'bg-white rounded-xl shadow-base p-4 w-full relative space-y-0 md:space-y-4'}>

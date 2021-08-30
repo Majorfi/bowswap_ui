@@ -23,7 +23,6 @@ const AccountContext = createContext();
 export const AccountContextApp = ({children}) => {
 	const	{active, provider, getProvider, address} = useWeb3();
 	const	[nonce, set_nonce] = useState(0);
-	const	[isFetchingBalances, set_isFetchingBalances] = useState(false);
 	const	[balancesOf, set_balancesOf] = useState({});
 	const	[allowances, set_allowances] = useState({});
 
@@ -86,24 +85,29 @@ export const AccountContextApp = ({children}) => {
 	}
 
 	useEffect(() => {
-		if (active && provider && address) {
-			if (!isFetchingBalances) {
-				set_isFetchingBalances(true);
-				retrieveBowswapBalances(),
-				retrieveYVempireBalances();
-				set_nonce(n => n + 1);
-			}
-		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [provider, address, active]);
-
-	useEffect(() => {
 		if (!active) {
 			set_balancesOf({});
 			set_allowances({});
 			set_nonce(0);
 		}
 	}, [active]);
+
+	useEffect(() => {
+		if (!address) {
+			set_balancesOf({});
+			set_allowances({});
+			set_nonce(0);
+		}
+	}, [address]);
+
+	useEffect(() => {
+		if (active && provider && address) {
+			retrieveBowswapBalances(),
+			retrieveYVempireBalances();
+			set_nonce(n => n + 1);
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [provider, address, active]);
 
 	async function	updateBalanceOf(addresses) {
 		const	ethcallProvider = new Provider();
