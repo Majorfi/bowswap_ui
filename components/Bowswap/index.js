@@ -104,15 +104,23 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 					instructions: V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2]
 				}, ({error}) => {
 					if (error) {
+						let message = undefined;
+						if (error?.data?.message?.includes('revert out too low')) {
+							message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
+						}
 						set_transactionProcessing(false);
-						return onCallback('error');
+						return onCallback('error', message);
 					}
 					set_transactionProcessing(false);
 					onCallback('success');
 				});
 			} catch (error) {
+				let message = undefined;
+				if (error?.data?.message?.includes('revert out too low')) {
+					message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
+				}
 				set_transactionProcessing(false);
-				return onCallback('error');
+				return onCallback('error', message);
 			}
 		} else {
 			try {
@@ -125,15 +133,23 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 					minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toString(), fromVault.decimals)
 				}, ({error}) => {
 					if (error) {
+						let message = undefined;
+						if (error?.data?.message?.includes('revert out too low')) {
+							message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
+						}
 						set_transactionProcessing(false);
-						return onCallback('error');
+						return onCallback('error', message);
 					}
 					set_transactionProcessing(false);
 					onCallback('success');
 				});
 			} catch (error) {
+				let message = undefined;
+				if (error?.data?.message?.includes('revert out too low')) {
+					message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
+				}
 				set_transactionProcessing(false);
-				return onCallback('error');
+				return onCallback('error', message);
 			}
 		}
 	}
@@ -416,6 +432,8 @@ function	Bowswap({yearnVaultData, prices}) {
 				return {open: true, title: 'APPROVE COMPLETED', color: 'bg-success', icon: <Success width={24} height={24} className={'mr-4'} />};
 			if (txSwapStatus.success)
 				return {open: true, title: 'SWAP COMPLETED', color: 'bg-success', icon: <Success width={24} height={24} className={'mr-4'} />};
+			if (txSwapStatus.error && txSwapStatus.message)
+				return {open: true, title: txSwapStatus.message, color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (txSwapStatus.error)
 				return {open: true, title: 'SWAP FAILED', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (txApproveStatus.error)
@@ -498,10 +516,10 @@ function	Bowswap({yearnVaultData, prices}) {
 						fromAmount={fromAmount}
 						expectedReceiveAmount={expectedReceiveAmount}
 						slippage={slippage}
-						onCallback={(type) => {
-							set_txSwapStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success'});
+						onCallback={(type, message) => {
+							set_txSwapStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success', message});
 							if (type === 'error') {
-								setTimeout(() => set_txSwapStatus((s) => s.error ? {none: true, pending: false, error: false, success: false} : s), 2500);
+								setTimeout(() => set_txSwapStatus((s) => s.error ? {none: true, pending: false, error: false, success: false, message} : s), 2500);
 							}
 							if (type === 'success') {
 								updateBalanceOf([fromVault.address, toVault.address]);

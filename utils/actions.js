@@ -63,7 +63,7 @@ export async function	metapoolSwapTokens({provider, contractAddress, from, to, a
 			callback({error: true, data: undefined});
 		}
 	} catch (error) {
-		callback({error: true, data: undefined});
+		callback({error: error, data: undefined});
 	}
 }
 
@@ -88,7 +88,7 @@ export async function	swapTokens({provider, contractAddress, from, to, amount, m
 			callback({error: true, data: undefined});
 		}
 	} catch (error) {
-		callback({error: true, data: undefined});
+		callback({error: error, data: undefined});
 	}
 }
 
@@ -112,6 +112,6 @@ export async function	migrateBachTokens({provider, contractAddress, batch}, call
 		}
 	} catch (error) {
 		console.error(error);
-		callback({error: true, data: undefined});
+		callback({error: error, data: undefined});
 	}
 }
