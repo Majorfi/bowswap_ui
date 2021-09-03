@@ -100,7 +100,7 @@ export async function	swapTokens({provider, contractAddress, from, to, amount, m
 			amount,
 			minAmountOut,
 			instructions,
-			{gasLimit: safeGasLimit}
+			{gasLimit: newGasLimit}
 		);
 		const	transactionResult = await transaction.wait();
 
