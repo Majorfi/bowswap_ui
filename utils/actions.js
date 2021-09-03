@@ -80,8 +80,30 @@ export async function	swapTokens({provider, contractAddress, from, to, amount, m
 	**	If the call is successful, try to perform the actual TX
 	**********************************************************************/
 	try {
-		const	transaction = await contract.swap(from, to, amount, minAmountOut, instructions);
+		const	gas = await contract.estimateGas.swap(
+			from,
+			to,
+			amount,
+			minAmountOut,
+			instructions,
+		);
+
+		const	safeGasLimit = ethers.BigNumber.from(2_000_000);
+		let	newGasLimit = gas.add(gas.mul(50).div(100));
+		if (newGasLimit.lte(safeGasLimit)) {
+			newGasLimit = safeGasLimit;
+		}
+
+		const	transaction = await contract.swap(
+			from,
+			to,
+			amount,
+			minAmountOut,
+			instructions,
+			{gasLimit: safeGasLimit}
+		);
 		const	transactionResult = await transaction.wait();
+
 		if (transactionResult.status === 1) {
 			callback({error: false, data: amount});
 		} else {
