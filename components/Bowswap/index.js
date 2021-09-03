@@ -18,6 +18,7 @@ import	BlockStatus										from	'components/Bowswap/BlockStatus';
 import	Success											from	'components/Icons/Success';
 import	Error											from	'components/Icons/Error';
 import	Pending											from	'components/Icons/Pending';
+import	BOWSWAP_CRV_EUR_VAULTS							from	'utils/BOWSWAP_CRV_EUR_VAULTS';
 import	BOWSWAP_CRV_BTC_VAULTS							from	'utils/BOWSWAP_CRV_BTC_VAULTS';
 import	BOWSWAP_CRV_USD_VAULTS							from	'utils/BOWSWAP_CRV_USD_VAULTS';
 import	BOWSWAP_CRV_V2_VAULTS							from	'utils/BOWSWAP_CRV_V2_VAULTS';
@@ -304,6 +305,8 @@ function	Bowswap({yearnVaultData, prices}) {
 
 		if (fromVault.scope === 'btc' || (fromVault.scope === 'v2' && fromVault.type === 'btc')) {
 			set_fromCounterValue(prices.bitcoin.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
+		} else if (fromVault.scope === 'eur' || (fromVault.scope === 'v2' && fromVault.type === 'eur')) {
+			set_fromCounterValue((prices?.['tether-eurt'].usd || 1) * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else if (fromVault.scope === 'v2' && fromVault.type === 'eth') {
 			set_fromCounterValue(prices.ethereum.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else if (fromVault.scope === 'v2' && fromVault.type === 'aave') {
@@ -338,6 +341,8 @@ function	Bowswap({yearnVaultData, prices}) {
 
 		if (toVault.scope === 'btc' || (toVault.scope === 'v2' && toVault.type === 'btc')) {
 			set_toCounterValue(prices.bitcoin.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
+		} else if (fromVault.scope === 'eur' || (fromVault.scope === 'v2' && fromVault.type === 'eur')) {
+			set_toCounterValue((prices?.['tether-eurt'].usd || 1) * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else if (toVault.scope === 'v2' && toVault.type === 'eth') {
 			set_toCounterValue(prices.ethereum.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else if (toVault.scope === 'v2' && toVault.type === 'aave') {
@@ -368,12 +373,17 @@ function	Bowswap({yearnVaultData, prices}) {
 		if (fromVault.scope === 'btc') {
 			const	vaultList = BOWSWAP_CRV_BTC_VAULTS.filter(e => e.address !== fromVault.address);
 			set_toVaultsList(vaultList);
-			if (toVault.scope === 'usd' || fromVault.address === toVault.address || !V2Paths.includes(toAddress(toVault.address)))
+			if (toVault.scope !== 'btc' || fromVault.address === toVault.address || !V2Paths.includes(toAddress(toVault.address)))
 				set_toVault(vaultList[0]);
 		} else if (fromVault.scope === 'usd') {
 			const	vaultList = BOWSWAP_CRV_USD_VAULTS.filter(e => e.address !== fromVault.address);
 			set_toVaultsList(vaultList);
-			if (toVault.scope === 'btc' || fromVault.address === toVault.address || !V2Paths.includes(toAddress(toVault.address)))
+			if (toVault.scope !== 'usd' || fromVault.address === toVault.address || !V2Paths.includes(toAddress(toVault.address)))
+				set_toVault(vaultList[0]);
+		} else if (fromVault.scope === 'eur') {
+			const	vaultList = BOWSWAP_CRV_EUR_VAULTS.filter(e => e.address !== fromVault.address);
+			set_toVaultsList(vaultList);
+			if (toVault.scope !== 'eur' || fromVault.address === toVault.address || !V2Paths.includes(toAddress(toVault.address)))
 				set_toVault(vaultList[0]);
 		} else {
 			set_toVaultsList([]);
@@ -440,6 +450,7 @@ function	Bowswap({yearnVaultData, prices}) {
 				return {open: true, title: 'APPROVE TRANSACTION FAILURE', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals)))
 				return {open: true, title: 'EXCEEDED BALANCE LIMIT !', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
+			
 			if (fromVault.scope === 'v2' && toVault.scope === 'v2' && fromVault.type === 'usd' && toVault.type !== 'usd')
 				return {open: true, title: 'You are moving from a USD pegged asset to a more volatile crypto asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (fromVault.scope !== 'v2' && toVault.scope === 'v2' && fromVault.scope === 'usd' && toVault.type !== 'usd')
@@ -448,6 +459,16 @@ function	Bowswap({yearnVaultData, prices}) {
 				return {open: true, title: 'You are moving from a volatile crypto asset to a USD pegged asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (fromVault.scope !== 'v2' && toVault.scope === 'v2' && fromVault.scope !== 'usd' && toVault.type === 'usd')
 				return {open: true, title: 'You are moving from a volatile crypto asset to a USD pegged asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
+
+			if (fromVault.scope === 'v2' && toVault.scope === 'v2' && fromVault.type === 'eur' && toVault.type !== 'eur')
+				return {open: true, title: 'You are moving from a EUR pegged asset to a more volatile crypto asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
+			if (fromVault.scope !== 'v2' && toVault.scope === 'v2' && fromVault.scope === 'eur' && toVault.type !== 'eur')
+				return {open: true, title: 'You are moving from a EUR pegged asset to a more volatile crypto asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
+			if (fromVault.scope === 'v2' && toVault.scope === 'v2' && fromVault.type !== 'eur' && toVault.type === 'eur')
+				return {open: true, title: 'You are moving from a volatile crypto asset to a EUR pegged asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
+			if (fromVault.scope !== 'v2' && toVault.scope === 'v2' && fromVault.scope !== 'eur' && toVault.type === 'eur')
+				return {open: true, title: 'You are moving from a volatile crypto asset to a EUR pegged asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
+
 			if (Number(slippage) >= 3)
 				return {open: true, title: 'HEAVY SLIPPAGE, USE IT AT YOUR OWN RISK', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (Number(slippage) === 0)
@@ -465,7 +486,7 @@ function	Bowswap({yearnVaultData, prices}) {
 			<div className={'bg-white rounded-xl shadow-base p-4 w-full relative space-y-0 md:space-y-4'}>
 				<SectionFromVault
 					disabled={!txApproveStatus.none || (!txSwapStatus.none && !txSwapStatus.success)}
-					vaults={[...BOWSWAP_CRV_USD_VAULTS, ...BOWSWAP_CRV_BTC_VAULTS, ...BOWSWAP_CRV_V2_VAULTS]}
+					vaults={[...BOWSWAP_CRV_USD_VAULTS, ...BOWSWAP_CRV_BTC_VAULTS, ...BOWSWAP_CRV_EUR_VAULTS, ...BOWSWAP_CRV_V2_VAULTS]}
 					fromVault={fromVault}
 					set_fromVault={set_fromVault}
 					fromAmount={fromAmount}
