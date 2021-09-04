@@ -37,7 +37,7 @@ function	VaultList({element, onClick, style, balanceOf, vault}) {
 						<p className={'pb-1'}>{ethers.utils.formatUnits(balanceOf?.toString() || '0', element.decimals)}</p>
 						<span className={'text-white text-xxs'}>
 							<p className={'inline opacity-70 text-xxs'}>{'APY: '}</p>
-							<p className={'inline opacity-100 text-ysm'}>{`${((vault?.apy?.net_apy || 0) * 100).toFixed(2) || '--'}%`}</p>
+							<p className={'inline opacity-100 text-ysm'}>{`${vault?.apy?.net_apy > 0 ? `${((vault?.apy?.net_apy || 0) * 100).toFixed(2)}%` : ' new'}`}</p>
 						</span>
 					</span>
 				</div>
