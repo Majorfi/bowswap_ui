@@ -12,6 +12,7 @@ import	{toAddress}							from	'utils';
 import	AAVE_V1								from	'utils/AaveV1';
 import	AAVE_V2								from	'utils/AaveV2';
 import	COMPOUND							from	'utils/Compound';
+import	BOWSWAP_CRV_EUR_VAULTS				from	'utils/BOWSWAP_CRV_EUR_VAULTS';
 import	BOWSWAP_CRV_BTC_VAULTS				from	'utils/BOWSWAP_CRV_BTC_VAULTS';
 import	BOWSWAP_CRV_USD_VAULTS				from	'utils/BOWSWAP_CRV_USD_VAULTS';
 import	BOWSWAP_CRV_V2_VAULTS				from	'utils/BOWSWAP_CRV_V2_VAULTS';
@@ -27,7 +28,7 @@ export const AccountContextApp = ({children}) => {
 	const	[allowances, set_allowances] = useState({});
 
 	async function	retrieveBowswapBalances() {
-		const	crvVaults = [...BOWSWAP_CRV_USD_VAULTS, ...BOWSWAP_CRV_BTC_VAULTS, ...BOWSWAP_CRV_V2_VAULTS].map(e => e.address);
+		const	crvVaults = [...BOWSWAP_CRV_USD_VAULTS, ...BOWSWAP_CRV_BTC_VAULTS, ...BOWSWAP_CRV_EUR_VAULTS, ...BOWSWAP_CRV_V2_VAULTS].map(e => e.address);
 		const	crvVaultsNoDuplicates = [...new Set(crvVaults)];
 		const	ethcallProvider = new Provider();
 		const	{chainId} = await provider.getNetwork();

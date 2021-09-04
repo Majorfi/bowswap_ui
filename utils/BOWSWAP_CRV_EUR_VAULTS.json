@@ -1,0 +1,24 @@
+[
+	{
+		"displayName": "crvEURS",
+		"icon": "https://rawcdn.githack.com/yearn/yearn-assets/4f46dc850636d0efcf8b5f90d5362d48a803952d/icons/tokens/0x25212Df29073FfFA7A67399AcEfC2dd75a831A1A/logo-128.png",
+		"symbol": "yvCurve-EURS",
+		"name": "yvCurve-EURS 0.3.5",
+		"decimals": 18,
+		"scope": "eur",
+		"address": "0x25212Df29073FfFA7A67399AcEfC2dd75a831A1A",
+		"tokenAddress": "0x194eBd173F6cDacE046C53eACcE9B953F28411d1",
+		"poolAddress": "0x0ce6a5ff5217e38315f87032cf90686c96627caa"
+	},
+	{
+		"icon": "https://rawcdn.githack.com/yearn/yearn-assets/4f46dc850636d0efcf8b5f90d5362d48a803952d/icons/tokens/0x0d4EA8536F9A13e4FBa16042a46c30f092b06aA5/logo-128.png",
+		"symbol": "yvCurve-EURT",
+		"name": "yvCurve-EURT 0.4.3",
+		"displayName": "crvEURT",
+		"decimals": 18,
+		"scope": "eur",
+		"address": "0x0d4EA8536F9A13e4FBa16042a46c30f092b06aA5",
+		"tokenAddress": "0xFD5dB7463a3aB53fD211b4af195c5BCCC1A03890",
+		"poolAddress": "0xFD5dB7463a3aB53fD211b4af195c5BCCC1A03890"
+	}
+]

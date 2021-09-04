@@ -203,8 +203,7 @@ async function findPath({from, to}) {
 
 async function	findAllPath() {
 	const	VAULT_ADDRESSES = [
-		'0xb4d1be44bff40ad6e506edf43156577a3f8672ec',
-
+		'0x0d4EA8536F9A13e4FBa16042a46c30f092b06aA5',
 		'0xdCD90C7f6324cfa40d7169ef80b12031770B4325',
 		'0xA74d4B67b3368E83797a35382AFB776bAAE4F5C8',
 		'0x8414Db07a7F743dEbaFb402070AB01a4E0d2E45e',
@@ -246,7 +245,10 @@ async function	findAllPath() {
 	];
 	const	results = [];
 
-	await asyncForEach(VAULT_ADDRESSES, async (element) => {
+	await asyncForEach(VAULT_ADDRESSES, async (element, index) => {
+		if (index >= 1) {
+			return;
+		}
 		await asyncForEach(VAULT_ADDRESSES, async (secondElement) => {
 			if (element === secondElement) {
 				return;
