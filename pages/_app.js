@@ -13,7 +13,7 @@ import	{ethers}						from	'ethers';
 import	useSWR							from	'swr';
 import	FullConfetti					from	'react-confetti';
 import	useWeb3, {Web3ContextApp}		from	'contexts/useWeb3';
-import	{AccountContextApp}				from	'contexts/useAccount';
+import	useAccount, {AccountContextApp}	from	'contexts/useAccount';
 import	Credits							from	'components/Credits';
 import	Navbar							from	'components/Commons/Navbar';
 import	ModalPong						from	'components/Commons/ModalPong';
@@ -37,12 +37,12 @@ const	useSecretCode = () => {
 
 function	WithLayout({children, hasSecret}) {
 	const	[triggerPong, set_triggerPong] = useState(false);
-
+	const	{yVempireNotificationCounter} = useAccount();
 	return (
 		<section className={'w-full md:px-12 px-4 space-y-12 mb-64 z-10 relative'}>
 			<div className={'flex flex-col w-full justify-center items-center'}>
 				<div className={'w-full max-w-2xl mb-2'}>
-					<Tabs />
+					<Tabs yVempireNotificationCounter={yVempireNotificationCounter} />
 				</div>
 				<div className={'w-full max-w-2xl'}>
 					{children}

@@ -27,7 +27,7 @@ let	lastReload = 0;
 
 function	YVempire({yearnVaultData, yVempireData, set_yVempireData}) {
 	const	{provider, address} = useWeb3();
-	const	{balancesOf, allowances, set_balancesOf, set_allowances} = useAccount();
+	const	{balancesOf, allowances, set_balancesOf, set_allowances, set_yVempireNotificationCounter} = useAccount();
 	const	[, set_nonce] = useState(0);
 	const	[isUpdating, set_isUpdating] = useState(false);
 	const	[selectedTokens, set_selectedTokens] = useState([]);
@@ -185,6 +185,7 @@ function	YVempire({yearnVaultData, yVempireData, set_yVempireData}) {
 								setTimeout(() => set_txMigrateStatus((s) => s.error ? {none: true, pending: false, error: false, success: false} : s), 2500);
 							}
 							if (type === 'success') {
+								set_yVempireNotificationCounter(n => n - selectedTokensList.length);
 								resetUTokenBalances(selectedTokensList);
 								set_txApproveStatus({none: true, pending: false, success: false, error: false, step: ''});
 								setTimeout(() => {
