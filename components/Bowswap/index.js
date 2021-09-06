@@ -311,7 +311,7 @@ function	Bowswap({yearnVaultData, prices}) {
 			set_fromCounterValue(prices.ethereum.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else if (fromVault.scope === 'v2' && fromVault.type === 'aave') {
 			set_fromCounterValue(prices.aave.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
-		} else if (fromVault.scope === 'v2' && fromVault.type === 'chainlink') {
+		} else if (fromVault.scope === 'v2' && fromVault.type === 'link') {
 			set_fromCounterValue(prices.chainlink.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else if (fromVault.scope === 'v2' && fromVault.type === 'tri') {
 			const	price = await computeTriCryptoPrice();
@@ -347,8 +347,8 @@ function	Bowswap({yearnVaultData, prices}) {
 			set_toCounterValue(prices.ethereum.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else if (toVault.scope === 'v2' && toVault.type === 'aave') {
 			set_toCounterValue(prices.aave.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
-		} else if (fromVault.scope === 'v2' && fromVault.type === 'chainlink') {
-			set_fromCounterValue(prices.chainlink.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
+		} else if (fromVault.scope === 'v2' && fromVault.type === 'link') {
+			set_toCounterValue(prices.chainlink.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else if (toVault.scope === 'v2' && toVault.type === 'tri') {
 			const	price = await computeTriCryptoPrice();
 			set_toCounterValue(price * ethers.utils.formatUnits(scaledBalanceOf, 18));
