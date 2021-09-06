@@ -23,6 +23,7 @@ const AccountContext = createContext();
 export const AccountContextApp = ({children}) => {
 	const	{active, provider, getProvider, address} = useWeb3();
 	const	[nonce, set_nonce] = useState(0);
+	const	[yVempireNotificationCounter, set_yVempireNotificationCounter] = useState(0);
 	const	[balancesOf, set_balancesOf] = useState({});
 	const	[allowances, set_allowances] = useState({});
 
@@ -76,11 +77,16 @@ export const AccountContextApp = ({children}) => {
 		const callResult = await ethcallProvider.all(multiCalls);
 
 		let	index = 0;
+		let	_yVempireNotificationCounter = 0;
 		(vaultsNoDuplicates).forEach((vaultAddress) => {
+			if (!callResult[index].isZero()) {
+				_yVempireNotificationCounter += 1;
+			}
 			set_balancesOf((b) => {b[vaultAddress] = callResult[index]; return b;});
 			set_allowances((b) => {b[vaultAddress] = callResult[index + 1]; return b;});			
 			index += 2;
 		});
+		set_yVempireNotificationCounter(_yVempireNotificationCounter);
 		set_nonce(n => n + 1);
 	}
 
@@ -136,7 +142,16 @@ export const AccountContextApp = ({children}) => {
 	}
 
 	return (
-		<AccountContext.Provider value={{balancesOf, updateBalanceOf, allowances, set_balancesOf, set_allowances, balancesNonce: nonce}}>
+		<AccountContext.Provider value={{
+			balancesOf, 
+			updateBalanceOf, 
+			allowances, 
+			set_balancesOf, 
+			set_allowances, 
+			balancesNonce: nonce,
+			yVempireNotificationCounter,
+			set_yVempireNotificationCounter
+		}}>
 			{children}
 		</AccountContext.Provider>
 	);
