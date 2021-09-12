@@ -23,7 +23,7 @@
     "@web3-react/types": "^6.0.7",
     "@web3-react/walletconnect-connector": "^6.2.4",
     "autoprefixer": "^10.3.3",
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "dotenv-webpack": "^7.0.3",
     "ethcall": "4.0.0",
     "ethers": "^5.4.3",
