@@ -87,6 +87,86 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 	const	{provider} = useWeb3();
 	const	[transactionProcessing, set_transactionProcessing] = useState(false);
 
+	function	performV2Swap() {
+		try {
+			swapTokens({
+				provider: provider,
+				contractAddress: process.env.METAPOOL_SWAPPER_ADDRESS,
+				from: fromVault.address,
+				to: toVault.address,
+				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
+				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toString(), fromVault.decimals),
+				instructions: V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2]
+			}, ({error}) => {
+				if (error) {
+					let message = undefined;
+					if (error?.data?.message?.includes('revert out too low')) {
+						message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
+					}
+					set_transactionProcessing(false);
+					return onCallback('error', message);
+				}
+				set_transactionProcessing(false);
+				onCallback('success');
+			});
+		} catch (error) {
+			let message = undefined;
+			if (error?.data?.message?.includes('revert out too low')) {
+				message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
+			}
+			set_transactionProcessing(false);
+			return onCallback('error', message);
+		}
+	}
+	function	performV1Swap() {
+		const	v2PathExists = V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address);
+
+		try {
+			metapoolSwapTokens({
+				provider: provider,
+				contractAddress: process.env.METAPOOL_SWAPPER_ADDRESS,
+				from: fromVault.address,
+				to: toVault.address,
+				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
+				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toString(), fromVault.decimals)
+			}, ({error}) => {
+				if (error) {
+					if (error?.message?.includes('User denied transaction signature')) {
+						set_transactionProcessing(false);
+						return onCallback('error', 'User denied transaction signature');
+					} else if (v2PathExists) {
+						console.log('FALLBACK_WITH_V2');
+						return performV2Swap();
+					} else {
+						let message = undefined;
+						if (error?.data?.message?.includes('revert out too low')) {
+							message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
+						}
+						set_transactionProcessing(false);
+						return onCallback('error', message);
+					}
+				}
+				set_transactionProcessing(false);
+				onCallback('success');
+			});
+		} catch (error) {
+			if (error?.message?.includes('User denied transaction signature')) {
+				set_transactionProcessing(false);
+				return onCallback('error', 'User denied transaction signature');
+			} else if (v2PathExists) {
+				console.log('FALLBACK_WITH_V2');
+				return performV2Swap();
+			} else {
+				let message = undefined;
+				if (error?.data?.message?.includes('revert out too low')) {
+					message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
+				}
+				set_transactionProcessing(false);
+				return onCallback('error', message);
+			}
+		}
+	}
+
 	function	performSwap() {
 		if (disabled || transactionProcessing || !approved) {
 			return;
@@ -94,64 +174,9 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 		set_transactionProcessing(true);
 		onCallback('pending');
 		if (toVault.scope === 'v2') {
-			try {
-				swapTokens({
-					provider: provider,
-					contractAddress: process.env.METAPOOL_SWAPPER_ADDRESS,
-					from: fromVault.address,
-					to: toVault.address,
-					amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-					minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toString(), fromVault.decimals),
-					instructions: V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2]
-				}, ({error}) => {
-					if (error) {
-						let message = undefined;
-						if (error?.data?.message?.includes('revert out too low')) {
-							message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
-						}
-						set_transactionProcessing(false);
-						return onCallback('error', message);
-					}
-					set_transactionProcessing(false);
-					onCallback('success');
-				});
-			} catch (error) {
-				let message = undefined;
-				if (error?.data?.message?.includes('revert out too low')) {
-					message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
-				}
-				set_transactionProcessing(false);
-				return onCallback('error', message);
-			}
+			performV2Swap();
 		} else {
-			try {
-				metapoolSwapTokens({
-					provider: provider,
-					contractAddress: process.env.METAPOOL_SWAPPER_ADDRESS,
-					from: fromVault.address,
-					to: toVault.address,
-					amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-					minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toString(), fromVault.decimals)
-				}, ({error}) => {
-					if (error) {
-						let message = undefined;
-						if (error?.data?.message?.includes('revert out too low')) {
-							message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
-						}
-						set_transactionProcessing(false);
-						return onCallback('error', message);
-					}
-					set_transactionProcessing(false);
-					onCallback('success');
-				});
-			} catch (error) {
-				let message = undefined;
-				if (error?.data?.message?.includes('revert out too low')) {
-					message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
-				}
-				set_transactionProcessing(false);
-				return onCallback('error', message);
-			}
+			performV1Swap();
 		}
 	}
 
