@@ -43,13 +43,16 @@ export async function	approveToken({provider, contractAddress, amount, from}, ca
 }
 
 //BowswapV1
-export async function	metapoolSwapTokens({provider, contractAddress, from, to, amount, minAmountOut}, callback) {
+export async function	metapoolSwapTokens({provider, contractAddress, from, to, amount, minAmountOut, shouldIncreaseGasLimit}, callback) {
 	const	signer = provider.getSigner();
 	const	contract = new ethers.Contract(
 		contractAddress,
 		['function metapool_swap(address from, address to, uint256 amount, uint256 min_amount_out)'],
 		signer
 	);
+	if (shouldIncreaseGasLimit) {
+		console.warn('Using extra gasLimit');
+	}
 
 	/**********************************************************************
 	**	If the call is successful, try to perform the actual TX
@@ -62,7 +65,7 @@ export async function	metapoolSwapTokens({provider, contractAddress, from, to, a
 			minAmountOut,
 		);
 
-		const	safeGasLimit = ethers.BigNumber.from(3_000_000);
+		const	safeGasLimit = ethers.BigNumber.from(shouldIncreaseGasLimit ? 3_000_000 : 2_000_000);
 		const	transaction = await contract.metapool_swap(from, to, amount, minAmountOut, {gasLimit: safeGasLimit});
 		const	transactionResult = await transaction.wait();
 		if (transactionResult.status === 1) {
@@ -76,13 +79,16 @@ export async function	metapoolSwapTokens({provider, contractAddress, from, to, a
 }
 
 //BowswapV2
-export async function	swapTokens({provider, contractAddress, from, to, amount, minAmountOut, instructions}, callback) {
+export async function	swapTokens({provider, contractAddress, from, to, amount, minAmountOut, instructions, shouldIncreaseGasLimit}, callback) {
 	const	signer = provider.getSigner();
 	const	contract = new ethers.Contract(
 		contractAddress,
 		['function swap(address from, address to, uint256 amount, uint256 min_amount_out, tuple(bool deposit, address pool, uint128 n)[] instructions)'],
 		signer
 	);
+	if (shouldIncreaseGasLimit) {
+		console.warn('Using extra gasLimit');
+	}
 
 	/**********************************************************************
 	**	If the call is successful, try to perform the actual TX
@@ -96,7 +102,7 @@ export async function	swapTokens({provider, contractAddress, from, to, amount, m
 			instructions,
 		);
 
-		const	safeGasLimit = ethers.BigNumber.from(3_000_000);
+		const	safeGasLimit = ethers.BigNumber.from(shouldIncreaseGasLimit ? 3_000_000 : 2_000_000);
 		const	transaction = await contract.swap(
 			from,
 			to,
