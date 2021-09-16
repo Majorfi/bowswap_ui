@@ -339,5 +339,17 @@
         "address": "0x671a912C10bba0CFA74Cfc2d6Fba9BA1ed9530B2",
         "tokenAddress": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
         "poolAddress": "0xf178c0b5bb7e7abf4e12a4838c7b7c5ba2c623c0"
-    }
+    },
+	{
+		"icon": "https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x2DfB14E32e2F8156ec15a2c21c3A6c053af52Be8/logo-128.png",
+		"symbol": "yvCurve-MIM",
+		"name": "Curve MIM Pool yVault",
+		"displayName": "Curve MIM",
+		"decimals": 18,
+        "scope": "v2",
+		"type": "usd",
+		"address": "0x2DfB14E32e2F8156ec15a2c21c3A6c053af52Be8",
+		"tokenAddress": "0x5a6A4D54456819380173272A5E8E9B9904BdF41B",
+        "poolAddress": "0x5a6A4D54456819380173272A5E8E9B9904BdF41B"
+	}
 ]
