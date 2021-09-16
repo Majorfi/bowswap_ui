@@ -121,17 +121,6 @@
         "poolAddress": "0xC18cC39da8b11dA8c3541C598eE022258F9744da"
     },
 	{
-        "icon": "https://rawcdn.githack.com/yearn/yearn-assets/3fa15c2e51ff3ed4dac8bd124a7bfa8888b3b78c/icons/tokens/0x84E13785B5a27879921D6F685f041421C7F482dA/logo-128.png",
-        "symbol": "yvCurve-3pool",
-        "name": "yvCurve-3pool 0.3.5",
-		"displayName": "3 Pool",
-        "decimals": 18,
-        "scope": "usd",
-        "address": "0x84E13785B5a27879921D6F685f041421C7F482dA",
-        "tokenAddress": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490",
-        "poolAddress": "0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7"
-    },
-	{
 		"icon": "https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x2DfB14E32e2F8156ec15a2c21c3A6c053af52Be8/logo-128.png",
 		"symbol": "yvCurve-MIM",
 		"name": "Curve MIM Pool yVault",
