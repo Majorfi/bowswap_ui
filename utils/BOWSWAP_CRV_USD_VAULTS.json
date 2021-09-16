@@ -113,10 +113,22 @@
         "icon": "https://rawcdn.githack.com/yearn/yearn-assets/3fa15c2e51ff3ed4dac8bd124a7bfa8888b3b78c/icons/tokens/0xC116dF49c02c5fD147DE25Baa105322ebF26Bd97/logo-128.png",
         "symbol": "yvCurve-RSV",
         "name": "yvCurve-RSV 0.3.5",
+		"displayName": "Curve RSV",
         "decimals": 18,
 		"scope": "usd",
         "address": "0xC116dF49c02c5fD147DE25Baa105322ebF26Bd97",
         "tokenAddress": "0xC2Ee6b0334C261ED60C72f6054450b61B8f18E35",
         "poolAddress": "0xC18cC39da8b11dA8c3541C598eE022258F9744da"
-    }
+    },
+	{
+		"icon": "https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/0x2DfB14E32e2F8156ec15a2c21c3A6c053af52Be8/logo-128.png",
+		"symbol": "yvCurve-MIM",
+		"name": "Curve MIM Pool yVault",
+		"displayName": "Curve MIM",
+		"decimals": 18,
+		"scope": "usd",
+		"address": "0x2DfB14E32e2F8156ec15a2c21c3A6c053af52Be8",
+		"tokenAddress": "0x5a6A4D54456819380173272A5E8E9B9904BdF41B",
+        "poolAddress": "0x5a6A4D54456819380173272A5E8E9B9904BdF41B"
+	}
 ]
