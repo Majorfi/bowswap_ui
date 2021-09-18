@@ -9,6 +9,7 @@ import	React, {useState, useEffect, useCallback}		from	'react';
 import	{ethers}										from	'ethers';
 import	useWeb3											from	'contexts/useWeb3';
 import	useAccount										from	'contexts/useAccount';
+import	useLocalStorage									from	'hook/useLocalStorage';
 import	useDebounce										from	'hook/useDebounce';
 import	{approveToken, metapoolSwapTokens, swapTokens}	from	'utils/actions';
 import	InputToken										from	'components/Bowswap/InputToken';
@@ -32,12 +33,16 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 			<div className={'flex flex-col md:flex-row items-start justify-center space-y-2 md:space-y-0 md:space-x-4 w-full'}>
 				<div className={'w-full md:w-4/11'}>
 					<ModalVaultList
+						isFrom
 						label={'Select from vault'}
 						disabled={disabled}
 						vaults={vaults}
 						yearnVaultData={yearnVaultData}
 						value={fromVault}
-						set_value={set_fromVault} />
+						set_value={set_fromVault}
+						set_input={(v) => {
+							set_fromAmount(ethers.utils.formatUnits(v, fromVault.decimals));
+						}} />
 				</div>
 				<div className={'w-full md:w-7/11'}>
 					<InputToken
@@ -255,14 +260,14 @@ function	Bowswap({yearnVaultData, prices}) {
 	const	{balancesOf, updateBalanceOf, allowances} = useAccount();
 	const	[, set_nonce] = useState(0);
 
-	const	[fromVault, set_fromVault] = useState(BOWSWAP_CRV_USD_VAULTS[0]);
-	const	[fromCounterValue, set_fromCounterValue] = useState(0);
-	const	[fromAmount, set_fromAmount] = useState('');
+	const	[fromVault, set_fromVault] = useLocalStorage('fromVault', BOWSWAP_CRV_USD_VAULTS[0]);
+	const	[fromCounterValue, set_fromCounterValue] = useLocalStorage('fromCounterValue', 0);
+	const	[fromAmount, set_fromAmount] = useLocalStorage('fromAmount', '');
 	const	[balanceOfFromVault, set_balanceOfFromVault] = useState(0);
 
 	const	[toVaultsListV2, set_toVaultsListV2] = useState(V2_PATHS.filter(e => e[0] === BOWSWAP_CRV_USD_VAULTS[0]));
 	const	[toVaultsList, set_toVaultsList] = useState(BOWSWAP_CRV_USD_VAULTS.slice(1));
-	const	[toVault, set_toVault] = useState(BOWSWAP_CRV_USD_VAULTS[1]);
+	const	[toVault, set_toVault] = useLocalStorage('toVault', BOWSWAP_CRV_USD_VAULTS[1]);
 	const	[toCounterValue, set_toCounterValue] = useState(0);
 	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('');
 
@@ -485,7 +490,7 @@ function	Bowswap({yearnVaultData, prices}) {
 			set_expectedReceiveAmount('');
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [debouncedFetchExpectedAmount, fromVault.address, toVault.address, fromVault.decimals]);
+	}, [debouncedFetchExpectedAmount, fromAmount, fromVault.address, toVault.address, fromVault.decimals]);
 
 
 	function	renderMiddlePart() {

@@ -13,7 +13,7 @@ import	{Transition}							from	'@headlessui/react';
 import	useAccount								from	'contexts/useAccount';
 import	{toAddress}								from	'utils';
 
-function	VaultList({element, onClick, style, balanceOf, vault}) {
+function	VaultList({element, onClick, style, balanceOf}) {
 	return (
 		<>
 			<div
@@ -37,7 +37,7 @@ function	VaultList({element, onClick, style, balanceOf, vault}) {
 						<p className={'pb-1'}>{ethers.utils.formatUnits(balanceOf?.toString() || '0', element.decimals)}</p>
 						<span className={'text-white text-xxs'}>
 							<p className={'inline opacity-70 text-xxs'}>{'APY: '}</p>
-							<p className={'inline opacity-100 text-ysm'}>{`${vault?.apy?.net_apy > 0 ? `${((vault?.apy?.net_apy || 0) * 100).toFixed(2)}%` : ' new'}`}</p>
+							<p className={'inline opacity-100 text-ysm'}>{`${element?.apy > 0 ? `${((element?.apy || 0) * 100).toFixed(2)}%` : ' new'}`}</p>
 						</span>
 					</span>
 				</div>
@@ -46,7 +46,7 @@ function	VaultList({element, onClick, style, balanceOf, vault}) {
 	);
 }
 
-function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabled}) {
+function ModalVaultList({vaults, yearnVaultData, label, value, set_value, set_input, isFrom, disabled}) {
 	const	{balancesOf} = useAccount();
 	const	[open, set_open] = useState(false);
 	const	[nonce, set_nonce] = useState(0);
@@ -56,11 +56,18 @@ function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabl
 	useEffect(() => {
 		const	_vaults = [...vaults].map((v) => {
 			v.balanceOf = ethers.utils.formatUnits(balancesOf[v.address]?.toString() || '0', v.decimals);
+			v.apy = yearnVaultData.find(yv => yv.address === v.address)?.apy?.net_apy;
 			return (v);
-		}).filter((v, i, a) => a.findIndex(t => (toAddress(t.address) === toAddress(v.address))) === i).sort((a, b) => b.balanceOf - a.balanceOf);
+		}).filter((v, i, a) => (
+			a.findIndex(t => (toAddress(t.address) === toAddress(v.address))) === i
+		)).sort((a, b) => {
+			if (isFrom)
+				return b.balanceOf - a.balanceOf;
+			return b.apy - a.apy;
+		});
 		set_filteredVaultList(_vaults);
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [nonce]);
+	}, [nonce, open]);
 
 	useEffect(() => {
 		if (!open) {
@@ -71,8 +78,15 @@ function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabl
 	useEffect(() => {
 		const	_vaults = [...vaults].map((v) => {
 			v.balanceOf = ethers.utils.formatUnits(balancesOf[v.address]?.toString() || '0', v.decimals);
+			v.apy = yearnVaultData.find(yv => yv.address === v.address)?.apy?.net_apy;
 			return (v);
-		}).filter((v, i, a) => a.findIndex(t => (toAddress(t.address) === toAddress(v.address))) === i).sort((a, b) => b.balanceOf - a.balanceOf);
+		}).filter((v, i, a) => (
+			a.findIndex(t => (toAddress(t.address) === toAddress(v.address))) === i)
+		).sort((a, b) => {
+			if (isFrom)
+				return b.balanceOf - a.balanceOf;
+			return b.apy - a.apy;
+		});
 
 		if (searchFilter === '') {
 			set_filteredVaultList(_vaults);
@@ -175,9 +189,9 @@ function ModalVaultList({vaults, yearnVaultData, label, value, set_value, disabl
 													style={style}
 													element={filteredVaultList[index]}
 													balanceOf={balancesOf[filteredVaultList[index].address]}
-													vault={yearnVaultData.find(v => v.address === filteredVaultList[index].address)}
 													onClick={() => {
 														set_value(filteredVaultList[index]);
+														set_input(balancesOf[filteredVaultList[index].address]);
 														set_open(false);
 													}} />
 											)}
