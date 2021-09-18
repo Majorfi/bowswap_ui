@@ -46,7 +46,7 @@ function	VaultList({element, onClick, style, balanceOf}) {
 	);
 }
 
-function ModalVaultList({vaults, yearnVaultData, label, value, set_value, isFrom, disabled}) {
+function ModalVaultList({vaults, yearnVaultData, label, value, set_value, set_input, isFrom, disabled}) {
 	const	{balancesOf} = useAccount();
 	const	[open, set_open] = useState(false);
 	const	[nonce, set_nonce] = useState(0);
@@ -191,6 +191,7 @@ function ModalVaultList({vaults, yearnVaultData, label, value, set_value, isFrom
 													balanceOf={balancesOf[filteredVaultList[index].address]}
 													onClick={() => {
 														set_value(filteredVaultList[index]);
+														set_input(balancesOf[filteredVaultList[index].address]);
 														set_open(false);
 													}} />
 											)}

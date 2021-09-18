@@ -38,7 +38,10 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 						vaults={vaults}
 						yearnVaultData={yearnVaultData}
 						value={fromVault}
-						set_value={set_fromVault} />
+						set_value={set_fromVault}
+						set_input={(v) => {
+							set_fromAmount(ethers.utils.formatUnits(v, fromVault.decimals));
+						}} />
 				</div>
 				<div className={'w-full md:w-7/11'}>
 					<InputToken
