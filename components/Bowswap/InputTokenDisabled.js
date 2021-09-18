@@ -33,8 +33,7 @@ function	InputTokenDisabled({value, toCounterValue, slippage, isFetchingExpected
 						readOnly
 						style={{backgroundColor: 'transparent', width: Number(value) === 0 ? '1px': 'auto'}}
 						className={'block w-full text-4xl font-medium h-full text-right text-ygray-700'}
-						type={'text'}
-						min={0} />
+						type={'text'} />
 				</label>
 			</div>
 			<div className={'h-4'}>

@@ -9,6 +9,7 @@ import	React, {useState, useEffect, useCallback}		from	'react';
 import	{ethers}										from	'ethers';
 import	useWeb3											from	'contexts/useWeb3';
 import	useAccount										from	'contexts/useAccount';
+import	useLocalStorage									from	'hook/useLocalStorage';
 import	useDebounce										from	'hook/useDebounce';
 import	{approveToken, metapoolSwapTokens, swapTokens}	from	'utils/actions';
 import	InputToken										from	'components/Bowswap/InputToken';
@@ -259,14 +260,14 @@ function	Bowswap({yearnVaultData, prices}) {
 	const	{balancesOf, updateBalanceOf, allowances} = useAccount();
 	const	[, set_nonce] = useState(0);
 
-	const	[fromVault, set_fromVault] = useState(BOWSWAP_CRV_USD_VAULTS[0]);
-	const	[fromCounterValue, set_fromCounterValue] = useState(0);
-	const	[fromAmount, set_fromAmount] = useState('');
+	const	[fromVault, set_fromVault] = useLocalStorage('fromVault', BOWSWAP_CRV_USD_VAULTS[0]);
+	const	[fromCounterValue, set_fromCounterValue] = useLocalStorage('fromCounterValue', 0);
+	const	[fromAmount, set_fromAmount] = useLocalStorage('fromAmount', '');
 	const	[balanceOfFromVault, set_balanceOfFromVault] = useState(0);
 
 	const	[toVaultsListV2, set_toVaultsListV2] = useState(V2_PATHS.filter(e => e[0] === BOWSWAP_CRV_USD_VAULTS[0]));
 	const	[toVaultsList, set_toVaultsList] = useState(BOWSWAP_CRV_USD_VAULTS.slice(1));
-	const	[toVault, set_toVault] = useState(BOWSWAP_CRV_USD_VAULTS[1]);
+	const	[toVault, set_toVault] = useLocalStorage('toVault', BOWSWAP_CRV_USD_VAULTS[1]);
 	const	[toCounterValue, set_toCounterValue] = useState(0);
 	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('');
 
@@ -489,7 +490,7 @@ function	Bowswap({yearnVaultData, prices}) {
 			set_expectedReceiveAmount('');
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [debouncedFetchExpectedAmount, fromVault.address, toVault.address, fromVault.decimals]);
+	}, [debouncedFetchExpectedAmount, fromAmount, fromVault.address, toVault.address, fromVault.decimals]);
 
 
 	function	renderMiddlePart() {

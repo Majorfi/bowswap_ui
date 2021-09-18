@@ -14,6 +14,7 @@ import	useSWR							from	'swr';
 import	FullConfetti					from	'react-confetti';
 import	useWeb3, {Web3ContextApp}		from	'contexts/useWeb3';
 import	useAccount, {AccountContextApp}	from	'contexts/useAccount';
+import	useLocalStorage					from	'hook/useLocalStorage';
 import	Credits							from	'components/Credits';
 import	Navbar							from	'components/Commons/Navbar';
 import	ModalPong						from	'components/Commons/ModalPong';
@@ -72,8 +73,12 @@ function	AppWrapper(props) {
 	const	hasSecretCode = useSecretCode();
 	const	[yearnVaultData, set_yearnVaultData] = useState([]);
 	const	[yVempireData, set_yVempireData] = useState(PAIRS);
-
+	const	[prices, set_prices] = useLocalStorage('cgPrices', []);
 	const	{data} = useSWR(`https://api.coingecko.com/api/v3/simple/price?ids=${['bitcoin', 'ethereum', 'aave', 'chainlink', 'tether-eurt']}&vs_currencies=usd`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, refreshInterval: 30000, shouldRetryOnError: true, dedupingInterval: 1000, focusThrottleInterval: 5000});
+
+	useEffect(() => {
+		set_prices(data);
+	}, [data]);
 
 	useEffect(() => {
 		if (active && router.asPath === '/') {
@@ -155,7 +160,7 @@ function	AppWrapper(props) {
 								element={props.element}
 								router={props.router}
 								hasSecret={active && hasSecretCode}
-								prices={data}
+								prices={prices}
 								yearnVaultData={yearnVaultData}
 								yVempireData={yVempireData}
 								set_yVempireData={set_yVempireData}
