@@ -27,6 +27,13 @@ import	V2_PATHS										from	'utils/currentPaths';
 import	{bigNumber, toAddress}							from	'utils';
 
 function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, slippage, set_slippage, fromCounterValue, balanceOf, disabled, yearnVaultData}) {
+	const	[isInit, set_isInit] = useState(false);
+	useEffect(() => {
+		if (!isInit && balanceOf !== '0') {
+			set_fromAmount(ethers.utils.formatUnits(balanceOf, fromVault.decimals));
+			set_isInit(true);
+		}
+	}, [balanceOf]);
 	return (
 		<section aria-label={'FROM_VAULT'}>
 			<label className={'font-medium text-ybase text-ygray-900 pl-0.5'}>{'From Vault'}</label>
@@ -72,7 +79,8 @@ function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, to
 						vaults={vaults}
 						yearnVaultData={yearnVaultData}
 						value={toVault}
-						set_value={set_toVault} />
+						set_value={set_toVault}
+						set_input={() => null} />
 				</div>
 				<div className={'w-full md:w-7/11'}>
 					<InputTokenDisabled
