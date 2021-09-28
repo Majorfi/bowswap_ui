@@ -11,7 +11,7 @@ import	useWeb3											from	'contexts/useWeb3';
 import	useAccount										from	'contexts/useAccount';
 import	useLocalStorage									from	'hook/useLocalStorage';
 import	useDebounce										from	'hook/useDebounce';
-import	{approveToken, metapoolSwapTokens, swapTokens}	from	'utils/actions';
+import	{approveToken, metapoolSwapTokens, swapTokens, metapoolSwapTokensWithSignature, swapTokensWithSignature, signTransaction}	from	'utils/actions';
 import	InputToken										from	'components/Bowswap/InputToken';
 import	InputTokenDisabled								from	'components/Bowswap/InputTokenDisabled';
 import	ModalVaultList									from	'components/Bowswap/ModalVaultList';
@@ -96,7 +96,7 @@ function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, to
 	);
 }
 
-function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slippage, shouldIncreaseGasLimit, approved, disabled, onCallback}) {
+function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slippage, signature, shouldIncreaseGasLimit, approved, disabled, onCallback}) {
 	const	{provider} = useWeb3();
 	const	[transactionProcessing, set_transactionProcessing] = useState(false);
 
@@ -182,6 +182,86 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 		}
 	}
 
+	function	performV2SwapWithSignature() {
+		swapTokensWithSignature({
+			provider: provider,
+			contractAddress: process.env.SIGNATURE_METAPOOL_SWAPPER_ADDRESS,
+			from: fromVault.address,
+			to: toVault.address,
+			amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
+			minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toString(), fromVault.decimals),
+			instructions: V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2],
+			signature,
+			shouldIncreaseGasLimit
+		}, ({error}) => {
+			if (error) {
+				if (error?.message?.includes('User denied transaction signature')) {
+					set_transactionProcessing(false);
+					return onCallback('error', 'User denied transaction signature');
+				} else {
+					let message = undefined;
+					if (error?.data?.message?.includes('revert out too low')) {
+						message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
+					}
+					set_transactionProcessing(false);
+					return onCallback('error', message);
+				}
+			}
+			set_transactionProcessing(false);
+			onCallback('success');
+		});
+	}
+	function	performV1SwapWithSignature() {
+		const	v2PathExists = V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address);
+
+		try {
+			metapoolSwapTokensWithSignature({
+				provider: provider,
+				contractAddress: process.env.SIGNATURE_METAPOOL_SWAPPER_ADDRESS,
+				from: fromVault.address,
+				to: toVault.address,
+				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
+				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toString(), fromVault.decimals),
+				signature,
+				shouldIncreaseGasLimit
+			}, ({error}) => {
+				if (error) {
+					if (error?.message?.includes('User denied transaction signature')) {
+						set_transactionProcessing(false);
+						return onCallback('error', 'User denied transaction signature');
+					} else if (v2PathExists) {
+						console.log('FALLBACK_WITH_V2');
+						return performV2SwapWithSignature();
+					} else {
+						let message = undefined;
+						if (error?.data?.message?.includes('revert out too low')) {
+							message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
+						}
+						set_transactionProcessing(false);
+						return onCallback('error', message);
+					}
+				}
+				set_transactionProcessing(false);
+				onCallback('success');
+			});
+		} catch (error) {
+			if (error?.message?.includes('User denied transaction signature')) {
+				set_transactionProcessing(false);
+				return onCallback('error', 'User denied transaction signature');
+			} else if (v2PathExists) {
+				console.log('FALLBACK_WITH_V2');
+				return performV2Swap();
+			} else {
+				let message = undefined;
+				if (error?.data?.message?.includes('revert out too low')) {
+					message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
+				}
+				set_transactionProcessing(false);
+				return onCallback('error', message);
+			}
+		}
+	}
+
 	function	performSwap() {
 		if (disabled || transactionProcessing || !approved) {
 			return;
@@ -189,8 +269,14 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 		set_transactionProcessing(true);
 		onCallback('pending');
 		if (toVault.scope === 'v2') {
+			if (signature) {
+				return performV2SwapWithSignature();
+			}
 			performV2Swap();
 		} else {
+			if (signature) {
+				return performV1SwapWithSignature();
+			}
 			performV1Swap();
 		}
 	}
@@ -207,16 +293,11 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 	);
 }
 
-function	ButtonApprove({fromVault, fromAmount, approved, disabled, onCallback}) {
+function	ButtonApprove({fromVault, fromAmount, approved, disabled, set_signature, onCallback}) {
 	const	{provider} = useWeb3();
 	const	[transactionProcessing, set_transactionProcessing] = useState(false);
 
-	function	performApprove() {
-		if (disabled || transactionProcessing || (!fromAmount || Number(fromAmount) === 0)) {
-			return;
-		}
-		set_transactionProcessing(true);
-		onCallback('pending');
+	function	approveTx() {
 		try {
 			approveToken({
 				provider: provider,
@@ -234,6 +315,41 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, onCallback}) 
 		} catch (error) {
 			set_transactionProcessing(false);
 			onCallback('error');
+		}
+	}
+
+	function	performApprove() {
+		if (disabled || transactionProcessing || (!fromAmount || Number(fromAmount) === 0)) {
+			return;
+		}
+		set_transactionProcessing(true);
+		onCallback('pending');
+		try {
+			signTransaction({
+				provider: provider,
+				vaultAddress: fromVault.address,
+				contractAddress: process.env.SIGNATURE_METAPOOL_SWAPPER_ADDRESS,
+				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals)
+			}, ({error, data}) => {
+				if (error) {
+					if (error?.message?.includes('User denied message signature')) {
+						set_transactionProcessing(false);
+						return onCallback('error', 'User denied signature');
+					}
+					console.log('FALLBACK_WITH_APPROVE');
+					return approveTx();
+				}
+				set_signature(data);
+				set_transactionProcessing(false);
+				onCallback('success');
+			});
+		} catch (error) {
+			if (error?.message?.includes('User denied message signature')) {
+				set_transactionProcessing(false);
+				return onCallback('error', 'User denied signature');
+			}
+			console.log('FALLBACK_WITH_APPROVE');
+			return approveTx();
 		}
 	}
 
@@ -286,6 +402,7 @@ function	Bowswap({yearnVaultData, prices}) {
 
 	const	[txApproveStatus, set_txApproveStatus] = useState({none: true, pending: false, success: false, error: false});
 	const	[txSwapStatus, set_txSwapStatus] = useState({none: true, pending: false, success: false, error: false});
+	const	[signature, set_signature] = useState(null);
 
 	function	resetStates() {
 		set_fromAmount('');
@@ -304,16 +421,16 @@ function	Bowswap({yearnVaultData, prices}) {
 	}
 
 	const	isNotCompatible = () => {
-		const	V2Paths = V2_PATHS.filter(e => toAddress(e[0]) === toAddress(fromVault.address)).map(e => e[1]);
+		const	V2Paths = V2_PATHS.filter(e => toAddress(e[0]) === toAddress(fromVault.address)).map(e => toAddress(e[1]));
 	
 		if (fromVault.scope === 'btc') {
-			return (toVault.scope !== 'btc' || fromVault.address === toVault.address || !V2Paths.includes(toAddress(toVault.address)));
+			return (toVault.scope !== 'btc' && fromVault.address === toVault.address && !V2Paths.includes(toAddress(toVault.address)));
 		} else if (fromVault.scope === 'usd') {
-			return (toVault.scope !== 'usd' || fromVault.address === toVault.address || !V2Paths.includes(toAddress(toVault.address)));
+			return (toVault.scope !== 'usd' && fromVault.address === toVault.address && !V2Paths.includes(toAddress(toVault.address)));
 		} else if (fromVault.scope === 'eur') {
-			return (toVault.scope !== 'eur' || fromVault.address === toVault.address || !V2Paths.includes(toAddress(toVault.address)));
+			return (toVault.scope !== 'eur' && fromVault.address === toVault.address && !V2Paths.includes(toAddress(toVault.address)));
 		} else {
-			return (!V2Paths.includes(toVault.address) || toVault.scope !== 'v2');
+			return (!V2Paths.includes(toVault.address) && toVault.scope !== 'v2');
 		}
 	};
 
@@ -513,6 +630,8 @@ function	Bowswap({yearnVaultData, prices}) {
 				return {open: true, title: txSwapStatus.message, color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (txSwapStatus.error)
 				return {open: true, title: 'SWAP FAILED', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
+			if (txApproveStatus.error && txApproveStatus.message)
+				return {open: true, title: txApproveStatus.message, color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (txApproveStatus.error)
 				return {open: true, title: 'APPROVE TRANSACTION FAILURE', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals)))
@@ -582,28 +701,30 @@ function	Bowswap({yearnVaultData, prices}) {
 
 				<div className={'flex flex-row justify-center pt-8 w-full space-x-4'}>
 					<ButtonApprove
-						disabled={(Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals)) || txApproveStatus.success || isAllowed )}
+						// disabled={(Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals)) || txApproveStatus.success || isAllowed )}
 						approved={txApproveStatus.success || isAllowed}
 						fromVault={fromVault}
 						fromAmount={fromAmount}
-						onCallback={(type) => {
-							set_txApproveStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success'});
+						set_signature={set_signature}
+						onCallback={(type, message) => {
+							set_txApproveStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success', message});
 							if (type === 'error') {
-								setTimeout(() => set_txApproveStatus((s) => s.error ? {none: true, pending: false, error: false, success: false} : s), 2500);
+								setTimeout(() => set_txApproveStatus((s) => s.error ? {none: true, pending: false, error: false, success: false, message} : s), 2500);
 							}
 							if (type === 'success') {
 								updateBalanceOf([fromVault.address]);
-								setTimeout(() => set_txApproveStatus({none: false, pending: false, error: false, success: true, hide: true}), 2500);
+								setTimeout(() => set_txApproveStatus({none: false, pending: false, error: false, success: true, hide: true, message: null}), 2500);
 							}
 						}} />
 					<ButtonSwap
-						disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals))}
-						approved={txApproveStatus.success || isAllowed}
+						// disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals))}
+						approved={txApproveStatus.success || isAllowed || signature}
 						fromVault={fromVault}
 						toVault={toVault}
 						fromAmount={fromAmount}
 						expectedReceiveAmount={expectedReceiveAmount}
 						slippage={slippage}
+						signature={signature}
 						shouldIncreaseGasLimit={Number(balanceOfFromVault) < Number(fromAmount)}
 						onCallback={(type, message) => {
 							set_txSwapStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success', message});
