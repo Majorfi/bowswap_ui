@@ -1,6 +1,5 @@
 /******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
+**	@Author:				Bowswap
 **	@Date:					Thursday August 19th 2021
 **	@Filename:				index.js
 ******************************************************************************/
@@ -264,7 +263,7 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, onCallback}) 
 }
 
 function	Bowswap({yearnVaultData, prices}) {
-	const	{provider} = useWeb3();
+	const	{wrongChain, active, provider} = useWeb3();
 	const	{balancesOf, updateBalanceOf, allowances} = useAccount();
 	const	[, set_nonce] = useState(0);
 
@@ -318,31 +317,33 @@ function	Bowswap({yearnVaultData, prices}) {
 	};
 
 	const	fetchEstimateOut = useCallback(async (from, to, amount) => {
-		const	fromToken = new ethers.Contract(process.env.METAPOOL_SWAPPER_ADDRESS, [
-			'function metapool_estimate_out(address from, address to, uint256 amount) public view returns (uint256)',
-			'function estimate_out(address from, address to, uint256 amount, tuple(bool deposit, address pool, uint128 n)[] instructions) public view returns (uint256)'
-		], provider);
+		if (provider && active && !wrongChain) {
+			const	fromToken = new ethers.Contract(process.env.METAPOOL_SWAPPER_ADDRESS, [
+				'function metapool_estimate_out(address from, address to, uint256 amount) public view returns (uint256)',
+				'function estimate_out(address from, address to, uint256 amount, tuple(bool deposit, address pool, uint128 n)[] instructions) public view returns (uint256)'
+			], provider);
 
-		if (isNotCompatible()) {
-			return set_isFetchingExpectedReceiveAmount(false);
-		}
+			if (isNotCompatible()) {
+				return set_isFetchingExpectedReceiveAmount(false);
+			}
 
-		if (toVault.scope === 'v2') {
-			const	estimate_out = await fromToken.estimate_out(
-				from,
-				to,
-				amount,
-				V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2]
-			);
-			set_expectedReceiveAmount(ethers.utils.formatUnits(estimate_out, toVault.decimals));
-			set_isFetchingExpectedReceiveAmount(false);
-		} else {
-			const	metapool_estimate_out = await fromToken.metapool_estimate_out(from, to, amount);
-			set_expectedReceiveAmount(ethers.utils.formatUnits(metapool_estimate_out, toVault.decimals));
-			set_isFetchingExpectedReceiveAmount(false);
+			if (toVault.scope === 'v2') {
+				const	estimate_out = await fromToken.estimate_out(
+					from,
+					to,
+					amount,
+					V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2]
+				);
+				set_expectedReceiveAmount(ethers.utils.formatUnits(estimate_out, toVault.decimals));
+				set_isFetchingExpectedReceiveAmount(false);
+			} else {
+				const	metapool_estimate_out = await fromToken.metapool_estimate_out(from, to, amount);
+				set_expectedReceiveAmount(ethers.utils.formatUnits(metapool_estimate_out, toVault.decimals));
+				set_isFetchingExpectedReceiveAmount(false);
+			}
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [fromVault.address, provider, toVault.address, toVault.decimals, toVault.scope, toVault.type]);
+	}, [fromVault.address, provider, toVault.address, toVault.decimals, toVault.scope, toVault.type, active, wrongChain]);
 
 	/**************************************************************************
 	**	This function will be used to compute the counter value of the want
@@ -459,11 +460,11 @@ function	Bowswap({yearnVaultData, prices}) {
 			}
 		}
 
-		if (provider)
+		if (provider && active && !wrongChain)
 			fetchFromVaultVirtualPrice();
 		set_nonce(n => n + 1);
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [fromVault.address, provider]);
+	}, [fromVault.address, provider, active, wrongChain]);
 
 	/**************************************************************************
 	**	Any time the fromVault address is changed, we need to change the list
@@ -474,12 +475,12 @@ function	Bowswap({yearnVaultData, prices}) {
 	**	@TRIGGER : any time the `TO` vault changes
 	**************************************************************************/
 	useEffect(() => {
-		if (provider) {
+		if (provider && active && !wrongChain) {
 			fetchToVaultVirtualPrice();
 			set_nonce(n => n + 1);
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [toVault.address, provider]);
+	}, [toVault.address, provider, active, wrongChain]);
 
 
 	/**************************************************************************

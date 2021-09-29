@@ -1,6 +1,5 @@
 /******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
+**	@Author:				Bowswap
 **	@Date:					Sunday August 8th 2021
 **	@Filename:				Credits.js
 ******************************************************************************/

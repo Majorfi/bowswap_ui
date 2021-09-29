@@ -1,6 +1,5 @@
 /******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
+**	@Author:				Bowswap
 **	@Date:					Thursday March 18th 2021
 **	@Filename:				index.js
 ******************************************************************************/

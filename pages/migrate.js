@@ -1,6 +1,5 @@
 /******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
+**	@Author:				Bowswap
 **	@Date:					Sunday July 4th 2021
 **	@Filename:				between-vaults.js
 ******************************************************************************/

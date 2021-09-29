@@ -1,6 +1,5 @@
 /******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
+**	@Author:				Bowswap
 **	@Date:					Sunday June 13th 2021
 **	@Filename:				useAccount.js
 ******************************************************************************/
@@ -22,7 +21,7 @@ const	ERC20ABI = [{'constant':true,'inputs':[],'name':'name','outputs':[{'name':
 const AccountContext = createContext();
 
 export const AccountContextApp = ({children}) => {
-	const	{active, provider, getProvider, address} = useWeb3();
+	const	{active, provider, wrongChain, getProvider, address} = useWeb3();
 	const	[nonce, set_nonce] = useState(0);
 	const	[yVempireNotificationCounter, set_yVempireNotificationCounter] = useState(0);
 	const	[balancesOf, set_balancesOf] = useState({});
@@ -108,13 +107,21 @@ export const AccountContextApp = ({children}) => {
 	}, [address]);
 
 	useEffect(() => {
-		if (active && provider && address) {
+		if (wrongChain) {
+			set_balancesOf({});
+			set_allowances({});
+			set_nonce(0);
+		}
+	}, [wrongChain]);
+
+	useEffect(() => {
+		if (active && provider && address && !wrongChain) {
 			retrieveBowswapBalances(),
 			retrieveYVempireBalances();
 			set_nonce(n => n + 1);
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [provider, address, active]);
+	}, [provider, address, active, wrongChain]);
 
 	async function	updateBalanceOf(addresses) {
 		const	ethcallProvider = new Provider();

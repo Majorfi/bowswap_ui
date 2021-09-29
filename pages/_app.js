@@ -1,6 +1,5 @@
 /******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
+**	@Author:				Bowswap
 **	@Date:					Sunday June 13th 2021
 **	@Filename:				_app.js
 ******************************************************************************/
@@ -15,6 +14,7 @@ import	FullConfetti					from	'react-confetti';
 import	useWeb3, {Web3ContextApp}		from	'contexts/useWeb3';
 import	useAccount, {AccountContextApp}	from	'contexts/useAccount';
 import	useLocalStorage					from	'hook/useLocalStorage';
+import	useWindowInFocus				from	'hook/useWindowInFocus';
 import	Credits							from	'components/Credits';
 import	Navbar							from	'components/Commons/Navbar';
 import	ModalPong						from	'components/Commons/ModalPong';
@@ -68,7 +68,8 @@ function	WithLayout({children, hasSecret}) {
 }
 
 function	AppWrapper(props) {
-	const	{active, address} = useWeb3();
+	const	{switchChain, wrongChain, active, address} = useWeb3();
+	const	windowInFocus = useWindowInFocus();
 	const	{Component, pageProps, router} = props;
 	const	hasSecretCode = useSecretCode();
 	const	[yearnVaultData, set_yearnVaultData] = useState([]);
@@ -76,8 +77,15 @@ function	AppWrapper(props) {
 	const	[prices, set_prices] = useLocalStorage('cgPrices', []);
 	const	{data} = useSWR(`https://api.coingecko.com/api/v3/simple/price?ids=${['bitcoin', 'ethereum', 'aave', 'chainlink', 'tether-eurt']}&vs_currencies=usd`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, refreshInterval: 30000, shouldRetryOnError: true, dedupingInterval: 1000, focusThrottleInterval: 5000});
 
+	React.useEffect(() => {
+		if (windowInFocus && wrongChain) {
+			switchChain();
+		}
+	}, [wrongChain, windowInFocus, switchChain]);
+
 	useEffect(() => {
 		set_prices(data);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [data]);
 
 	useEffect(() => {

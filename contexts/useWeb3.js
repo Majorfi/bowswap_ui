@@ -1,6 +1,5 @@
 /******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
+**	@Author:				Bowswap
 **	@Date:					Sunday June 13th 2021
 **	@Filename:				useWeb3.js
 ******************************************************************************/
@@ -79,6 +78,16 @@ export const Web3ContextApp = ({children}) => {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [account, chainId, connector, library, onDesactivate, onUpdate, set_address, set_chainID]);
 
+	const switchChain = useCallback(() => {
+		if (Number(chainID) === 1) {
+			return;
+		}
+		if (!provider || !active) {
+			console.error('Not initialized');
+			return;
+		}
+		provider.send('wallet_switchEthereumChain', [{chainId: '0x1'}]).catch((error) => console.error(error));
+	}, [active, chainID, provider]);
 
 	/**************************************************************************
 	**	connect
@@ -98,12 +107,7 @@ export const Web3ContextApp = ({children}) => {
 			if (active) {
 				deactivate();
 			}
-			const	injected = new InjectedConnector({
-				supportedChainIds: [
-					1, // ETH MAINNET
-					1337, // MAJORNET
-				]
-			});
+			const	injected = new InjectedConnector();
 			activate(injected, undefined, true);
 			set_lastWallet(walletType.METAMASK);
 		} else if (_providerType === walletType.WALLET_CONNECT) {
@@ -163,7 +167,9 @@ export const Web3ContextApp = ({children}) => {
 				initialized,
 				provider: active ? provider : getProvider(),
 				getProvider,
-				currentRPCProvider: provider
+				currentRPCProvider: provider,
+				switchChain,
+				wrongChain: Number(chainID) > 0 && (Number(chainID) !== 1 && Number(chainID) !== 1337)
 			}}>
 			{children}
 		</Web3Context.Provider>

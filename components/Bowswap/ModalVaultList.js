@@ -1,6 +1,5 @@
 /******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
+**	@Author:				Bowswap
 **	@Date:					Thursday July 29th 2021
 **	@Filename:				ModalVaultList.js
 ******************************************************************************/

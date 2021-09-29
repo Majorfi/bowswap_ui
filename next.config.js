@@ -1,7 +1,6 @@
 /******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Monday August 24th 2020
+**	@Author:				Bowswap
+**	@Date:					Wednesday September 29th 2021
 **	@Filename:				next.config.js
 ******************************************************************************/
 
