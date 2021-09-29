@@ -785,18 +785,4 @@ function	Bowswap({yearnVaultData, prices}) {
 	);
 }
 
-function	Wrapper(props) {
-	const	[loaded, set_loaded] = useState(false);
-	
-	useEffect(() => {
-		if (typeof(window) !== 'undefined')
-			setTimeout(() => set_loaded(true), 100);
-	}, [typeof(window) === 'undefined']);
-
-	if (!loaded) {
-		return null;
-	}
-	return <Bowswap {...props} />;
-}
-
 export default Bowswap;
