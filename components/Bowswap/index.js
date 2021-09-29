@@ -11,7 +11,7 @@ import	useWeb3											from	'contexts/useWeb3';
 import	useAccount										from	'contexts/useAccount';
 import	useLocalStorage									from	'hook/useLocalStorage';
 import	useDebounce										from	'hook/useDebounce';
-import	{approveToken, metapoolSwapTokens, swapTokens}	from	'utils/actions';
+import	{approveToken, metapoolSwapTokens, swapTokens, metapoolSwapTokensWithSignature, swapTokensWithSignature, signTransaction}	from	'utils/actions';
 import	InputToken										from	'components/Bowswap/InputToken';
 import	InputTokenDisabled								from	'components/Bowswap/InputTokenDisabled';
 import	ModalVaultList									from	'components/Bowswap/ModalVaultList';
@@ -28,12 +28,34 @@ import	{bigNumber, toAddress}							from	'utils';
 
 function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, slippage, set_slippage, fromCounterValue, balanceOf, disabled, yearnVaultData}) {
 	const	[isInit, set_isInit] = useState(false);
+
+	function	updateInputValue(newValue) {
+		let		_value = newValue.replaceAll('..', '.').replaceAll(/[^0-9.]/g, '');
+		const	[dec, frac] = _value.split('.');
+		if (frac) _value = `${dec}.${frac.slice(0, 12)}`;
+
+		if (_value === '.') {
+			set_fromAmount('0.');
+		} else if (_value.length > 0 && _value[0] === '-') {
+			set_fromAmount('');
+		} else if (_value.length >= 2 && _value[0] === '0' && _value[1] !== '.') {
+			set_fromAmount(_value.slice(1) || '');
+		} else {
+			set_fromAmount(_value || '');
+		}
+	}
+
 	useEffect(() => {
-		if (!isInit && balanceOf !== '0') {
+		if (!isInit && (fromAmount !== '' && fromAmount !== '0.0' && Number(fromAmount) !== 0)) {
+			updateInputValue(fromAmount);
+			set_isInit(true);
+		}
+		else if (!isInit && balanceOf !== '0') {
 			set_fromAmount(ethers.utils.formatUnits(balanceOf, fromVault.decimals));
 			set_isInit(true);
 		}
-	}, [balanceOf]);
+	}, [isInit, balanceOf, fromAmount]);
+
 	return (
 		<section aria-label={'FROM_VAULT'}>
 			<label className={'font-medium text-ybase text-ygray-900 pl-0.5'}>{'From Vault'}</label>
@@ -48,7 +70,7 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 						value={fromVault}
 						set_value={set_fromVault}
 						set_input={(v) => {
-							set_fromAmount(ethers.utils.formatUnits(v, fromVault.decimals));
+							updateInputValue(ethers.utils.formatUnits(v, fromVault.decimals));
 						}} />
 				</div>
 				<div className={'w-full md:w-7/11'}>
@@ -96,9 +118,20 @@ function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, to
 	);
 }
 
-function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slippage, shouldIncreaseGasLimit, approved, disabled, onCallback}) {
+function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slippage, signature, shouldIncreaseGasLimit, approved, disabled, onCallback}) {
 	const	{provider} = useWeb3();
 	const	[transactionProcessing, set_transactionProcessing] = useState(false);
+
+	const	[DEBUG_TX, set_DEBUG_TX] = useState(-1);
+
+	useEffect(() => {
+		window.swap = () => set_DEBUG_TX(n => n + 1);
+	}, [typeof(window) !== 'undefined']);
+
+	useEffect(() => {
+		if (DEBUG_TX >= 0)
+			performSwap(true);
+	}, [DEBUG_TX]);
 
 	function	performV2Swap() {
 		try {
@@ -182,15 +215,101 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 		}
 	}
 
-	function	performSwap() {
-		if (disabled || transactionProcessing || !approved) {
+	function	performV2SwapWithSignature() {
+		swapTokensWithSignature({
+			provider: provider,
+			contractAddress: process.env.SIGNATURE_METAPOOL_SWAPPER_ADDRESS,
+			from: fromVault.address,
+			to: toVault.address,
+			amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
+			minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toString(), fromVault.decimals),
+			instructions: V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2],
+			signature,
+			shouldIncreaseGasLimit
+		}, ({error}) => {
+			if (error) {
+				if (error?.message?.includes('User denied transaction signature')) {
+					set_transactionProcessing(false);
+					return onCallback('error', 'User denied transaction signature');
+				} else {
+					let message = undefined;
+					if (error?.data?.message?.includes('revert out too low')) {
+						message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
+					}
+					set_transactionProcessing(false);
+					return onCallback('error', message);
+				}
+			}
+			set_transactionProcessing(false);
+			onCallback('success');
+		});
+	}
+	function	performV1SwapWithSignature() {
+		const	v2PathExists = V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address);
+
+		try {
+			metapoolSwapTokensWithSignature({
+				provider: provider,
+				contractAddress: process.env.SIGNATURE_METAPOOL_SWAPPER_ADDRESS,
+				from: fromVault.address,
+				to: toVault.address,
+				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
+				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toString(), fromVault.decimals),
+				signature,
+				shouldIncreaseGasLimit
+			}, ({error}) => {
+				if (error) {
+					if (error?.message?.includes('User denied transaction signature')) {
+						set_transactionProcessing(false);
+						return onCallback('error', 'User denied transaction signature');
+					} else if (v2PathExists) {
+						console.log('FALLBACK_WITH_V2');
+						return performV2SwapWithSignature();
+					} else {
+						let message = undefined;
+						if (error?.data?.message?.includes('revert out too low')) {
+							message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
+						}
+						set_transactionProcessing(false);
+						return onCallback('error', message);
+					}
+				}
+				set_transactionProcessing(false);
+				onCallback('success');
+			});
+		} catch (error) {
+			if (error?.message?.includes('User denied transaction signature')) {
+				set_transactionProcessing(false);
+				return onCallback('error', 'User denied transaction signature');
+			} else if (v2PathExists) {
+				console.log('FALLBACK_WITH_V2');
+				return performV2Swap();
+			} else {
+				let message = undefined;
+				if (error?.data?.message?.includes('revert out too low')) {
+					message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
+				}
+				set_transactionProcessing(false);
+				return onCallback('error', message);
+			}
+		}
+	}
+
+	function	performSwap(forced = false) {
+		if (!forced && (disabled || transactionProcessing || !approved)) {
 			return;
 		}
 		set_transactionProcessing(true);
 		onCallback('pending');
 		if (toVault.scope === 'v2') {
+			if (signature) {
+				return performV2SwapWithSignature();
+			}
 			performV2Swap();
 		} else {
+			if (signature) {
+				return performV1SwapWithSignature();
+			}
 			performV1Swap();
 		}
 	}
@@ -207,16 +326,21 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 	);
 }
 
-function	ButtonApprove({fromVault, fromAmount, approved, disabled, onCallback}) {
+function	ButtonApprove({fromVault, fromAmount, approved, disabled, set_signature, onCallback}) {
 	const	{provider} = useWeb3();
 	const	[transactionProcessing, set_transactionProcessing] = useState(false);
+	const	[DEBUG_TX, set_DEBUG_TX] = useState(-1);
 
-	function	performApprove() {
-		if (disabled || transactionProcessing || (!fromAmount || Number(fromAmount) === 0)) {
-			return;
-		}
-		set_transactionProcessing(true);
-		onCallback('pending');
+	useEffect(() => {
+		window.approve = (nonce) => set_DEBUG_TX(nonce);
+	}, [typeof(window) !== 'undefined']);
+
+	useEffect(() => {
+		if (DEBUG_TX >= 0)
+			performApprove(true, DEBUG_TX);
+	}, [DEBUG_TX]);
+
+	function	approveTx() {
 		try {
 			approveToken({
 				provider: provider,
@@ -234,6 +358,42 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, onCallback}) 
 		} catch (error) {
 			set_transactionProcessing(false);
 			onCallback('error');
+		}
+	}
+
+	function	performApprove(forced = false, nonceOverwrite = undefined) {
+		if (!forced && (disabled || transactionProcessing || (!fromAmount || Number(fromAmount) === 0))) {
+			return;
+		}
+		set_transactionProcessing(true);
+		onCallback('pending');
+		try {
+			signTransaction({
+				provider: provider,
+				vaultAddress: fromVault.address,
+				contractAddress: process.env.SIGNATURE_METAPOOL_SWAPPER_ADDRESS,
+				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
+				nonceOverwrite 
+			}, ({error, data}) => {
+				if (error) {
+					if (error?.message?.includes('User denied message signature')) {
+						set_transactionProcessing(false);
+						return onCallback('error', 'User denied signature');
+					}
+					console.log('FALLBACK_WITH_APPROVE');
+					return approveTx();
+				}
+				set_signature(data);
+				set_transactionProcessing(false);
+				onCallback('success');
+			});
+		} catch (error) {
+			if (error?.message?.includes('User denied message signature')) {
+				set_transactionProcessing(false);
+				return onCallback('error', 'User denied signature');
+			}
+			console.log('FALLBACK_WITH_APPROVE');
+			return approveTx();
 		}
 	}
 
@@ -267,32 +427,30 @@ function	Bowswap({yearnVaultData, prices}) {
 	const	{provider} = useWeb3();
 	const	{balancesOf, updateBalanceOf, allowances} = useAccount();
 	const	[, set_nonce] = useState(0);
-
 	const	[fromVault, set_fromVault] = useLocalStorage('fromVault', BOWSWAP_CRV_USD_VAULTS[0]);
 	const	[fromCounterValue, set_fromCounterValue] = useLocalStorage('fromCounterValue', 0);
 	const	[fromAmount, set_fromAmount] = useLocalStorage('fromAmount', '');
 	const	[balanceOfFromVault, set_balanceOfFromVault] = useState(0);
-
 	const	[toVaultsListV2, set_toVaultsListV2] = useState(V2_PATHS.filter(e => e[0] === BOWSWAP_CRV_USD_VAULTS[0]));
 	const	[toVaultsList, set_toVaultsList] = useState(BOWSWAP_CRV_USD_VAULTS.slice(1));
 	const	[toVault, set_toVault] = useLocalStorage('toVault', BOWSWAP_CRV_USD_VAULTS[1]);
 	const	[toCounterValue, set_toCounterValue] = useState(0);
 	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('');
-
 	const	[slippage, set_slippage] = useState(0.05);
 	const	[isFetchingExpectedReceiveAmount, set_isFetchingExpectedReceiveAmount] = useState(false);
-
 	const	debouncedFetchExpectedAmount = useDebounce(fromAmount, 750);
-
 	const	[txApproveStatus, set_txApproveStatus] = useState({none: true, pending: false, success: false, error: false});
 	const	[txSwapStatus, set_txSwapStatus] = useState({none: true, pending: false, success: false, error: false});
+	const	[signature, set_signature] = useState(null);
 
 	function	resetStates() {
+		set_signature(null);
 		set_fromAmount('');
 		set_toCounterValue(0);
 		set_expectedReceiveAmount('');
 		set_slippage(0.10);
 		set_txApproveStatus({none: true, pending: false, success: false, error: false});
+		set_txSwapStatus({none: true, pending: false, success: false, error: false});
 	}
 
 	async function computeTriCryptoPrice() {
@@ -304,16 +462,16 @@ function	Bowswap({yearnVaultData, prices}) {
 	}
 
 	const	isNotCompatible = () => {
-		const	V2Paths = V2_PATHS.filter(e => toAddress(e[0]) === toAddress(fromVault.address)).map(e => e[1]);
+		const	V2Paths = V2_PATHS.filter(e => toAddress(e[0]) === toAddress(fromVault.address)).map(e => toAddress(e[1]));
 	
 		if (fromVault.scope === 'btc') {
-			return (toVault.scope !== 'btc' || fromVault.address === toVault.address || !V2Paths.includes(toAddress(toVault.address)));
+			return ((toVault.scope !== 'btc' && fromVault.address === toVault.address) || !V2Paths.includes(toAddress(toVault.address)));
 		} else if (fromVault.scope === 'usd') {
-			return (toVault.scope !== 'usd' || fromVault.address === toVault.address || !V2Paths.includes(toAddress(toVault.address)));
+			return ((toVault.scope !== 'usd' && fromVault.address === toVault.address) || !V2Paths.includes(toAddress(toVault.address)));
 		} else if (fromVault.scope === 'eur') {
-			return (toVault.scope !== 'eur' || fromVault.address === toVault.address || !V2Paths.includes(toAddress(toVault.address)));
+			return ((toVault.scope !== 'eur' && fromVault.address === toVault.address) || !V2Paths.includes(toAddress(toVault.address)));
 		} else {
-			return (!V2Paths.includes(toVault.address) || toVault.scope !== 'v2');
+			return (!V2Paths.includes(toVault.address) && toVault.scope !== 'v2');
 		}
 	};
 
@@ -342,7 +500,7 @@ function	Bowswap({yearnVaultData, prices}) {
 			set_isFetchingExpectedReceiveAmount(false);
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [fromVault.address, provider, toVault.address, toVault.decimals, toVault.scope, toVault.type]);
+	}, [fromVault.address, provider, toVault?.address, toVault?.decimals, toVault?.scope, toVault?.type]);
 
 	/**************************************************************************
 	**	This function will be used to compute the counter value of the want
@@ -414,7 +572,7 @@ function	Bowswap({yearnVaultData, prices}) {
 			set_toCounterValue(prices.ethereum.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else if (toVault.scope === 'v2' && toVault.type === 'aave') {
 			set_toCounterValue(prices.aave.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
-		} else if (fromVault.scope === 'v2' && fromVault.type === 'link') {
+		} else if (toVault.scope === 'v2' && toVault.type === 'link') {
 			set_toCounterValue(prices.chainlink.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else if (toVault.scope === 'v2' && toVault.type === 'tri') {
 			const	price = await computeTriCryptoPrice();
@@ -479,7 +637,7 @@ function	Bowswap({yearnVaultData, prices}) {
 			set_nonce(n => n + 1);
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [toVault.address, provider]);
+	}, [toVault?.address, provider]);
 
 
 	/**************************************************************************
@@ -498,7 +656,7 @@ function	Bowswap({yearnVaultData, prices}) {
 			set_expectedReceiveAmount('');
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [debouncedFetchExpectedAmount, fromAmount, fromVault.address, toVault.address, fromVault.decimals]);
+	}, [debouncedFetchExpectedAmount, fromAmount, fromVault.address, toVault?.address, fromVault.decimals]);
 
 
 	function	renderMiddlePart() {
@@ -513,27 +671,29 @@ function	Bowswap({yearnVaultData, prices}) {
 				return {open: true, title: txSwapStatus.message, color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (txSwapStatus.error)
 				return {open: true, title: 'SWAP FAILED', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
+			if (txApproveStatus.error && txApproveStatus.message)
+				return {open: true, title: txApproveStatus.message, color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (txApproveStatus.error)
 				return {open: true, title: 'APPROVE TRANSACTION FAILURE', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 			if (Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals)))
 				return {open: true, title: 'EXCEEDED BALANCE LIMIT !', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 
-			if (fromVault.scope === 'v2' && toVault.scope === 'v2' && fromVault.type === 'usd' && toVault.type !== 'usd')
+			if (fromVault.scope === 'v2' && toVault?.scope === 'v2' && fromVault.type === 'usd' && toVault?.type !== 'usd')
 				return {open: true, title: 'You are moving from a USD pegged asset to a more volatile crypto asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope !== 'v2' && toVault.scope === 'v2' && fromVault.scope === 'usd' && toVault.type !== 'usd')
+			if (fromVault.scope !== 'v2' && toVault?.scope === 'v2' && fromVault.scope === 'usd' && toVault?.type !== 'usd')
 				return {open: true, title: 'You are moving from a USD pegged asset to a more volatile crypto asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope === 'v2' && toVault.scope === 'v2' && fromVault.type !== 'usd' && toVault.type === 'usd')
+			if (fromVault.scope === 'v2' && toVault?.scope === 'v2' && fromVault.type !== 'usd' && toVault?.type === 'usd')
 				return {open: true, title: 'You are moving from a volatile crypto asset to a USD pegged asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope !== 'v2' && toVault.scope === 'v2' && fromVault.scope !== 'usd' && toVault.type === 'usd')
+			if (fromVault.scope !== 'v2' && toVault?.scope === 'v2' && fromVault.scope !== 'usd' && toVault?.type === 'usd')
 				return {open: true, title: 'You are moving from a volatile crypto asset to a USD pegged asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
 
-			if (fromVault.scope === 'v2' && toVault.scope === 'v2' && fromVault.type === 'eur' && toVault.type !== 'eur')
+			if (fromVault.scope === 'v2' && toVault?.scope === 'v2' && fromVault.type === 'eur' && toVault?.type !== 'eur')
 				return {open: true, title: 'You are moving from a EUR pegged asset to a more volatile crypto asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope !== 'v2' && toVault.scope === 'v2' && fromVault.scope === 'eur' && toVault.type !== 'eur')
+			if (fromVault.scope !== 'v2' && toVault?.scope === 'v2' && fromVault.scope === 'eur' && toVault?.type !== 'eur')
 				return {open: true, title: 'You are moving from a EUR pegged asset to a more volatile crypto asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope === 'v2' && toVault.scope === 'v2' && fromVault.type !== 'eur' && toVault.type === 'eur')
+			if (fromVault.scope === 'v2' && toVault?.scope === 'v2' && fromVault.type !== 'eur' && toVault?.type === 'eur')
 				return {open: true, title: 'You are moving from a volatile crypto asset to a EUR pegged asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope !== 'v2' && toVault.scope === 'v2' && fromVault.scope !== 'eur' && toVault.type === 'eur')
+			if (fromVault.scope !== 'v2' && toVault?.scope === 'v2' && fromVault.scope !== 'eur' && toVault?.type === 'eur')
 				return {open: true, title: 'You are moving from a volatile crypto asset to a EUR pegged asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
 
 			if (Number(slippage) >= 3)
@@ -586,24 +746,26 @@ function	Bowswap({yearnVaultData, prices}) {
 						approved={txApproveStatus.success || isAllowed}
 						fromVault={fromVault}
 						fromAmount={fromAmount}
-						onCallback={(type) => {
-							set_txApproveStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success'});
+						set_signature={set_signature}
+						onCallback={(type, message) => {
+							set_txApproveStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success', message});
 							if (type === 'error') {
-								setTimeout(() => set_txApproveStatus((s) => s.error ? {none: true, pending: false, error: false, success: false} : s), 2500);
+								setTimeout(() => set_txApproveStatus((s) => s.error ? {none: true, pending: false, error: false, success: false, message} : s), 2500);
 							}
 							if (type === 'success') {
 								updateBalanceOf([fromVault.address]);
-								setTimeout(() => set_txApproveStatus({none: false, pending: false, error: false, success: true, hide: true}), 2500);
+								setTimeout(() => set_txApproveStatus({none: false, pending: false, error: false, success: true, hide: true, message: null}), 2500);
 							}
 						}} />
 					<ButtonSwap
 						disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals))}
-						approved={txApproveStatus.success || isAllowed}
+						approved={txApproveStatus.success || isAllowed || signature}
 						fromVault={fromVault}
 						toVault={toVault}
 						fromAmount={fromAmount}
 						expectedReceiveAmount={expectedReceiveAmount}
 						slippage={slippage}
+						signature={signature}
 						shouldIncreaseGasLimit={Number(balanceOfFromVault) < Number(fromAmount)}
 						onCallback={(type, message) => {
 							set_txSwapStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success', message});
