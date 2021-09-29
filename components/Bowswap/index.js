@@ -28,12 +28,33 @@ import	{bigNumber, toAddress}							from	'utils';
 
 function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, slippage, set_slippage, fromCounterValue, balanceOf, disabled, yearnVaultData}) {
 	const	[isInit, set_isInit] = useState(false);
+
+	function	updateInputValue(newValue) {
+		let		_value = newValue.replaceAll('..', '.').replaceAll(/[^0-9.]/g, '');
+		const	[dec, frac] = _value.split('.');
+		if (frac) _value = `${dec}.${frac.slice(0, 12)}`;
+
+		if (_value === '.') {
+			set_fromAmount('0.');
+		} else if (_value.length > 0 && _value[0] === '-') {
+			set_fromAmount('');
+		} else if (_value.length >= 2 && _value[0] === '0' && _value[1] !== '.') {
+			set_fromAmount(_value.slice(1) || '');
+		} else {
+			set_fromAmount(_value || '');
+		}
+	}
+
 	useEffect(() => {
-		if (!isInit && balanceOf !== '0') {
+		if (!isInit && (fromAmount !== '' && fromAmount !== '0.0' && Number(fromAmount) !== 0)) {
+			updateInputValue(fromAmount);
+			set_isInit(true);
+		}
+		else if (!isInit && balanceOf !== '0') {
 			set_fromAmount(ethers.utils.formatUnits(balanceOf, fromVault.decimals));
 			set_isInit(true);
 		}
-	}, [balanceOf]);
+	}, [isInit, balanceOf, fromAmount]);
 
 	return (
 		<section aria-label={'FROM_VAULT'}>
@@ -49,7 +70,7 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 						value={fromVault}
 						set_value={set_fromVault}
 						set_input={(v) => {
-							set_fromAmount(ethers.utils.formatUnits(v, fromVault.decimals));
+							updateInputValue(ethers.utils.formatUnits(v, fromVault.decimals));
 						}} />
 				</div>
 				<div className={'w-full md:w-7/11'}>
@@ -406,23 +427,18 @@ function	Bowswap({yearnVaultData, prices}) {
 	const	{provider} = useWeb3();
 	const	{balancesOf, updateBalanceOf, allowances} = useAccount();
 	const	[, set_nonce] = useState(0);
-
 	const	[fromVault, set_fromVault] = useLocalStorage('fromVault', BOWSWAP_CRV_USD_VAULTS[0]);
 	const	[fromCounterValue, set_fromCounterValue] = useLocalStorage('fromCounterValue', 0);
 	const	[fromAmount, set_fromAmount] = useLocalStorage('fromAmount', '');
 	const	[balanceOfFromVault, set_balanceOfFromVault] = useState(0);
-
 	const	[toVaultsListV2, set_toVaultsListV2] = useState(V2_PATHS.filter(e => e[0] === BOWSWAP_CRV_USD_VAULTS[0]));
 	const	[toVaultsList, set_toVaultsList] = useState(BOWSWAP_CRV_USD_VAULTS.slice(1));
 	const	[toVault, set_toVault] = useLocalStorage('toVault', BOWSWAP_CRV_USD_VAULTS[1]);
 	const	[toCounterValue, set_toCounterValue] = useState(0);
 	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('');
-
 	const	[slippage, set_slippage] = useState(0.05);
 	const	[isFetchingExpectedReceiveAmount, set_isFetchingExpectedReceiveAmount] = useState(false);
-
 	const	debouncedFetchExpectedAmount = useDebounce(fromAmount, 750);
-
 	const	[txApproveStatus, set_txApproveStatus] = useState({none: true, pending: false, success: false, error: false});
 	const	[txSwapStatus, set_txSwapStatus] = useState({none: true, pending: false, success: false, error: false});
 	const	[signature, set_signature] = useState(null);
@@ -767,6 +783,20 @@ function	Bowswap({yearnVaultData, prices}) {
 			</div>
 		</div>
 	);
+}
+
+function	Wrapper(props) {
+	const	[loaded, set_loaded] = useState(false);
+	
+	useEffect(() => {
+		if (typeof(window) !== 'undefined')
+			setTimeout(() => set_loaded(true), 100);
+	}, [typeof(window) === 'undefined']);
+
+	if (!loaded) {
+		return null;
+	}
+	return <Bowswap {...props} />;
 }
 
 export default Bowswap;
