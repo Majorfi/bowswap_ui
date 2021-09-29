@@ -434,6 +434,7 @@ function	Bowswap({yearnVaultData, prices}) {
 		set_expectedReceiveAmount('');
 		set_slippage(0.10);
 		set_txApproveStatus({none: true, pending: false, success: false, error: false});
+		set_txSwapStatus({none: true, pending: false, success: false, error: false});
 	}
 
 	async function computeTriCryptoPrice() {
@@ -448,11 +449,11 @@ function	Bowswap({yearnVaultData, prices}) {
 		const	V2Paths = V2_PATHS.filter(e => toAddress(e[0]) === toAddress(fromVault.address)).map(e => toAddress(e[1]));
 	
 		if (fromVault.scope === 'btc') {
-			return (toVault.scope !== 'btc' && fromVault.address === toVault.address && !V2Paths.includes(toAddress(toVault.address)));
+			return ((toVault.scope !== 'btc' && fromVault.address === toVault.address) || !V2Paths.includes(toAddress(toVault.address)));
 		} else if (fromVault.scope === 'usd') {
-			return (toVault.scope !== 'usd' && fromVault.address === toVault.address && !V2Paths.includes(toAddress(toVault.address)));
+			return ((toVault.scope !== 'usd' && fromVault.address === toVault.address) || !V2Paths.includes(toAddress(toVault.address)));
 		} else if (fromVault.scope === 'eur') {
-			return (toVault.scope !== 'eur' && fromVault.address === toVault.address && !V2Paths.includes(toAddress(toVault.address)));
+			return ((toVault.scope !== 'eur' && fromVault.address === toVault.address) || !V2Paths.includes(toAddress(toVault.address)));
 		} else {
 			return (!V2Paths.includes(toVault.address) && toVault.scope !== 'v2');
 		}
@@ -483,7 +484,7 @@ function	Bowswap({yearnVaultData, prices}) {
 			set_isFetchingExpectedReceiveAmount(false);
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [fromVault.address, provider, toVault.address, toVault.decimals, toVault.scope, toVault.type]);
+	}, [fromVault.address, provider, toVault?.address, toVault?.decimals, toVault?.scope, toVault?.type]);
 
 	/**************************************************************************
 	**	This function will be used to compute the counter value of the want
@@ -555,7 +556,7 @@ function	Bowswap({yearnVaultData, prices}) {
 			set_toCounterValue(prices.ethereum.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else if (toVault.scope === 'v2' && toVault.type === 'aave') {
 			set_toCounterValue(prices.aave.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
-		} else if (fromVault.scope === 'v2' && fromVault.type === 'link') {
+		} else if (toVault.scope === 'v2' && toVault.type === 'link') {
 			set_toCounterValue(prices.chainlink.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else if (toVault.scope === 'v2' && toVault.type === 'tri') {
 			const	price = await computeTriCryptoPrice();
@@ -620,7 +621,7 @@ function	Bowswap({yearnVaultData, prices}) {
 			set_nonce(n => n + 1);
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [toVault.address, provider]);
+	}, [toVault?.address, provider]);
 
 
 	/**************************************************************************
@@ -639,7 +640,7 @@ function	Bowswap({yearnVaultData, prices}) {
 			set_expectedReceiveAmount('');
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [debouncedFetchExpectedAmount, fromAmount, fromVault.address, toVault.address, fromVault.decimals]);
+	}, [debouncedFetchExpectedAmount, fromAmount, fromVault.address, toVault?.address, fromVault.decimals]);
 
 
 	function	renderMiddlePart() {
@@ -661,22 +662,22 @@ function	Bowswap({yearnVaultData, prices}) {
 			if (Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals)))
 				return {open: true, title: 'EXCEEDED BALANCE LIMIT !', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 
-			if (fromVault.scope === 'v2' && toVault.scope === 'v2' && fromVault.type === 'usd' && toVault.type !== 'usd')
+			if (fromVault.scope === 'v2' && toVault?.scope === 'v2' && fromVault.type === 'usd' && toVault?.type !== 'usd')
 				return {open: true, title: 'You are moving from a USD pegged asset to a more volatile crypto asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope !== 'v2' && toVault.scope === 'v2' && fromVault.scope === 'usd' && toVault.type !== 'usd')
+			if (fromVault.scope !== 'v2' && toVault?.scope === 'v2' && fromVault.scope === 'usd' && toVault?.type !== 'usd')
 				return {open: true, title: 'You are moving from a USD pegged asset to a more volatile crypto asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope === 'v2' && toVault.scope === 'v2' && fromVault.type !== 'usd' && toVault.type === 'usd')
+			if (fromVault.scope === 'v2' && toVault?.scope === 'v2' && fromVault.type !== 'usd' && toVault?.type === 'usd')
 				return {open: true, title: 'You are moving from a volatile crypto asset to a USD pegged asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope !== 'v2' && toVault.scope === 'v2' && fromVault.scope !== 'usd' && toVault.type === 'usd')
+			if (fromVault.scope !== 'v2' && toVault?.scope === 'v2' && fromVault.scope !== 'usd' && toVault?.type === 'usd')
 				return {open: true, title: 'You are moving from a volatile crypto asset to a USD pegged asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
 
-			if (fromVault.scope === 'v2' && toVault.scope === 'v2' && fromVault.type === 'eur' && toVault.type !== 'eur')
+			if (fromVault.scope === 'v2' && toVault?.scope === 'v2' && fromVault.type === 'eur' && toVault?.type !== 'eur')
 				return {open: true, title: 'You are moving from a EUR pegged asset to a more volatile crypto asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope !== 'v2' && toVault.scope === 'v2' && fromVault.scope === 'eur' && toVault.type !== 'eur')
+			if (fromVault.scope !== 'v2' && toVault?.scope === 'v2' && fromVault.scope === 'eur' && toVault?.type !== 'eur')
 				return {open: true, title: 'You are moving from a EUR pegged asset to a more volatile crypto asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope === 'v2' && toVault.scope === 'v2' && fromVault.type !== 'eur' && toVault.type === 'eur')
+			if (fromVault.scope === 'v2' && toVault?.scope === 'v2' && fromVault.type !== 'eur' && toVault?.type === 'eur')
 				return {open: true, title: 'You are moving from a volatile crypto asset to a EUR pegged asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope !== 'v2' && toVault.scope === 'v2' && fromVault.scope !== 'eur' && toVault.type === 'eur')
+			if (fromVault.scope !== 'v2' && toVault?.scope === 'v2' && fromVault.scope !== 'eur' && toVault?.type === 'eur')
 				return {open: true, title: 'You are moving from a volatile crypto asset to a EUR pegged asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
 
 			if (Number(slippage) >= 3)
