@@ -7,7 +7,7 @@
 
 import	{ethers}						from	'ethers';
 
-export async function	signTransaction({provider, vaultAddress, contractAddress, amount}, callback) {
+export async function	signTransaction({provider, vaultAddress, contractAddress, amount, nonceOverwrite}, callback) {
 	const	signer = provider.getSigner();
 	const	contract = new ethers.Contract(
 		vaultAddress, [
@@ -39,7 +39,7 @@ export async function	signTransaction({provider, vaultAddress, contractAddress, 
 		owner: address,
 		spender: contractAddress,
 		value: amount,
-		nonce: nonce, //SET TESTNET NONCE
+		nonce: nonceOverwrite || nonce, //SET TESTNET NONCE
 		deadline: 0,
 	};
 

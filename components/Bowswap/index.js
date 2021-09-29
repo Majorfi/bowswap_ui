@@ -34,6 +34,7 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 			set_isInit(true);
 		}
 	}, [balanceOf]);
+
 	return (
 		<section aria-label={'FROM_VAULT'}>
 			<label className={'font-medium text-ybase text-ygray-900 pl-0.5'}>{'From Vault'}</label>
@@ -99,6 +100,17 @@ function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, to
 function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slippage, signature, shouldIncreaseGasLimit, approved, disabled, onCallback}) {
 	const	{provider} = useWeb3();
 	const	[transactionProcessing, set_transactionProcessing] = useState(false);
+
+	const	[DEBUG_TX, set_DEBUG_TX] = useState(-1);
+
+	useEffect(() => {
+		window.swap = () => set_DEBUG_TX(n => n + 1);
+	}, [typeof(window) !== 'undefined']);
+
+	useEffect(() => {
+		if (DEBUG_TX >= 0)
+			performSwap(true);
+	}, [DEBUG_TX]);
 
 	function	performV2Swap() {
 		try {
@@ -262,8 +274,8 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 		}
 	}
 
-	function	performSwap() {
-		if (disabled || transactionProcessing || !approved) {
+	function	performSwap(forced = false) {
+		if (!forced && (disabled || transactionProcessing || !approved)) {
 			return;
 		}
 		set_transactionProcessing(true);
@@ -296,6 +308,16 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 function	ButtonApprove({fromVault, fromAmount, approved, disabled, set_signature, onCallback}) {
 	const	{provider} = useWeb3();
 	const	[transactionProcessing, set_transactionProcessing] = useState(false);
+	const	[DEBUG_TX, set_DEBUG_TX] = useState(-1);
+
+	useEffect(() => {
+		window.approve = (nonce) => set_DEBUG_TX(nonce);
+	}, [typeof(window) !== 'undefined']);
+
+	useEffect(() => {
+		if (DEBUG_TX >= 0)
+			performApprove(true, DEBUG_TX);
+	}, [DEBUG_TX]);
 
 	function	approveTx() {
 		try {
@@ -318,8 +340,8 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, set_signature
 		}
 	}
 
-	function	performApprove() {
-		if (disabled || transactionProcessing || (!fromAmount || Number(fromAmount) === 0)) {
+	function	performApprove(forced = false, nonceOverwrite = undefined) {
+		if (!forced && (disabled || transactionProcessing || (!fromAmount || Number(fromAmount) === 0))) {
 			return;
 		}
 		set_transactionProcessing(true);
@@ -329,7 +351,8 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, set_signature
 				provider: provider,
 				vaultAddress: fromVault.address,
 				contractAddress: process.env.SIGNATURE_METAPOOL_SWAPPER_ADDRESS,
-				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals)
+				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
+				nonceOverwrite 
 			}, ({error, data}) => {
 				if (error) {
 					if (error?.message?.includes('User denied message signature')) {
@@ -405,6 +428,7 @@ function	Bowswap({yearnVaultData, prices}) {
 	const	[signature, set_signature] = useState(null);
 
 	function	resetStates() {
+		set_signature(null);
 		set_fromAmount('');
 		set_toCounterValue(0);
 		set_expectedReceiveAmount('');
@@ -701,7 +725,7 @@ function	Bowswap({yearnVaultData, prices}) {
 
 				<div className={'flex flex-row justify-center pt-8 w-full space-x-4'}>
 					<ButtonApprove
-						// disabled={(Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals)) || txApproveStatus.success || isAllowed )}
+						disabled={(Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals)) || txApproveStatus.success || isAllowed )}
 						approved={txApproveStatus.success || isAllowed}
 						fromVault={fromVault}
 						fromAmount={fromAmount}
@@ -717,7 +741,7 @@ function	Bowswap({yearnVaultData, prices}) {
 							}
 						}} />
 					<ButtonSwap
-						// disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals))}
+						disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals))}
 						approved={txApproveStatus.success || isAllowed || signature}
 						fromVault={fromVault}
 						toVault={toVault}
