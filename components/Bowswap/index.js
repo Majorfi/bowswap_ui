@@ -461,39 +461,23 @@ function	Bowswap({yearnVaultData, prices}) {
 		return	ethers.utils.formatUnits(priceUSDC, 6);
 	}
 
-	const	isNotCompatible = () => {
-		const	V2Paths = V2_PATHS.filter(e => toAddress(e[0]) === toAddress(fromVault.address)).map(e => toAddress(e[1]));
-	
-		if (fromVault.scope === 'btc') {
-			return ((toVault.scope !== 'btc' && fromVault.address === toVault.address) || !V2Paths.includes(toAddress(toVault.address)));
-		} else if (fromVault.scope === 'usd') {
-			return ((toVault.scope !== 'usd' && fromVault.address === toVault.address) || !V2Paths.includes(toAddress(toVault.address)));
-		} else if (fromVault.scope === 'eur') {
-			return ((toVault.scope !== 'eur' && fromVault.address === toVault.address) || !V2Paths.includes(toAddress(toVault.address)));
-		} else {
-			return (!V2Paths.includes(toVault.address) && toVault.scope !== 'v2');
-		}
-	};
-
 	const	fetchEstimateOut = useCallback(async (from, to, amount) => {
 		const	fromToken = new ethers.Contract(process.env.METAPOOL_SWAPPER_ADDRESS, [
 			'function metapool_estimate_out(address from, address to, uint256 amount) public view returns (uint256)',
 			'function estimate_out(address from, address to, uint256 amount, tuple(bool deposit, address pool, uint128 n)[] instructions) public view returns (uint256)'
 		], provider);
 
-		if (isNotCompatible()) {
-			return set_isFetchingExpectedReceiveAmount(false);
-		}
-
 		if (toVault.scope === 'v2') {
-			const	estimate_out = await fromToken.estimate_out(
-				from,
-				to,
-				amount,
-				V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2]
-			);
-			set_expectedReceiveAmount(ethers.utils.formatUnits(estimate_out, toVault.decimals));
-			set_isFetchingExpectedReceiveAmount(false);
+			if (V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address) !== undefined) {
+				const	estimate_out = await fromToken.estimate_out(
+					from,
+					to,
+					amount,
+					V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2]
+				);
+				set_expectedReceiveAmount(ethers.utils.formatUnits(estimate_out, toVault.decimals));
+				set_isFetchingExpectedReceiveAmount(false);
+			}
 		} else {
 			const	metapool_estimate_out = await fromToken.metapool_estimate_out(from, to, amount);
 			set_expectedReceiveAmount(ethers.utils.formatUnits(metapool_estimate_out, toVault.decimals));
@@ -566,7 +550,7 @@ function	Bowswap({yearnVaultData, prices}) {
 
 		if (toVault.scope === 'btc' || (toVault.scope === 'v2' && toVault.type === 'btc')) {
 			set_toCounterValue(prices.bitcoin.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
-		} else if (fromVault.scope === 'eur' || (fromVault.scope === 'v2' && fromVault.type === 'eur')) {
+		} else if (toVault.scope === 'eur' || (toVault.scope === 'v2' && toVault.type === 'eur')) {
 			set_toCounterValue((prices?.['tether-eurt'].usd || 1) * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else if (toVault.scope === 'v2' && toVault.type === 'eth') {
 			set_toCounterValue(prices.ethereum.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
