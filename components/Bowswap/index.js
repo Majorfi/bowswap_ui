@@ -189,7 +189,7 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 
 	return (
 		<button
-			onClick={performSwap}
+			onClick={() => performSwap(false)}
 			className={`w-full h-11 flex items-center justify-center space-x-2 px-6 py-3 text-ybase font-medium rounded-lg focus:outline-none overflow-hidden transition-colors border ${
 				disabled || transactionProcessing || !approved ? 'text-ygray-400 bg-white border-ygray-400 cursor-not-allowed' :
 					'bg-yblue hover:bg-yblue-hover border-yblue hover:border-yblue-hover text-white cursor-pointer'
