@@ -235,6 +235,8 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 					let message = undefined;
 					if (error?.data?.message?.includes('revert out too low')) {
 						message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
+					} else if (error?.data?.message?.includes('execution reverted')) {
+						message = 'INVALID SIGNATURE, FALLBACK TO DEFAULT FLOW';
 					}
 					set_transactionProcessing(false);
 					return onCallback('error', message);
@@ -269,6 +271,8 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 						let message = undefined;
 						if (error?.data?.message?.includes('revert out too low')) {
 							message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
+						} else if (error?.message?.includes('execution reverted')) {
+							message = 'INVALID SIGNATURE, FALLBACK TO DEFAULT FLOW';
 						}
 						set_transactionProcessing(false);
 						return onCallback('error', message);
@@ -286,7 +290,7 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 				return performV2Swap();
 			} else {
 				let message = undefined;
-				if (error?.data?.message?.includes('revert out too low')) {
+				if (error?.message?.includes('revert out too low')) {
 					message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
 				}
 				set_transactionProcessing(false);
@@ -326,7 +330,7 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 	);
 }
 
-function	ButtonApprove({fromVault, fromAmount, approved, disabled, set_signature, onCallback}) {
+function	ButtonApprove({fromVault, fromAmount, approved, disabled, set_signature, canSign, onCallback}) {
 	const	{provider} = useWeb3();
 	const	[transactionProcessing, set_transactionProcessing] = useState(false);
 	const	[DEBUG_TX, set_DEBUG_TX] = useState(-1);
@@ -367,6 +371,9 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, set_signature
 		}
 		set_transactionProcessing(true);
 		onCallback('pending');
+		if (!canSign) {
+			return approveTx();
+		}
 		try {
 			signTransaction({
 				provider: provider,
@@ -442,6 +449,7 @@ function	Bowswap({yearnVaultData, prices}) {
 	const	[txApproveStatus, set_txApproveStatus] = useState({none: true, pending: false, success: false, error: false});
 	const	[txSwapStatus, set_txSwapStatus] = useState({none: true, pending: false, success: false, error: false});
 	const	[signature, set_signature] = useState(null);
+	const	[canSign, set_canSign] = useState(true);
 
 	function	resetStates() {
 		set_signature(null);
@@ -731,6 +739,7 @@ function	Bowswap({yearnVaultData, prices}) {
 						fromVault={fromVault}
 						fromAmount={fromAmount}
 						set_signature={set_signature}
+						canSign={canSign}
 						onCallback={(type, message) => {
 							set_txApproveStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success', message});
 							if (type === 'error') {
@@ -752,9 +761,21 @@ function	Bowswap({yearnVaultData, prices}) {
 						signature={signature}
 						shouldIncreaseGasLimit={Number(balanceOfFromVault) < Number(fromAmount)}
 						onCallback={(type, message) => {
+							set_txApproveStatus({none: false, pending: false, error: false, success: true, hide: true, message: null});
+
 							set_txSwapStatus({none: false, pending: type === 'pending', error: type === 'error', success: type === 'success', message});
 							if (type === 'error') {
-								setTimeout(() => set_txSwapStatus((s) => s.error ? {none: true, pending: false, error: false, success: false, message} : s), 2500);
+								if (message === 'INVALID SIGNATURE, FALLBACK TO DEFAULT FLOW') {
+									setTimeout(() => {
+										set_canSign(false);
+										set_signature(null);
+										set_txApproveStatus({none: true, pending: false, error: false, success: false, message: undefined});
+										set_txSwapStatus({none: true, pending: false, error: false, success: false});
+									}, 2500);
+
+								} else {
+									setTimeout(() => set_txSwapStatus((s) => s.error ? {none: true, pending: false, error: false, success: false, message} : s), 2500);
+								}
 							}
 							if (type === 'success') {
 								updateBalanceOf([fromVault.address, toVault.address]);

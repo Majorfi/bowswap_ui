@@ -151,7 +151,7 @@ export async function	metapoolSwapTokensWithSignature({provider, contractAddress
 			signature,
 		);
 	} catch (error) {
-		callback({error: true, data: undefined});
+		callback({error, data: undefined});
 		return;
 	}
 
@@ -177,7 +177,7 @@ export async function	metapoolSwapTokensWithSignature({provider, contractAddress
 			callback({error: true, data: undefined});
 		}
 	} catch (error) {
-		callback({error: error, data: undefined});
+		callback({error, data: undefined});
 	}
 }
 
@@ -253,7 +253,7 @@ export async function	swapTokensWithSignature({provider, contractAddress, from, 
 			signature
 		);
 	} catch (error) {
-		callback({error: true, data: undefined});
+		callback({error, data: undefined});
 		return;
 	}
 
@@ -290,7 +290,7 @@ export async function	swapTokensWithSignature({provider, contractAddress, from, 
 			callback({error: true, data: undefined});
 		}
 	} catch (error) {
-		callback({error: error, data: undefined});
+		callback({error, data: undefined});
 	}
 }
 

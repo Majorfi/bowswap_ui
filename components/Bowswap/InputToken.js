@@ -11,18 +11,23 @@ import	PopoverSlippage					from	'components/Bowswap/PopoverSlippage';
 
 function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decimals, fromCounterValue, disabled}) {
 	const	inputRef = useRef();
+	const	[isMounted, set_isMounted] = React.useState(false);
 
 	useEffect(() => {
 		if (inputRef?.current) {
 			let inputWitdh = (value.length * 20) + 3;
 			if (String(value).includes('.')) {
-				inputWitdh -= 8;
+				inputWitdh -= 10;
+			}
+			if (value.length >= 9) {
+				inputWitdh += 3;
 			}
 			if (value.length === 0) {
 				inputRef.current.style.width = `${1}px`;
 			} else {
-				inputRef.current.style.width = `${inputWitdh + 2}px`;
+				inputRef.current.style.width = `${inputWitdh + 1}px`;
 			}
+			set_isMounted(true);
 		}
 	}, [value]);
 
@@ -63,7 +68,7 @@ function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decima
 			</div>
 			<label
 				htmlFor={'fromInput'}
-				className={`with-placeholder placeholder-${value.length} flex justify-end w-full h-10 text-4xl font-medium text-ygray-900 text-opacity-20 proportional-nums cursor-text ${disabled ? 'cursor-not-allowed' : 'cursor-text'}`}>
+				className={`with-placeholder placeholder-${!isMounted ? 100 : value.length} flex justify-end w-full h-10 text-4xl font-medium text-ygray-900 text-opacity-20 proportional-nums cursor-text ${disabled ? 'cursor-not-allowed' : 'cursor-text'}`}>
 				<input
 					ref={inputRef}
 					id={'fromInput'}
