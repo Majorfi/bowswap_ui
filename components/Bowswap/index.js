@@ -237,6 +237,8 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 						message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
 					} else if (error?.data?.message?.includes('execution reverted')) {
 						message = 'INVALID SIGNATURE, FALLBACK TO DEFAULT FLOW';
+					} else {
+						message = 'INVALID SIGNATURE, FALLBACK TO DEFAULT FLOW';
 					}
 					set_transactionProcessing(false);
 					return onCallback('error', message);
@@ -272,6 +274,8 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 						if (error?.data?.message?.includes('revert out too low')) {
 							message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
 						} else if (error?.message?.includes('execution reverted')) {
+							message = 'INVALID SIGNATURE, FALLBACK TO DEFAULT FLOW';
+						} else {
 							message = 'INVALID SIGNATURE, FALLBACK TO DEFAULT FLOW';
 						}
 						set_transactionProcessing(false);
