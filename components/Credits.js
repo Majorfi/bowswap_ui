@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Sunday August 8th 2021
-**	@Filename:				Credits.js
-******************************************************************************/
-
 import	React	from	'react';
 
 function	Credits() {

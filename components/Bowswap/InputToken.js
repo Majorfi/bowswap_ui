@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Thursday July 29th 2021
-**	@Filename:				InputToken.js
-******************************************************************************/
-
 import	React, {useEffect, useRef}		from	'react';
 import	{ethers}						from	'ethers';
 import	PopoverSlippage					from	'components/Bowswap/PopoverSlippage';

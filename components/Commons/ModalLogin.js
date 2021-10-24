@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Sunday July 4th 2021
-**	@Filename:				ModalLogin.js
-******************************************************************************/
-
 import	React, {Fragment, useRef}		from	'react';
 import	{Dialog, Transition}			from	'@headlessui/react';
 import	Image							from	'next/image';

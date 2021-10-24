@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Thursday August 19th 2021
-**	@Filename:				TableBody.js
-******************************************************************************/
-
 import	React		from	'react';
 import	TableRow	from	'components/YVempire/TableRow';
 import {ethers} from 'ethers';

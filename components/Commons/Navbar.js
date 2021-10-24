@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Sunday July 4th 2021
-**	@Filename:				Navbar.js
-******************************************************************************/
-
 import	React, {useState}		from	'react';
 import	Image					from	'next/image';
 import	useWeb3					from	'contexts/useWeb3';

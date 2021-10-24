@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Saturday July 31st 2021
-**	@Filename:				Success.js
-******************************************************************************/
-
 import	React				from	'react';
 
 function Icon({width = 84, height = 84, className}) {

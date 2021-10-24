@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Thursday July 29th 2021
-**	@Filename:				InputTokenDisabled.js
-******************************************************************************/
-
 import	React				from	'react';
 import	{ethers}			from	'ethers';
 

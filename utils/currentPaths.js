@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Thursday August 19th 2021
-**	@Filename:				currentPaths.js
-******************************************************************************/
-
 const	True = true;
 const	False = false;
 const	CURRENT_PATHS = [

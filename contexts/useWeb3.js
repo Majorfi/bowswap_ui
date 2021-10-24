@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Sunday June 13th 2021
-**	@Filename:				useWeb3.js
-******************************************************************************/
-
 import	React, {useState, useEffect, useContext, createContext, useCallback}	from	'react';
 import	{ethers}																from	'ethers';
 import	QRCodeModal																from	'@walletconnect/qrcode-modal';

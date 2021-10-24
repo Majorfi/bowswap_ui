@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Sunday June 13th 2021
-**	@Filename:				_app.js
-******************************************************************************/
-
 import	React, {useState, useEffect}	from	'react';
 import	Head							from	'next/head';
 import	{DefaultSeo}					from	'next-seo';

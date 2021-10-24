@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Thursday August 19th 2021
-**	@Filename:				index.js
-******************************************************************************/
-
 import	React, {useState, useEffect, useCallback}		from	'react';
 import	{ethers}										from	'ethers';
 import	useWeb3											from	'contexts/useWeb3';

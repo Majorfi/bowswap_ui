@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Thursday July 29th 2021
-**	@Filename:				PopoverSlippage.js
-******************************************************************************/
-
 import	React, {Fragment, useRef, useEffect, useState}	from	'react';
 import	{Popover, Transition}					from	'@headlessui/react';
 

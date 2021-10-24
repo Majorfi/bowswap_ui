@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Sunday July 4th 2021
-**	@Filename:				ModalLogin.js
-******************************************************************************/
-
 import	React, {Fragment}		from	'react';
 import	{Transition}			from	'@headlessui/react';
 import	Pong					from	'components/Commons/Pong';
