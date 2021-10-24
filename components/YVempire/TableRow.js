@@ -1,9 +1,3 @@
-/******************************************************************************
-**	@Author:				Bowswap
-**	@Date:					Thursday August 19th 2021
-**	@Filename:				TableBody.js
-******************************************************************************/
-
 import	React, {useState}			from	'react';
 import	Image						from	'next/image';
 import	{ethers}					from	'ethers';

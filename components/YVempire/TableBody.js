@@ -1,9 +1,12 @@
+<<<<<<< HEAD
 /******************************************************************************
 **	@Author:				Bowswap
 **	@Date:					Thursday August 19th 2021
 **	@Filename:				TableBody.js
 ******************************************************************************/
 
+=======
+>>>>>>> 1029127fdace860cc962d3544ed0aa3a9de9628f
 import	React		from	'react';
 import	TableRow	from	'components/YVempire/TableRow';
 import {ethers} from 'ethers';

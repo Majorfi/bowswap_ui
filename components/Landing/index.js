@@ -1,9 +1,3 @@
-/******************************************************************************
-**	@Author:				Bowswap
-**	@Date:					Wednesday August 25th 2021
-**	@Filename:				index.js
-******************************************************************************/
-
 import	React					from	'react';
 import	Image					from	'next/image';
 import	Link					from	'next/link';

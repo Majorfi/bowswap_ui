@@ -1,9 +1,12 @@
+<<<<<<< HEAD
 /******************************************************************************
 **	@Author:				Bowswap
 **	@Date:					Thursday July 29th 2021
 **	@Filename:				useDebounce.js
 ******************************************************************************/
 
+=======
+>>>>>>> 1029127fdace860cc962d3544ed0aa3a9de9628f
 import {useState, useEffect} from 'react';
 
 function useDebounce(value, delay) {

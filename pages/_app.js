@@ -1,9 +1,12 @@
+<<<<<<< HEAD
 /******************************************************************************
 **	@Author:				Bowswap
 **	@Date:					Sunday June 13th 2021
 **	@Filename:				_app.js
 ******************************************************************************/
 
+=======
+>>>>>>> 1029127fdace860cc962d3544ed0aa3a9de9628f
 import	React, {useState, useEffect}	from	'react';
 import	Head							from	'next/head';
 import	{DefaultSeo}					from	'next-seo';

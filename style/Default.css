@@ -1,9 +1,3 @@
-/******************************************************************************
-**	@Author:				Bowswap
-**	@Date:					Tuesday September 28th 2021
-**	@Filename:				Default.css
-******************************************************************************/
-
 html {
 	background-color: #F2F3F5;
 }
@@ -16,7 +10,7 @@ html {
 	height: 100%
 }
 
-::placeholder {
+/* ::placeholder { */
 	color: #C5C6C7 !important;
 }
 :-ms-input-placeholder,

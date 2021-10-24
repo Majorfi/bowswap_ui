@@ -1,9 +1,3 @@
-/******************************************************************************
-**	@Author:				Bowswap
-**	@Date:					Wednesday September 29th 2021
-**	@Filename:				next.config.js
-******************************************************************************/
-
 const Dotenv = require('dotenv-webpack');
 
 module.exports = ({
@@ -12,8 +6,9 @@ module.exports = ({
 	],
 	env: {
 		ALCHEMY_KEY: process.env.ALCHEMY_KEY,
-		METAPOOL_SWAPPER_ADDRESS: process.env.METAPOOL_SWAPPER_ADDRESS,
-		VYEMPIRE_SWAPPER: process.env.VYEMPIRE_SWAPPER,
+		SIGNATURE_METAPOOL_SWAPPER_ADDRESS: '0xF12eeAB1C759dD7D8C012CcA6d8715EEd80e51b6',
+		METAPOOL_SWAPPER_ADDRESS: '0xF12eeAB1C759dD7D8C012CcA6d8715EEd80e51b6',
+		VYEMPIRE_SWAPPER: '0xEB8D98f9E42a15b0Eb35315F737bdfDa1a8D2Eaa',
 		SECRET: process.env.SECRET,
 	},
 	optimization: {
