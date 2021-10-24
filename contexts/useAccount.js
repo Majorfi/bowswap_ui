@@ -6,6 +6,7 @@
 ******************************************************************************/
 
 import	React, {useContext, useState, useEffect, createContext}	from	'react';
+import	{ethers}							from	'ethers';
 import	{Provider, Contract}				from	'ethcall';
 import	useWeb3								from	'contexts/useWeb3';
 import	{toAddress}							from	'utils';
@@ -19,7 +20,8 @@ import	BOWSWAP_CRV_V2_VAULTS				from	'utils/BOWSWAP_CRV_V2_VAULTS';
 
 const	ERC20ABI = [{'constant':true,'inputs':[],'name':'name','outputs':[{'name':'','type':'string'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_spender','type':'address'},{'name':'_value','type':'uint256'}],'name':'approve','outputs':[{'name':'','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[],'name':'totalSupply','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_from','type':'address'},{'name':'_to','type':'address'},{'name':'_value','type':'uint256'}],'name':'transferFrom','outputs':[{'name':'','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[],'name':'decimals','outputs':[{'name':'','type':'uint8'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[{'name':'_owner','type':'address'}],'name':'balanceOf','outputs':[{'name':'balance','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[],'name':'symbol','outputs':[{'name':'','type':'string'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_to','type':'address'},{'name':'_value','type':'uint256'}],'name':'transfer','outputs':[{'name':'','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[{'name':'_owner','type':'address'},{'name':'_spender','type':'address'}],'name':'allowance','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'payable':true,'stateMutability':'payable','type':'fallback'},{'anonymous':false,'inputs':[{'indexed':true,'name':'owner','type':'address'},{'indexed':true,'name':'spender','type':'address'},{'indexed':false,'name':'value','type':'uint256'}],'name':'Approval','type':'event'},{'anonymous':false,'inputs':[{'indexed':true,'name':'from','type':'address'},{'indexed':true,'name':'to','type':'address'},{'indexed':false,'name':'value','type':'uint256'}],'name':'Transfer','type':'event'}];
 
-const AccountContext = createContext();
+const	AccountContext = createContext();
+const	fetcher = (...args) => fetch(...args).then(res => res.json());
 
 export const AccountContextApp = ({children}) => {
 	const	{active, provider, getProvider, address} = useWeb3();
@@ -58,7 +60,10 @@ export const AccountContextApp = ({children}) => {
 	}
 
 	async function	retrieveYVempireBalances() {
-		const	vaults = [...COMPOUND, ...AAVE_V1, ...AAVE_V2].map(e => e.uToken.address);
+		const	LENDERS = [...COMPOUND, ...AAVE_V1, ...AAVE_V2];
+		const	vaults = LENDERS.map(e => e.uToken.address);
+		const	ids = [...new Set(LENDERS.map(e => e.cgID))];
+		const	_prices = await fetcher(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`);
 		const	vaultsNoDuplicates = [...new Set(vaults)];
 		const	ethcallProvider = new Provider();
 		const	{chainId} = await provider.getNetwork();
@@ -76,17 +81,24 @@ export const AccountContextApp = ({children}) => {
 			multiCalls.push(vaulContract.allowance(address, toAddress(process.env.VYEMPIRE_SWAPPER)));
 		});
 		const callResult = await ethcallProvider.all(multiCalls);
-
 		let	index = 0;
 		let	_yVempireNotificationCounter = 0;
 		(vaultsNoDuplicates).forEach((vaultAddress) => {
 			if (!callResult[index].isZero()) {
-				_yVempireNotificationCounter += 1;
+				const	lender = LENDERS.find(e => e.uToken.address === vaultAddress);
+				const	price = _prices[lender.cgID].usd;
+				const	decimals = lender.decimals;
+				const	value = ethers.utils.formatUnits(callResult[index], decimals) * price;
+				if (Number(value) >= 100) {
+					_yVempireNotificationCounter += 1;
+				}
 			}
 			set_balancesOf((b) => {b[vaultAddress] = callResult[index]; return b;});
 			set_allowances((b) => {b[vaultAddress] = callResult[index + 1]; return b;});			
 			index += 2;
 		});
+
+
 		set_yVempireNotificationCounter(_yVempireNotificationCounter);
 		set_nonce(n => n + 1);
 	}
