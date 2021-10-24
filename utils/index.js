@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Thursday March 18th 2021
-**	@Filename:				index.js
-******************************************************************************/
-
 import	{ethers}						from	'ethers';
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';

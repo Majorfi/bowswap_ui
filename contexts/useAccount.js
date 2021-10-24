@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Sunday June 13th 2021
-**	@Filename:				useAccount.js
-******************************************************************************/
-
 import	React, {useContext, useState, useEffect, createContext}	from	'react';
 import	{Provider, Contract}				from	'ethcall';
 import	useWeb3								from	'contexts/useWeb3';

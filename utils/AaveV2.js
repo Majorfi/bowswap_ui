@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Thursday August 12th 2021
-**	@Filename:				AaveV2.js
-******************************************************************************/
-
 const	AAVE_V2 = [
 	{
 		service: 2,

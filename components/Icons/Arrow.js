@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Saturday July 31st 2021
-**	@Filename:				Arrow.js
-******************************************************************************/
-
 import	React				from	'react';
 
 function Icon({width = 32, height = 20, className}) {

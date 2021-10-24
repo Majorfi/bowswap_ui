@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Saturday January 2nd 2021
-**	@Filename:				API.js
-******************************************************************************/
-
 import	axios			from	'axios';
 
 export const	performGet = (url) => {

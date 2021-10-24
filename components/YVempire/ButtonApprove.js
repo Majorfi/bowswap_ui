@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Thursday August 19th 2021
-**	@Filename:				ButtonApprove.js
-******************************************************************************/
-
 import	React, {useState}			from	'react';
 import	{ethers}					from	'ethers';
 import	useWeb3						from	'contexts/useWeb3';

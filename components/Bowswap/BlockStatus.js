@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Saturday July 31st 2021
-**	@Filename:				BlockStatus.js
-******************************************************************************/
-
 import	React, {Fragment}	from	'react';
 import	{Transition}		from	'@headlessui/react';
 import	Arrow				from	'components/Icons/Arrow';

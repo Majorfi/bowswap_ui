@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Thursday August 19th 2021
-**	@Filename:				ButtonMigrate.js
-******************************************************************************/
-
 import	React, {useState}			from	'react';
 import	useWeb3						from	'contexts/useWeb3';
 import	{migrateBachTokens}			from	'utils/actions';

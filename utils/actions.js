@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Wednesday July 14th 2021
-**	@Filename:				actions.js
-******************************************************************************/
-
 import	{ethers}						from	'ethers';
 
 export async function	signTransaction({provider, vaultAddress, contractAddress, amount, nonceOverwrite}, callback) {

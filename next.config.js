@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Monday August 24th 2020
-**	@Filename:				next.config.js
-******************************************************************************/
-
 const Dotenv = require('dotenv-webpack');
 
 module.exports = ({

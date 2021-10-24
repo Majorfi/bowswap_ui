@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Wednesday August 11th 2021
-**	@Filename:				Pong.js
-******************************************************************************/
-
 // FROM HERE https://codepen.io/gdube/pen/JybxxZ
 
 // Global letiables

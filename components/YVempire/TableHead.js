@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Thursday August 19th 2021
-**	@Filename:				TableaHead.js
-******************************************************************************/
-
 import	React	from	'react';
 
 function	TableHead({from, to}) {

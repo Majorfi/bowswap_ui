@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Tuesday August 17th 2021
-**	@Filename:				Tabs.js
-******************************************************************************/
-
 import	React			from	'react';
 import	{useRouter}		from	'next/router';
 
