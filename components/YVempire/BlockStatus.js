@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-/******************************************************************************
-**	@Author:				Bowswap
-**	@Date:					Saturday July 31st 2021
-**	@Filename:				BlockStatus.js
-******************************************************************************/
-
-=======
->>>>>>> 1029127fdace860cc962d3544ed0aa3a9de9628f
 import	React, {Fragment}	from	'react';
 import	{Transition}		from	'@headlessui/react';
 

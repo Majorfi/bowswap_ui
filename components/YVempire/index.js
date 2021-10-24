@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-/******************************************************************************
-**	@Author:				Bowswap
-**	@Date:					Wednesday August 18th 2021
-**	@Filename:				yVempire.js
-******************************************************************************/
-
-=======
->>>>>>> 1029127fdace860cc962d3544ed0aa3a9de9628f
 import	React, {useState, useEffect, useCallback}			from	'react';
 import	{ethers}											from	'ethers';
 import	useWeb3												from	'contexts/useWeb3';

@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-/******************************************************************************
-**	@Author:				Bowswap
-**	@Date:					Saturday January 2nd 2021
-**	@Filename:				API.js
-******************************************************************************/
-
-=======
->>>>>>> 1029127fdace860cc962d3544ed0aa3a9de9628f
 import	axios			from	'axios';
 
 export const	performGet = (url) => {

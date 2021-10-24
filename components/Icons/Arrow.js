@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-/******************************************************************************
-**	@Author:				Bowswap
-**	@Date:					Saturday July 31st 2021
-**	@Filename:				Arrow.js
-******************************************************************************/
-
-=======
->>>>>>> 1029127fdace860cc962d3544ed0aa3a9de9628f
 import	React				from	'react';
 
 function Icon({width = 32, height = 20, className}) {

@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-/******************************************************************************
-**	@Author:				Bowswap
-**	@Date:					Tuesday August 10th 2021
-**	@Filename:				useSecret.js
-******************************************************************************/
-
-=======
->>>>>>> 1029127fdace860cc962d3544ed0aa3a9de9628f
 import {useEffect, useState} from 'react';
 import {useInputEvent} from 'hook/useInputEvent';
 

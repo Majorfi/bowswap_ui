@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-/******************************************************************************
-**	@Author:				Bowswap
-**	@Date:					Thursday August 19th 2021
-**	@Filename:				currentPaths.js
-******************************************************************************/
-
-=======
->>>>>>> 1029127fdace860cc962d3544ed0aa3a9de9628f
 const	True = true;
 const	False = false;
 const	CURRENT_PATHS = [

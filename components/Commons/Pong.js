@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-/******************************************************************************
-**	@Author:				Bowswap
-**	@Date:					Wednesday August 11th 2021
-**	@Filename:				Pong.js
-******************************************************************************/
-
-=======
->>>>>>> 1029127fdace860cc962d3544ed0aa3a9de9628f
 // FROM HERE https://codepen.io/gdube/pen/JybxxZ
 
 // Global letiables

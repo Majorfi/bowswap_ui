@@ -1,12 +1,9 @@
-<<<<<<< HEAD
 /******************************************************************************
 **	@Author:				Bowswap
 **	@Date:					Sunday July 4th 2021
 **	@Filename:				ModalLogin.js
 ******************************************************************************/
 
-=======
->>>>>>> 1029127fdace860cc962d3544ed0aa3a9de9628f
 import	React, {Fragment, useRef}		from	'react';
 import	{Dialog, Transition}			from	'@headlessui/react';
 import	Image							from	'next/image';

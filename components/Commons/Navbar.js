@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-/******************************************************************************
-**	@Author:				Bowswap
-**	@Date:					Sunday July 4th 2021
-**	@Filename:				Navbar.js
-******************************************************************************/
-
-=======
->>>>>>> 1029127fdace860cc962d3544ed0aa3a9de9628f
 import	React, {useState}		from	'react';
 import	Image					from	'next/image';
 import	useWeb3					from	'contexts/useWeb3';

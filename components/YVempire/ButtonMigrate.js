@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-/******************************************************************************
-**	@Author:				Bowswap
-**	@Date:					Thursday August 19th 2021
-**	@Filename:				ButtonMigrate.js
-******************************************************************************/
-
-=======
->>>>>>> 1029127fdace860cc962d3544ed0aa3a9de9628f
 import	React, {useState}			from	'react';
 import	useWeb3						from	'contexts/useWeb3';
 import	{migrateBachTokens}			from	'utils/actions';
