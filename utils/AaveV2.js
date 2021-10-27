@@ -154,8 +154,8 @@ const	AAVE_V2 = [
 		},
 		yvToken: {
 			name: 'yvRAI',
-			image: '/yvTokens/0x671a912C10bba0CFA74Cfc2d6Fba9BA1ed9530B2.svg',
-			address: '0x671a912C10bba0CFA74Cfc2d6Fba9BA1ed9530B2',
+			image: '/yvTokens/0x873fB544277FD7b977B196a826459a69E27eA4ea.svg',
+			address: '0x873fB544277FD7b977B196a826459a69E27eA4ea',
 			apy: 0,
 		}
 	},
@@ -214,8 +214,8 @@ const	AAVE_V2 = [
 		},
 		yvToken: {
 			name: 'yvYFI',
-			image: '/yvTokens/0xE14d13d8B3b85aF791b2AADD661cDBd5E6097Db1.svg',
-			address: '0xE14d13d8B3b85aF791b2AADD661cDBd5E6097Db1',
+			image: '/yvTokens/0xdb25cA703181E7484a155DD612b06f57E12Be5F0.svg',
+			address: '0xdb25cA703181E7484a155DD612b06f57E12Be5F0',
 			apy: 0,
 		}
 	},
