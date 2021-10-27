@@ -154,8 +154,8 @@ const	COMPOUND = [
 		},
 		yvToken: {
 			name: 'yvYFI',
-			image: '/yvTokens/0xE14d13d8B3b85aF791b2AADD661cDBd5E6097Db1.svg',
-			address: '0xE14d13d8B3b85aF791b2AADD661cDBd5E6097Db1',
+			image: '/yvTokens/0xdb25cA703181E7484a155DD612b06f57E12Be5F0.svg',
+			address: '0xdb25cA703181E7484a155DD612b06f57E12Be5F0',
 			apy: 0,
 		}
 	},
