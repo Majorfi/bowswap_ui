@@ -13,7 +13,7 @@ import	Pending								from	'components/Icons/Pending';
 
 function	YVempire() {
 	const	{address} = useWeb3();
-	const	{balancesOf, allowances, set_balancesOf, set_allowances, set_yVempireNotificationCounter, yearnVaultData, yVempireData} = useAccount();
+	const	{balancesOf, allowances, set_balancesOf, set_allowances, yearnVaultData, yVempireData} = useAccount();
 	const	[, set_nonce] = useState(0);
 	const	[selectedTokens, set_selectedTokens] = useState([]);
 
@@ -128,7 +128,6 @@ function	YVempire() {
 								setTimeout(() => set_txMigrateStatus((s) => s.error ? {none: true, pending: false, error: false, success: false} : s), 2500);
 							}
 							if (type === 'success') {
-								set_yVempireNotificationCounter(n => n - selectedTokensList.length);
 								resetUTokenBalances(selectedTokensList);
 								set_txApproveStatus({none: true, pending: false, success: false, error: false, step: ''});
 								setTimeout(() => {
