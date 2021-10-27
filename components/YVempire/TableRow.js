@@ -5,14 +5,14 @@ import	Arrow						from	'components/Icons/Arrow';
 import	{formatAmount}				from	'utils';
 
 function	TableRow({pair, balanceOf, yearnVaultData, selectedTokens, set_nonce, onSelectToken}) {
-	const	[isChecked, set_isChecked] = useState(false); //used to update the localstate
+	const	[isChecked, set_isChecked] = useState(false);
 	const	disabled = balanceOf?.isZero() || !balanceOf;
+	if (pair?.uToken?.isHidden) {
+		return null;
+	}
 
 	const	yearnAPY = Number((yearnVaultData?.apy?.net_apy || 0) * 100);
 	const	uAPY = Number(pair.uToken.apy);
-	if (uAPY > yearnAPY) {
-		return null;
-	}
 
 	return (
 		<tr className={'bg-white z-10 relative'}>

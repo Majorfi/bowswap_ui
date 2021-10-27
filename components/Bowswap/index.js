@@ -427,9 +427,9 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, set_signature
 	);
 }
 
-function	Bowswap({yearnVaultData, prices}) {
+function	Bowswap({prices}) {
 	const	{provider} = useWeb3();
-	const	{balancesOf, updateBalanceOf, allowances} = useAccount();
+	const	{balancesOf, updateBalanceOf, allowances, yearnVaultData} = useAccount();
 	const	[, set_nonce] = useState(0);
 	const	[fromVault, set_fromVault] = useLocalStorage('fromVault', BOWSWAP_CRV_USD_VAULTS[0]);
 	const	[fromCounterValue, set_fromCounterValue] = useLocalStorage('fromCounterValue', 0);
