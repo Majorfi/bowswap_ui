@@ -42,7 +42,6 @@ export async function	signTransaction({provider, vaultAddress, contractAddress, 
 	} catch (error) {
 		return callback({error: error, data: undefined});
 	}
-	console.log({signature});
 
 	return callback({error: false, data: signature});
 }

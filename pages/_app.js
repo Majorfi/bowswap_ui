@@ -6,22 +6,17 @@ import	{ethers}						from	'ethers';
 import	useSWR							from	'swr';
 import	FullConfetti					from	'react-confetti';
 import	useWeb3, {Web3ContextApp}		from	'contexts/useWeb3';
-import	useAccount, {AccountContextApp}	from	'contexts/useAccount';
+import	{AccountContextApp}				from	'contexts/useAccount';
 import	useLocalStorage					from	'hook/useLocalStorage';
 import	Credits							from	'components/Credits';
 import	Navbar							from	'components/Commons/Navbar';
 import	ModalPong						from	'components/Commons/ModalPong';
 import	Tabs							from	'components/Commons/Tabs';
 import	useSecret						from	'hook/useSecret';
-import	{fetchYearnVaults}				from	'utils/API';
-import	AAVE_V1							from	'utils/AaveV1';
-import	AAVE_V2							from	'utils/AaveV2';
-import	COMPOUND						from	'utils/Compound';
 
 import	'style/Default.css';
 import	'tailwindcss/tailwind.css';
 
-const	PAIRS = [...COMPOUND, ...AAVE_V1, ...AAVE_V2];
 const	fetcher = (...args) => fetch(...args).then(res => res.json());
 const	useSecretCode = () => {
 	const secretCode = process.env.SECRET.split(',');
@@ -31,12 +26,11 @@ const	useSecretCode = () => {
 
 function	WithLayout({children, hasSecret}) {
 	const	[triggerPong, set_triggerPong] = useState(false);
-	const	{yVempireNotificationCounter} = useAccount();
 	return (
 		<section className={'w-full md:px-12 px-4 space-y-12 mb-64 z-10 relative'}>
 			<div className={'flex flex-col w-full justify-center items-center'}>
 				<div className={'w-full max-w-2xl mb-2'}>
-					<Tabs yVempireNotificationCounter={yVempireNotificationCounter} />
+					<Tabs />
 				</div>
 				<div className={'w-full max-w-2xl'}>
 					{children}
@@ -64,8 +58,6 @@ function	AppWrapper(props) {
 	const	{active, address} = useWeb3();
 	const	{Component, pageProps, router} = props;
 	const	hasSecretCode = useSecretCode();
-	const	[yearnVaultData, set_yearnVaultData] = useState([]);
-	const	[yVempireData, set_yVempireData] = useState(PAIRS);
 	const	[prices, set_prices] = useLocalStorage('cgPrices', []);
 	const	{data} = useSWR(`https://api.coingecko.com/api/v3/simple/price?ids=${['bitcoin', 'ethereum', 'aave', 'chainlink', 'tether-eurt']}&vs_currencies=usd`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, refreshInterval: 30000, shouldRetryOnError: true, dedupingInterval: 1000, focusThrottleInterval: 5000});
 
@@ -79,15 +71,6 @@ function	AppWrapper(props) {
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [active, address]);
-
-	const	retrieveYearnVaults = React.useCallback(async () => {
-		const	vaults = await fetchYearnVaults();
-		set_yearnVaultData(vaults);
-	}, []);
-
-	useEffect(() => {
-		retrieveYearnVaults();
-	}, [retrieveYearnVaults]);
 
 	return (
 		<>
@@ -154,9 +137,6 @@ function	AppWrapper(props) {
 								router={props.router}
 								hasSecret={active && hasSecretCode}
 								prices={prices}
-								yearnVaultData={yearnVaultData}
-								yVempireData={yVempireData}
-								set_yVempireData={set_yVempireData}
 								{...pageProps} />
 						</WithLayout>
 					</div>

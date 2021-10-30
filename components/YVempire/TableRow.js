@@ -5,8 +5,14 @@ import	Arrow						from	'components/Icons/Arrow';
 import	{formatAmount}				from	'utils';
 
 function	TableRow({pair, balanceOf, yearnVaultData, selectedTokens, set_nonce, onSelectToken}) {
-	const	[isChecked, set_isChecked] = useState(false); //used to update the localstate
+	const	[isChecked, set_isChecked] = useState(false);
 	const	disabled = balanceOf?.isZero() || !balanceOf;
+	if (pair?.uToken?.isHidden) {
+		return null;
+	}
+
+	const	yearnAPY = Number((yearnVaultData?.apy?.net_apy || 0) * 100);
+	const	uAPY = Number(pair.uToken.apy);
 
 	return (
 		<tr className={'bg-white z-10 relative'}>
@@ -41,7 +47,7 @@ function	TableRow({pair, balanceOf, yearnVaultData, selectedTokens, set_nonce, o
 							</div>
 							<div className={'pl-4 text-left overflow-ellipsis'}>
 								<div className={'text-ybase font-medium whitespace-nowrap'}>{pair.uToken.name}</div>
-								<div className={'text-ybase text-ygray-400 overflow-ellipsis mt-1'}>{`${Number(pair.uToken.apy).toFixed(2)}%`}</div>
+								<div className={'text-ybase text-ygray-400 overflow-ellipsis mt-1'}>{`${uAPY.toFixed(2)}%`}</div>
 							</div>
 						</div>
 
@@ -61,7 +67,7 @@ function	TableRow({pair, balanceOf, yearnVaultData, selectedTokens, set_nonce, o
 								</div>
 								<div className={'pl-4 text-left overflow-ellipsis'}>
 									<div className={'text-ybase font-medium whitespace-nowrap'}>{pair.yvToken.name}</div>
-									<div key={pair.yvToken.apy} className={'text-ybase font-medium text-yblue overflow-ellipsis mt-1'}>{`${Number((yearnVaultData?.apy?.net_apy || 0) * 100).toFixed(2)}%`}</div>
+									<div key={pair.yvToken.apy} className={'text-ybase font-medium text-yblue overflow-ellipsis mt-1'}>{`${yearnAPY.toFixed(2)}%`}</div>
 								</div>
 							</div>
 						</div>

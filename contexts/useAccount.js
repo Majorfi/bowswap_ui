@@ -3,6 +3,7 @@ import	{ethers}							from	'ethers';
 import	{Provider, Contract}				from	'ethcall';
 import	useWeb3								from	'contexts/useWeb3';
 import	{toAddress}							from	'utils';
+import	{fetchYearnVaults}					from	'utils/API';
 import	AAVE_V1								from	'utils/AaveV1';
 import	AAVE_V2								from	'utils/AaveV2';
 import	COMPOUND							from	'utils/Compound';
@@ -11,21 +12,29 @@ import	BOWSWAP_CRV_BTC_VAULTS				from	'utils/BOWSWAP_CRV_BTC_VAULTS';
 import	BOWSWAP_CRV_USD_VAULTS				from	'utils/BOWSWAP_CRV_USD_VAULTS';
 import	BOWSWAP_CRV_V2_VAULTS				from	'utils/BOWSWAP_CRV_V2_VAULTS';
 
-const	ERC20ABI = [{'constant':true,'inputs':[],'name':'name','outputs':[{'name':'','type':'string'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_spender','type':'address'},{'name':'_value','type':'uint256'}],'name':'approve','outputs':[{'name':'','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[],'name':'totalSupply','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_from','type':'address'},{'name':'_to','type':'address'},{'name':'_value','type':'uint256'}],'name':'transferFrom','outputs':[{'name':'','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[],'name':'decimals','outputs':[{'name':'','type':'uint8'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[{'name':'_owner','type':'address'}],'name':'balanceOf','outputs':[{'name':'balance','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[],'name':'symbol','outputs':[{'name':'','type':'string'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_to','type':'address'},{'name':'_value','type':'uint256'}],'name':'transfer','outputs':[{'name':'','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[{'name':'_owner','type':'address'},{'name':'_spender','type':'address'}],'name':'allowance','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'payable':true,'stateMutability':'payable','type':'fallback'},{'anonymous':false,'inputs':[{'indexed':true,'name':'owner','type':'address'},{'indexed':true,'name':'spender','type':'address'},{'indexed':false,'name':'value','type':'uint256'}],'name':'Approval','type':'event'},{'anonymous':false,'inputs':[{'indexed':true,'name':'from','type':'address'},{'indexed':true,'name':'to','type':'address'},{'indexed':false,'name':'value','type':'uint256'}],'name':'Transfer','type':'event'}];
+const	LENDING_POOL_ADDRESS = '0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9';
+const	ERC20ABI = [
+	{'constant':true,'inputs':[],'name':'name','outputs':[{'name':'','type':'string'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_spender','type':'address'},{'name':'_value','type':'uint256'}],'name':'approve','outputs':[{'name':'','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[],'name':'totalSupply','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_from','type':'address'},{'name':'_to','type':'address'},{'name':'_value','type':'uint256'}],'name':'transferFrom','outputs':[{'name':'','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[],'name':'decimals','outputs':[{'name':'','type':'uint8'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[{'name':'_owner','type':'address'}],'name':'balanceOf','outputs':[{'name':'balance','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[],'name':'symbol','outputs':[{'name':'','type':'string'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_to','type':'address'},{'name':'_value','type':'uint256'}],'name':'transfer','outputs':[{'name':'','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[{'name':'_owner','type':'address'},{'name':'_spender','type':'address'}],'name':'allowance','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'payable':true,'stateMutability':'payable','type':'fallback'},{'anonymous':false,'inputs':[{'indexed':true,'name':'owner','type':'address'},{'indexed':true,'name':'spender','type':'address'},{'indexed':false,'name':'value','type':'uint256'}],'name':'Approval','type':'event'},{'anonymous':false,'inputs':[{'indexed':true,'name':'from','type':'address'},{'indexed':true,'name':'to','type':'address'},{'indexed':false,'name':'value','type':'uint256'}],'name':'Transfer','type':'event'}
+];
+const	LENDING_POOL_ABI = [
+	{'inputs':[{'internalType':'address','name':'asset','type':'address'}],'name':'getReserveData','outputs':[{'components':[{'components':[{'internalType':'uint256','name':'data','type':'uint256'}],'internalType':'struct DataTypes.ReserveConfigurationMap','name':'configuration','type':'tuple'},{'internalType':'uint128','name':'liquidityIndex','type':'uint128'},{'internalType':'uint128','name':'variableBorrowIndex','type':'uint128'},{'internalType':'uint128','name':'currentLiquidityRate','type':'uint128'},{'internalType':'uint128','name':'currentVariableBorrowRate','type':'uint128'},{'internalType':'uint128','name':'currentStableBorrowRate','type':'uint128'},{'internalType':'uint40','name':'lastUpdateTimestamp','type':'uint40'},{'internalType':'address','name':'aTokenAddress','type':'address'},{'internalType':'address','name':'stableDebtTokenAddress','type':'address'},{'internalType':'address','name':'variableDebtTokenAddress','type':'address'},{'internalType':'address','name':'interestRateStrategyAddress','type':'address'},{'internalType':'uint8','name':'id','type':'uint8'}],'internalType':'struct DataTypes.ReserveData','name':'','type':'tuple'}],'stateMutability':'view','type':'function'}
+];
 
+
+const	PAIRS = [...COMPOUND, ...AAVE_V1, ...AAVE_V2];
 const	AccountContext = createContext();
 const	fetcher = (...args) => fetch(...args).then(res => res.json());
 
 export const AccountContextApp = ({children}) => {
 	const	{active, provider, getProvider, address} = useWeb3();
+	const	[yVempireData, set_yVempireData] = useState(PAIRS);
 	const	[nonce, set_nonce] = useState(0);
-	const	[yVempireNotificationCounter, set_yVempireNotificationCounter] = useState(0);
+	const	[yVempireNotificationCounter, set_yVempireNotificationCounter] = useState([]);
+	const	[yearnVaultData, set_yearnVaultData] = useState([]);
 	const	[balancesOf, set_balancesOf] = useState({});
 	const	[allowances, set_allowances] = useState({});
 
-	async function	retrieveBowswapBalances() {
-		const	crvVaults = [...BOWSWAP_CRV_USD_VAULTS, ...BOWSWAP_CRV_BTC_VAULTS, ...BOWSWAP_CRV_EUR_VAULTS, ...BOWSWAP_CRV_V2_VAULTS].map(e => e.address);
-		const	crvVaultsNoDuplicates = [...new Set(crvVaults)];
+	async function	multiCallProvider(provider) {
 		const	ethcallProvider = new Provider();
 		const	{chainId} = await provider.getNetwork();
 		if (chainId === 1337) {
@@ -34,7 +43,13 @@ export const AccountContextApp = ({children}) => {
 		} else {
 			await ethcallProvider.init(provider);
 		}
+		return ethcallProvider;
+	}
 
+	async function	retrieveBowswapBalances() {
+		const	crvVaults = [...BOWSWAP_CRV_USD_VAULTS, ...BOWSWAP_CRV_BTC_VAULTS, ...BOWSWAP_CRV_EUR_VAULTS, ...BOWSWAP_CRV_V2_VAULTS].map(e => e.address);
+		const	crvVaultsNoDuplicates = [...new Set(crvVaults)];
+		const	ethcallProvider = await multiCallProvider(provider);
 		const	multiCalls = [];
 		(crvVaultsNoDuplicates).forEach((vaultAddress) => {
 			const	contract = new Contract(vaultAddress, ERC20ABI);
@@ -49,24 +64,13 @@ export const AccountContextApp = ({children}) => {
 			set_allowances((b) => {b[vaultAddress] = callResult[index + 1]; return b;});			
 			index += 2;
 		});
-		set_nonce(n => n + 1);
 	}
 
-	async function	retrieveYVempireBalances() {
+	async function	retrieveYVempireBalances({_prices}) {
 		const	LENDERS = [...COMPOUND, ...AAVE_V1, ...AAVE_V2];
 		const	vaults = LENDERS.map(e => e.uToken.address);
-		const	ids = [...new Set(LENDERS.map(e => e.cgID))];
-		const	_prices = await fetcher(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`);
 		const	vaultsNoDuplicates = [...new Set(vaults)];
-		const	ethcallProvider = new Provider();
-		const	{chainId} = await provider.getNetwork();
-		if (chainId === 1337) {
-			await ethcallProvider.init(getProvider('major'));
-			ethcallProvider.multicallAddress = '0xeefba1e63905ef1d7acba5a8513c70307c1ce441';
-		} else {
-			await ethcallProvider.init(provider);
-		}
-
+		const	ethcallProvider = await multiCallProvider(provider);
 		const	multiCalls = [];
 		vaultsNoDuplicates.forEach((vaultAddress) => {
 			const	vaulContract = new Contract(vaultAddress, ERC20ABI);
@@ -75,7 +79,7 @@ export const AccountContextApp = ({children}) => {
 		});
 		const callResult = await ethcallProvider.all(multiCalls);
 		let	index = 0;
-		let	_yVempireNotificationCounter = 0;
+		let	_yVempireNotificationCounter = {};
 		(vaultsNoDuplicates).forEach((vaultAddress) => {
 			if (!callResult[index].isZero()) {
 				const	lender = LENDERS.find(e => e.uToken.address === vaultAddress);
@@ -83,7 +87,7 @@ export const AccountContextApp = ({children}) => {
 				const	decimals = lender.decimals;
 				const	value = ethers.utils.formatUnits(callResult[index], decimals) * price;
 				if (Number(value) >= 100) {
-					_yVempireNotificationCounter += 1;
+					_yVempireNotificationCounter[vaultAddress] = value;
 				}
 			}
 			set_balancesOf((b) => {b[vaultAddress] = callResult[index]; return b;});
@@ -91,9 +95,40 @@ export const AccountContextApp = ({children}) => {
 			index += 2;
 		});
 
-
 		set_yVempireNotificationCounter(_yVempireNotificationCounter);
-		set_nonce(n => n + 1);
+	}
+
+	async function retrieveUTokenBalances({_yVaultsData}) {
+		const	aLendingPoolContract = new ethers.Contract(LENDING_POOL_ADDRESS, LENDING_POOL_ABI, provider);
+		const	_yVempireData = yVempireData;
+
+		for (let index = 0; index < _yVempireData.length; index++) {
+			const	pair = _yVempireData[index];
+			const	fromTokenContract = new ethers.Contract(pair.uToken.address, [
+				'function supplyRatePerBlock() view returns (uint256)'
+			], provider);
+			const	currentYearnVault = _yVaultsData.find(yv => yv.address === pair.yvToken.address);
+			_yVempireData[index].yvToken.apy = (currentYearnVault?.apy?.net_apy || 0) * 100;
+
+			if (pair.service === 0) {
+				const	supplyRatePerBlock = await fromTokenContract.supplyRatePerBlock();
+				const	ethMantissa = 1e18;
+				const	blocksPerDay = 6570;
+				const	daysPerYear = 365;
+				const	supplyApy = (((Math.pow((supplyRatePerBlock / ethMantissa * blocksPerDay) + 1, daysPerYear))) - 1) * 100;
+				_yVempireData[index].uToken.apy = supplyApy;
+			} else {
+				const	reserveData = await aLendingPoolContract.getReserveData(pair.underlyingAddress);
+				_yVempireData[index].uToken.apy = ethers.utils.formatUnits(reserveData.currentLiquidityRate, 25);
+			}
+
+			const	yearnAPY = Number((currentYearnVault?.apy?.net_apy || 0) * 100);
+			const	uAPY = Number(_yVempireData[index].uToken.apy);
+			if (uAPY > yearnAPY) {
+				_yVempireData[index].uToken.isHidden = true;
+			}
+			set_yVempireData(p => {p[index] = _yVempireData[index]; return p;});
+		}
 	}
 
 	useEffect(() => {
@@ -112,25 +147,29 @@ export const AccountContextApp = ({children}) => {
 		}
 	}, [address]);
 
+	async function updateData() {
+		const	LENDERS = [...COMPOUND, ...AAVE_V1, ...AAVE_V2];
+		const	ids = [...new Set(LENDERS.map(e => e.cgID))];
+		const	[_prices, _yVaultsData] = await Promise.all([
+			fetcher(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`),
+			fetchYearnVaults()
+		]);
+		set_yearnVaultData(_yVaultsData);
+		retrieveBowswapBalances();
+		retrieveYVempireBalances({_prices});
+		retrieveUTokenBalances({_yVaultsData});
+		set_nonce(n => n + 1);
+	}
+
 	useEffect(() => {
 		if (active && provider && address) {
-			retrieveBowswapBalances(),
-			retrieveYVempireBalances();
-			set_nonce(n => n + 1);
+			updateData();
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [provider, address, active]);
 
 	async function	updateBalanceOf(addresses) {
-		const	ethcallProvider = new Provider();
-		const	{chainId} = await provider.getNetwork();
-		if (chainId === 1337) {
-			await ethcallProvider.init(getProvider('major'));
-			ethcallProvider.multicallAddress = '0xeefba1e63905ef1d7acba5a8513c70307c1ce441';
-		} else {
-			await ethcallProvider.init(provider);
-		}
-
+		const	ethcallProvider = await multiCallProvider(provider);
 		const	multiCalls = [];
 		addresses.forEach((addr) => {
 			const	vaulContract = new Contract(addr, ERC20ABI);
@@ -156,7 +195,9 @@ export const AccountContextApp = ({children}) => {
 			set_allowances, 
 			balancesNonce: nonce,
 			yVempireNotificationCounter,
-			set_yVempireNotificationCounter
+			set_yVempireNotificationCounter,
+			yearnVaultData,
+			yVempireData,
 		}}>
 			{children}
 		</AccountContext.Provider>

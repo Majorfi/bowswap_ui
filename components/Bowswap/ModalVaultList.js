@@ -39,8 +39,8 @@ function	VaultList({element, onClick, style, balanceOf}) {
 	);
 }
 
-function ModalVaultList({vaults, yearnVaultData, label, value, set_value, set_input, isFrom, disabled}) {
-	const	{balancesOf} = useAccount();
+function ModalVaultList({vaults, label, value, set_value, set_input, isFrom, disabled}) {
+	const	{balancesOf, yearnVaultData} = useAccount();
 	const	[open, set_open] = useState(false);
 	const	[nonce, set_nonce] = useState(0);
 	const	[searchFilter, set_searchFilter] = useState('');
