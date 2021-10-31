@@ -19,7 +19,14 @@ import	BOWSWAP_CRV_V2_VAULTS							from	'utils/BOWSWAP_CRV_V2_VAULTS';
 import	V2_PATHS										from	'utils/currentPaths';
 import	{bigNumber, toAddress}							from	'utils';
 
-function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fromAmount, slippage, set_slippage, fromCounterValue, balanceOf, disabled, yearnVaultData}) {
+function	SectionFromVault({
+	vaults, fromVault, set_fromVault,
+	fromAmount, set_fromAmount,
+	slippage, set_slippage,
+	donation, set_donation,
+	fromCounterValue, balanceOf, disabled,
+	yearnVaultData
+}) {
 	const	[isInit, set_isInit] = useState(false);
 
 	function	updateInputValue(newValue) {
@@ -75,14 +82,22 @@ function	SectionFromVault({vaults, fromVault, set_fromVault, fromAmount, set_fro
 						value={fromAmount}
 						set_value={set_fromAmount}
 						slippage={slippage}
-						set_slippage={set_slippage} />
+						set_slippage={set_slippage}
+						donation={donation}
+						set_donation={set_donation} />
 				</div>
 			</div>
 		</section>
 	);
 }
 
-function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, toCounterValue, balanceOf, slippage, isFetchingExpectedReceiveAmount, disabled, yearnVaultData}) {
+function	SectionToVault({
+	vaults, toVault, set_toVault,
+	expectedReceiveAmount, toCounterValue, balanceOf,
+	slippage, donation,
+	isFetchingExpectedReceiveAmount, disabled,
+	yearnVaultData
+}) {
 	return (
 		<section aria-label={'TO_VAULT'}>
 			<label className={'font-medium text-ybase text-ygray-900 pl-0.5'}>{'To Vault'}</label>
@@ -102,6 +117,7 @@ function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, to
 						value={expectedReceiveAmount}
 						toCounterValue={toCounterValue}
 						slippage={slippage}
+						donation={donation}
 						balanceOf={balanceOf}
 						decimals={toVault.decimals}
 						isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount} />
@@ -111,7 +127,13 @@ function	SectionToVault({vaults, toVault, set_toVault, expectedReceiveAmount, to
 	);
 }
 
-function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slippage, signature, shouldIncreaseGasLimit, approved, disabled, onCallback}) {
+function	ButtonSwap({
+	fromVault, toVault,
+	fromAmount, expectedReceiveAmount,
+	slippage, donation,
+	signature, shouldIncreaseGasLimit,
+	approved, disabled, onCallback
+}) {
 	const	{provider} = useWeb3();
 	const	[transactionProcessing, set_transactionProcessing] = useState(false);
 
@@ -134,7 +156,7 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 				from: fromVault.address,
 				to: toVault.address,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toString(), fromVault.decimals),
+				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * (slippage + donation) / 100)).toString(), fromVault.decimals),
 				instructions: V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2],
 				shouldIncreaseGasLimit
 			}, ({error}) => {
@@ -168,7 +190,7 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 				from: fromVault.address,
 				to: toVault.address,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toString(), fromVault.decimals),
+				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * (slippage + donation) / 100)).toString(), fromVault.decimals),
 				shouldIncreaseGasLimit
 			}, ({error}) => {
 				if (error) {
@@ -215,7 +237,7 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 			from: fromVault.address,
 			to: toVault.address,
 			amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-			minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toString(), fromVault.decimals),
+			minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * (slippage + donation) / 100)).toString(), fromVault.decimals),
 			instructions: V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2],
 			signature,
 			shouldIncreaseGasLimit
@@ -251,7 +273,7 @@ function	ButtonSwap({fromVault, toVault, fromAmount, expectedReceiveAmount, slip
 				from: fromVault.address,
 				to: toVault.address,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toString(), fromVault.decimals),
+				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * (slippage + donation) / 100)).toString(), fromVault.decimals),
 				signature,
 				shouldIncreaseGasLimit
 			}, ({error}) => {
@@ -441,6 +463,7 @@ function	Bowswap({prices}) {
 	const	[toCounterValue, set_toCounterValue] = useState(0);
 	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('');
 	const	[slippage, set_slippage] = useState(0.05);
+	const	[donation, set_donation] = useState(0.05);
 	const	[isFetchingExpectedReceiveAmount, set_isFetchingExpectedReceiveAmount] = useState(false);
 	const	debouncedFetchExpectedAmount = useDebounce(fromAmount, 750);
 	const	[txApproveStatus, set_txApproveStatus] = useState({none: true, pending: false, success: false, error: false});
@@ -453,7 +476,8 @@ function	Bowswap({prices}) {
 		set_fromAmount('');
 		set_toCounterValue(0);
 		set_expectedReceiveAmount('');
-		set_slippage(0.10);
+		set_slippage(0.05);
+		set_donation(0.05);
 		set_txApproveStatus({none: true, pending: false, success: false, error: false});
 		set_txSwapStatus({none: true, pending: false, success: false, error: false});
 	}
@@ -711,6 +735,8 @@ function	Bowswap({prices}) {
 					balanceOf={balancesOf[fromVault.address]?.toString() || '0'}
 					slippage={slippage}
 					set_slippage={set_slippage}
+					donation={donation}
+					set_donation={set_donation}
 					yearnVaultData={yearnVaultData} />
 
 				<div className={'flex w-full justify-center pt-4'}>
@@ -725,6 +751,7 @@ function	Bowswap({prices}) {
 					expectedReceiveAmount={expectedReceiveAmount}
 					toCounterValue={toCounterValue}
 					slippage={slippage}
+					donation={donation}
 					balanceOf={balancesOf[toVault.address]?.toString() || '0'}
 					isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount}
 					yearnVaultData={yearnVaultData} />
@@ -755,6 +782,7 @@ function	Bowswap({prices}) {
 						fromAmount={fromAmount}
 						expectedReceiveAmount={expectedReceiveAmount}
 						slippage={slippage}
+						donation={donation}
 						signature={signature}
 						shouldIncreaseGasLimit={Number(balanceOfFromVault) < Number(fromAmount)}
 						onCallback={(type, message) => {

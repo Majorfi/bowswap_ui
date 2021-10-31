@@ -1,18 +1,25 @@
 import	React				from	'react';
 import	{ethers}			from	'ethers';
 
-function	InputTokenDisabled({value, toCounterValue, slippage, isFetchingExpectedReceiveAmount, balanceOf, decimals}) {
+function	InputTokenDisabled({
+	value, toCounterValue,
+	slippage, donation,
+	balanceOf, decimals,
+	isFetchingExpectedReceiveAmount
+}) {
+	const	expectedOutWithSettings = Number(value) !== 0 ? (Number(value) - ((Number(value) * (slippage + donation) / 100))) : 0;
+	const	tokenBalance = Number(ethers.utils.formatUnits(balanceOf, decimals));
 	return (
 		<div className={'relative w-full text-left bg-white border border-ygray-100 rounded-lg cursor-default focus:outline-none flex flex-col justify-between text-ygray-800 h-24 py-2 px-2 space-y-1'}>
 			<div className={'h-4'}>
 				<div className={'flex flex-row items-center justify-end w-full'}>
 					<label
 						className={'font-normal text-ybase text-ygray-500 hidden md:flex flex-row items-center cursor-pointer'}>
-						{`Balance: ${Number(ethers.utils.formatUnits(balanceOf, decimals))}`}
+						{`Balance: ${tokenBalance < 1 ? '< 1' : tokenBalance}`}
 					</label>
 					<label
 						className={'font-normal text-ybase text-ygray-500 flex flex-row items-center md:hidden cursor-pointer'}>
-						{`Balance: ${Number(ethers.utils.formatUnits(balanceOf, decimals)).toFixed(8)}`}
+						{`Balance: ${tokenBalance < 1 ? '< 1' : tokenBalance.toFixed(8)}`}
 					</label>
 				</div>
 			</div>
@@ -21,7 +28,7 @@ function	InputTokenDisabled({value, toCounterValue, slippage, isFetchingExpected
 					htmlFor={'fromInput'}
 					className={`with-placeholder placeholder-${value.length} flex justify-end w-full h-10 text-4xl font-medium text-ygray-700 text-opacity-20 proportional-nums cursor-text`}>
 					<input
-						value={(Number(value) !== 0 ? `${(Number(value) - ((Number(value) * slippage / 100))).toFixed(6)}` : '')}
+						value={expectedOutWithSettings.toFixed(6)}
 						disabled
 						readOnly
 						style={{backgroundColor: 'transparent', width: Number(value) === 0 ? '1px': 'auto'}}
@@ -32,7 +39,7 @@ function	InputTokenDisabled({value, toCounterValue, slippage, isFetchingExpected
 			<div className={'h-4'}>
 				<div className={`flex w-full justify-between items-center ${isFetchingExpectedReceiveAmount ? 'hidden' : ''}`}>
 					<div className={'items-center text-ybase text-ygray-500'}>
-						<span>{`≃ $${(toCounterValue * Number(value)).toFixed(2)}`}</span>
+						<span>{`≃ $${(toCounterValue * Number(expectedOutWithSettings)).toFixed(2)}`}</span>
 					</div>
 				</div>
 			</div>

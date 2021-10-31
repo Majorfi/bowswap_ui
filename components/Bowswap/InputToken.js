@@ -1,8 +1,13 @@
 import	React, {useEffect, useRef}		from	'react';
 import	{ethers}						from	'ethers';
-import	PopoverSlippage					from	'components/Bowswap/PopoverSlippage';
+import	PopoverSettings					from	'components/Bowswap/PopoverSettings';
 
-function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decimals, fromCounterValue, disabled}) {
+function	InputToken({
+	value, set_value,
+	slippage, set_slippage,
+	donation, set_donation,
+	balanceOf, decimals, fromCounterValue, disabled
+}) {
 	const	inputRef = useRef();
 	const	[isMounted, set_isMounted] = React.useState(false);
 
@@ -87,7 +92,11 @@ function	InputToken({value, set_value, slippage, set_slippage, balanceOf, decima
 							className={`items-center text-xxs font-medium py-0.5 text-white bg-yblue hover:bg-yblue-hover focus:outline-none px-3 rounded-lg transition-colors h-5 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
 							<span>{'MAX'}</span>
 						</button>
-						<PopoverSlippage slippage={slippage} set_slippage={set_slippage}/>
+						<PopoverSettings
+							slippage={slippage}
+							set_slippage={set_slippage}
+							donation={donation}
+							set_donation={set_donation} />
 					</div>
 				</div>
 			</div>
