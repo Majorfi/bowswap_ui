@@ -158,6 +158,7 @@ function	ButtonSwap({
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
 				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * (slippage + donation) / 100)).toString(), fromVault.decimals),
 				instructions: V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2],
+				donation,
 				shouldIncreaseGasLimit
 			}, ({error}) => {
 				if (error) {
@@ -191,6 +192,7 @@ function	ButtonSwap({
 				to: toVault.address,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
 				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * (slippage + donation) / 100)).toString(), fromVault.decimals),
+				donation,
 				shouldIncreaseGasLimit
 			}, ({error}) => {
 				if (error) {
@@ -240,6 +242,7 @@ function	ButtonSwap({
 			minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * (slippage + donation) / 100)).toString(), fromVault.decimals),
 			instructions: V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2],
 			signature,
+			donation,
 			shouldIncreaseGasLimit
 		}, ({error}) => {
 			if (error) {
@@ -275,6 +278,7 @@ function	ButtonSwap({
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
 				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * (slippage + donation) / 100)).toString(), fromVault.decimals),
 				signature,
+				donation,
 				shouldIncreaseGasLimit
 			}, ({error}) => {
 				if (error) {
@@ -463,7 +467,7 @@ function	Bowswap({prices}) {
 	const	[toCounterValue, set_toCounterValue] = useState(0);
 	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('');
 	const	[slippage, set_slippage] = useState(0.05);
-	const	[donation, set_donation] = useState(0.05);
+	const	[donation, set_donation] = useState(0.03);
 	const	[isFetchingExpectedReceiveAmount, set_isFetchingExpectedReceiveAmount] = useState(false);
 	const	debouncedFetchExpectedAmount = useDebounce(fromAmount, 750);
 	const	[txApproveStatus, set_txApproveStatus] = useState({none: true, pending: false, success: false, error: false});
@@ -477,7 +481,7 @@ function	Bowswap({prices}) {
 		set_toCounterValue(0);
 		set_expectedReceiveAmount('');
 		set_slippage(0.05);
-		set_donation(0.05);
+		set_donation(0.03);
 		set_txApproveStatus({none: true, pending: false, success: false, error: false});
 		set_txSwapStatus({none: true, pending: false, success: false, error: false});
 	}
@@ -492,8 +496,8 @@ function	Bowswap({prices}) {
 
 	const	fetchEstimateOut = useCallback(async (from, to, amount) => {
 		const	fromToken = new ethers.Contract(process.env.METAPOOL_SWAPPER_ADDRESS, [
-			'function metapool_estimate_out(address from, address to, uint256 amount) public view returns (uint256)',
-			'function estimate_out(address from, address to, uint256 amount, tuple(bool deposit, address pool, uint128 n)[] instructions) public view returns (uint256)'
+			'function metapool_estimate_out(address from, address to, uint256 amount, uint256 donation) public view returns (uint256)',
+			'function estimate_out(address from, address to, uint256 amount, tuple(bool deposit, address pool, uint128 n)[] instructions, uint256 donation) public view returns (uint256)'
 		], provider);
 
 		if (toVault.scope === 'v2') {
@@ -502,13 +506,14 @@ function	Bowswap({prices}) {
 					from,
 					to,
 					amount,
-					V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2]
+					V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2],
+					donation
 				);
 				set_expectedReceiveAmount(ethers.utils.formatUnits(estimate_out, toVault.decimals));
 				set_isFetchingExpectedReceiveAmount(false);
 			}
 		} else {
-			const	metapool_estimate_out = await fromToken.metapool_estimate_out(from, to, amount);
+			const	metapool_estimate_out = await fromToken.metapool_estimate_out(from, to, amount, donation);
 			set_expectedReceiveAmount(ethers.utils.formatUnits(metapool_estimate_out, toVault.decimals));
 			set_isFetchingExpectedReceiveAmount(false);
 		}

@@ -82,11 +82,11 @@ export async function	approveToken({provider, contractAddress, amount, from}, ca
 }
 
 //BowswapV1
-export async function	metapoolSwapTokens({provider, contractAddress, from, to, amount, minAmountOut, shouldIncreaseGasLimit}, callback) {
+export async function	metapoolSwapTokens({provider, contractAddress, from, to, amount, minAmountOut, shouldIncreaseGasLimit, donation}, callback) {
 	const	signer = provider.getSigner();
 	const	contract = new ethers.Contract(
 		contractAddress,
-		['function metapool_swap(address from, address to, uint256 amount, uint256 min_amount_out)'],
+		['function metapool_swap(address from, address to, uint256 amount, uint256 min_amount_out, uint256 donation)'],
 		signer
 	);
 	if (shouldIncreaseGasLimit) {
@@ -102,10 +102,11 @@ export async function	metapoolSwapTokens({provider, contractAddress, from, to, a
 			to,
 			amount,
 			minAmountOut,
+			donation
 		);
 
 		const	safeGasLimit = ethers.BigNumber.from(shouldIncreaseGasLimit ? 3_000_000 : 2_000_000);
-		const	transaction = await contract.metapool_swap(from, to, amount, minAmountOut, {gasLimit: safeGasLimit});
+		const	transaction = await contract.metapool_swap(from, to, amount, minAmountOut, donation, {gasLimit: safeGasLimit});
 		const	transactionResult = await transaction.wait();
 		if (transactionResult.status === 1) {
 			callback({error: false, data: amount});
@@ -118,11 +119,11 @@ export async function	metapoolSwapTokens({provider, contractAddress, from, to, a
 }
 
 //BowswapV1 Signature
-export async function	metapoolSwapTokensWithSignature({provider, contractAddress, from, to, amount, minAmountOut, signature, shouldIncreaseGasLimit}, callback) {	
+export async function	metapoolSwapTokensWithSignature({provider, contractAddress, from, to, amount, minAmountOut, signature, donation, shouldIncreaseGasLimit}, callback) {	
 	const	signer = provider.getSigner();
 	const	contract = new ethers.Contract(
 		contractAddress,
-		['function metapool_swap_with_signature(address from_vault, address to_vault, uint256 amount, uint256 min_amount_out, uint256 expiry, bytes calldata signature) public'],
+		['function metapool_swap_with_signature(address from_vault, address to_vault, uint256 amount, uint256 min_amount_out, uint256 expiry, bytes calldata signature, uint256 donation) public'],
 		signer
 	);
 	if (shouldIncreaseGasLimit) {
@@ -141,6 +142,7 @@ export async function	metapoolSwapTokensWithSignature({provider, contractAddress
 			minAmountOut,
 			0,
 			signature,
+			donation
 		);
 	} catch (error) {
 		callback({error, data: undefined});
@@ -158,10 +160,11 @@ export async function	metapoolSwapTokensWithSignature({provider, contractAddress
 			minAmountOut,
 			0,
 			signature,
+			donation
 		);
 
 		const	safeGasLimit = ethers.BigNumber.from(shouldIncreaseGasLimit ? 3_000_000 : 2_000_000);
-		const	transaction = await contract.metapool_swap_with_signature(from, to, amount, minAmountOut, 0, signature, {gasLimit: safeGasLimit});
+		const	transaction = await contract.metapool_swap_with_signature(from, to, amount, minAmountOut, 0, signature, donation, {gasLimit: safeGasLimit});
 		const	transactionResult = await transaction.wait();
 		if (transactionResult.status === 1) {
 			callback({error: false, data: amount});
@@ -174,11 +177,11 @@ export async function	metapoolSwapTokensWithSignature({provider, contractAddress
 }
 
 //BowswapV2
-export async function	swapTokens({provider, contractAddress, from, to, amount, minAmountOut, instructions, shouldIncreaseGasLimit}, callback) {
+export async function	swapTokens({provider, contractAddress, from, to, amount, minAmountOut, instructions, shouldIncreaseGasLimit, donation}, callback) {
 	const	signer = provider.getSigner();
 	const	contract = new ethers.Contract(
 		contractAddress,
-		['function swap(address from, address to, uint256 amount, uint256 min_amount_out, tuple(bool deposit, address pool, uint128 n)[] instructions)'],
+		['function swap(address from, address to, uint256 amount, uint256 min_amount_out, tuple(bool deposit, address pool, uint128 n)[] instructions), uint256 donation'],
 		signer
 	);
 	if (shouldIncreaseGasLimit) {
@@ -195,6 +198,7 @@ export async function	swapTokens({provider, contractAddress, from, to, amount, m
 			amount,
 			minAmountOut,
 			instructions,
+			donation
 		);
 
 		const	safeGasLimit = ethers.BigNumber.from(shouldIncreaseGasLimit ? 3_000_000 : 2_000_000);
@@ -204,6 +208,7 @@ export async function	swapTokens({provider, contractAddress, from, to, amount, m
 			amount,
 			minAmountOut,
 			instructions,
+			donation,
 			{gasLimit: safeGasLimit}
 		);
 		const	transactionResult = await transaction.wait();
@@ -219,11 +224,11 @@ export async function	swapTokens({provider, contractAddress, from, to, amount, m
 }
 
 //BowswapV2 Signature
-export async function	swapTokensWithSignature({provider, contractAddress, from, to, amount, minAmountOut, instructions, signature, shouldIncreaseGasLimit}, callback) {
+export async function	swapTokensWithSignature({provider, contractAddress, from, to, amount, minAmountOut, instructions, signature, donation, shouldIncreaseGasLimit}, callback) {
 	const	signer = provider.getSigner();
 	const	contract = new ethers.Contract(
 		contractAddress,
-		['function swap_with_signature(address from, address to, uint256 amount, uint256 min_amount_out, tuple(bool deposit, address pool, uint128 n)[] instructions, uint256 expiry, bytes calldata signature)'],
+		['function swap_with_signature(address from, address to, uint256 amount, uint256 min_amount_out, tuple(bool deposit, address pool, uint128 n)[] instructions, uint256 expiry, bytes calldata signature, uint256 donation)'],
 		signer
 	);
 	if (shouldIncreaseGasLimit) {
@@ -242,7 +247,8 @@ export async function	swapTokensWithSignature({provider, contractAddress, from, 
 			minAmountOut,
 			instructions,
 			0,
-			signature
+			signature,
+			donation
 		);
 	} catch (error) {
 		callback({error, data: undefined});
@@ -260,7 +266,8 @@ export async function	swapTokensWithSignature({provider, contractAddress, from, 
 			minAmountOut,
 			instructions,
 			0,
-			signature
+			signature,
+			donation
 		);
 
 		const	safeGasLimit = ethers.BigNumber.from(shouldIncreaseGasLimit ? 3_000_000 : 2_000_000);
@@ -272,6 +279,7 @@ export async function	swapTokensWithSignature({provider, contractAddress, from, 
 			instructions,
 			0,
 			signature,
+			donation,
 			{gasLimit: safeGasLimit}
 		);
 		const	transactionResult = await transaction.wait();
