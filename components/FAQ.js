@@ -15,8 +15,8 @@ function	FAQElement({label, children}) {
 	}
 
 	return (
-		<div  className={'bg-white rounded-lg w-full cursor-pointer'}>
-			<div onClick={onExpand} className={'font-bold text-ygray-900 flex flex-row items-center justify-between p-6'}>
+		<div onClick={onExpand} className={'bg-white rounded-lg w-full cursor-pointer'}>
+			<div className={'font-bold text-ygray-900 flex flex-row items-center justify-between p-6'}>
 				{label}
 				<svg
 					width={'24'}
