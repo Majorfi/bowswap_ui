@@ -62,6 +62,9 @@ module.exports = {
 				'7/11': '63.6363%',
 				150: '37.5rem'
 			},
+			spacing: {
+				18: '4.5rem',
+			},
 			boxShadow: {
 				base: '0px 16px 56px 0px #001D2D1A'
 			},
