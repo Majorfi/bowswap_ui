@@ -4,126 +4,16 @@ import	useWeb3											from	'contexts/useWeb3';
 import	useAccount										from	'contexts/useAccount';
 import	useLocalStorage									from	'hook/useLocalStorage';
 import	useDebounce										from	'hook/useDebounce';
-import	InputToken										from	'components/Bowswap/InputToken';
-import	InputTokenDisabled								from	'components/Bowswap/InputTokenDisabled';
-import	ModalVaultList									from	'components/Bowswap/ModalVaultList';
-import	BlockStatus										from	'components/Bowswap/BlockStatus';
-import	Success											from	'components/Icons/Success';
-import	Error											from	'components/Icons/Error';
-import	Pending											from	'components/Icons/Pending';
+import	SectionButtons									from	'components/Bowswap/SectionButtons';
+import	SectionFromVault 								from	'components/Bowswap/SectionFromVault';
+import	SectionToVault 									from	'components/Bowswap/SectionToVault';
+import	SectionBlockStatus								from	'components/Bowswap/SectionBlockStatus';
 import	BOWSWAP_CRV_EUR_VAULTS							from	'utils/BOWSWAP_CRV_EUR_VAULTS';
 import	BOWSWAP_CRV_BTC_VAULTS							from	'utils/BOWSWAP_CRV_BTC_VAULTS';
 import	BOWSWAP_CRV_USD_VAULTS							from	'utils/BOWSWAP_CRV_USD_VAULTS';
 import	BOWSWAP_CRV_V2_VAULTS							from	'utils/BOWSWAP_CRV_V2_VAULTS';
 import	V2_PATHS										from	'utils/currentPaths';
 import	{bigNumber, toAddress}							from	'utils';
-import SectionButtons from './SectionButtons';
-
-function	SectionFromVault({
-	vaults, fromVault, set_fromVault,
-	fromAmount, set_fromAmount,
-	slippage, set_slippage,
-	donation, set_donation,
-	fromCounterValue, balanceOf, disabled,
-	yearnVaultData
-}) {
-	const	[isInit, set_isInit] = useState(false);
-
-	function	updateInputValue(newValue) {
-		let		_value = newValue.replaceAll('..', '.').replaceAll(/[^0-9.]/g, '');
-		const	[dec, frac] = _value.split('.');
-		if (frac) _value = `${dec}.${frac.slice(0, 12)}`;
-
-		if (_value === '.') {
-			set_fromAmount('0.');
-		} else if (_value.length > 0 && _value[0] === '-') {
-			set_fromAmount('');
-		} else if (_value.length >= 2 && _value[0] === '0' && _value[1] !== '.') {
-			set_fromAmount(_value.slice(1) || '');
-		} else {
-			set_fromAmount(_value || '');
-		}
-	}
-
-	useEffect(() => {
-		if (!isInit && (fromAmount !== '' && fromAmount !== '0.0' && Number(fromAmount) !== 0)) {
-			updateInputValue(fromAmount);
-			set_isInit(true);
-		}
-		else if (!isInit && balanceOf !== '0') {
-			set_fromAmount(ethers.utils.formatUnits(balanceOf, fromVault.decimals));
-			set_isInit(true);
-		}
-	}, [isInit, balanceOf, fromAmount]);
-
-	return (
-		<section aria-label={'FROM_VAULT'}>
-			<label className={'font-medium text-ybase text-ygray-900 pl-0.5'}>{'From Vault'}</label>
-			<div className={'flex flex-col md:flex-row items-start justify-center space-y-2 md:space-y-0 md:space-x-4 w-full'}>
-				<div className={'w-full md:w-4/11'}>
-					<ModalVaultList
-						isFrom
-						label={'Select from vault'}
-						disabled={disabled}
-						vaults={vaults}
-						yearnVaultData={yearnVaultData}
-						value={fromVault}
-						set_value={set_fromVault}
-						set_input={(v) => {
-							updateInputValue(ethers.utils.formatUnits(v, fromVault.decimals));
-						}} />
-				</div>
-				<div className={'w-full md:w-7/11'}>
-					<InputToken
-						disabled={disabled}
-						balanceOf={balanceOf}
-						decimals={fromVault.decimals}
-						fromCounterValue={fromCounterValue}
-						value={fromAmount}
-						set_value={set_fromAmount}
-						slippage={slippage}
-						set_slippage={set_slippage}
-						donation={donation}
-						set_donation={set_donation} />
-				</div>
-			</div>
-		</section>
-	);
-}
-
-function	SectionToVault({
-	vaults, toVault, set_toVault,
-	expectedReceiveAmount, toCounterValue, balanceOf,
-	slippage, isFetchingExpectedReceiveAmount, disabled,
-	yearnVaultData
-}) {
-	return (
-		<section aria-label={'TO_VAULT'}>
-			<label className={'font-medium text-ybase text-ygray-900 pl-0.5'}>{'To Vault'}</label>
-			<div className={'flex flex-col md:flex-row items-start justify-center space-y-2 md:space-y-0 md:space-x-4 w-full'}>
-				<div className={'w-full md:w-4/11'}>
-					<ModalVaultList
-						label={'Select to vault'}
-						disabled={disabled}
-						vaults={vaults}
-						yearnVaultData={yearnVaultData}
-						value={toVault}
-						set_value={set_toVault}
-						set_input={() => null} />
-				</div>
-				<div className={'w-full md:w-7/11'}>
-					<InputTokenDisabled
-						value={expectedReceiveAmount}
-						toCounterValue={toCounterValue}
-						slippage={slippage}
-						balanceOf={balanceOf}
-						decimals={toVault.decimals}
-						isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount} />
-				</div>
-			</div>
-		</section>
-	);
-}
 
 function	Bowswap({prices}) {
 	const	{provider} = useWeb3();
@@ -351,55 +241,6 @@ function	Bowswap({prices}) {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [debouncedFetchExpectedAmount, fromAmount, donation, fromVault.address, toVault?.address, fromVault.decimals]);
 
-
-	function	renderMiddlePart() {
-		const	getArgs = () => {
-			if (txApproveStatus.pending || txSwapStatus.pending)
-				return {open: true, title: 'PENDING...', color: 'bg-pending', icon: <Pending width={24} height={24} className={'mr-4'} />};
-			if (txApproveStatus.success && !txApproveStatus.hide)
-				return {open: true, title: 'APPROVE COMPLETED', color: 'bg-success', icon: <Success width={24} height={24} className={'mr-4'} />};
-			if (txSwapStatus.success)
-				return {open: true, title: 'SWAP COMPLETED', color: 'bg-success', icon: <Success width={24} height={24} className={'mr-4'} />};
-			if (txSwapStatus.error && txSwapStatus.message)
-				return {open: true, title: txSwapStatus.message, color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (txSwapStatus.error)
-				return {open: true, title: 'SWAP FAILED', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (txApproveStatus.error && txApproveStatus.message)
-				return {open: true, title: txApproveStatus.message, color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (txApproveStatus.error)
-				return {open: true, title: 'APPROVE TRANSACTION FAILURE', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals)))
-				return {open: true, title: 'EXCEEDED BALANCE LIMIT !', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
-
-			if (fromVault.scope === 'v2' && toVault?.scope === 'v2' && fromVault.type === 'usd' && toVault?.type !== 'usd')
-				return {open: true, title: 'You are moving from a USD pegged asset to a more volatile crypto asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope !== 'v2' && toVault?.scope === 'v2' && fromVault.scope === 'usd' && toVault?.type !== 'usd')
-				return {open: true, title: 'You are moving from a USD pegged asset to a more volatile crypto asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope === 'v2' && toVault?.scope === 'v2' && fromVault.type !== 'usd' && toVault?.type === 'usd')
-				return {open: true, title: 'You are moving from a volatile crypto asset to a USD pegged asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope !== 'v2' && toVault?.scope === 'v2' && fromVault.scope !== 'usd' && toVault?.type === 'usd')
-				return {open: true, title: 'You are moving from a volatile crypto asset to a USD pegged asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-
-			if (fromVault.scope === 'v2' && toVault?.scope === 'v2' && fromVault.type === 'eur' && toVault?.type !== 'eur')
-				return {open: true, title: 'You are moving from a EUR pegged asset to a more volatile crypto asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope !== 'v2' && toVault?.scope === 'v2' && fromVault.scope === 'eur' && toVault?.type !== 'eur')
-				return {open: true, title: 'You are moving from a EUR pegged asset to a more volatile crypto asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope === 'v2' && toVault?.scope === 'v2' && fromVault.type !== 'eur' && toVault?.type === 'eur')
-				return {open: true, title: 'You are moving from a volatile crypto asset to a EUR pegged asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (fromVault.scope !== 'v2' && toVault?.scope === 'v2' && fromVault.scope !== 'eur' && toVault?.type === 'eur')
-				return {open: true, title: 'You are moving from a volatile crypto asset to a EUR pegged asset', color: 'bg-pending', icon: <Error width={28} height={24} className={'mr-4'} />};
-
-			if (Number(slippage) >= 3)
-				return {open: true, title: 'HEAVY SLIPPAGE, USE IT AT YOUR OWN RISK', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
-			if (Number(slippage) === 0)
-				return {open: true, title: 'NO SLIPPAGE, USE IT AT YOUR OWN RISK', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
-			return {open: false, title: '', color: 'bg-yblue', icon: <div/>};
-		};
-		return (
-			<BlockStatus {...getArgs()} />
-		);
-	}
-
 	return (
 		<div className={'w-full max-w-2xl'}>
 			<div className={'bg-white rounded-xl shadow-base p-4 w-full relative space-y-0 md:space-y-4'}>
@@ -419,7 +260,14 @@ function	Bowswap({prices}) {
 					yearnVaultData={yearnVaultData} />
 
 				<div className={'flex w-full justify-center pt-4'}>
-					{renderMiddlePart()}
+					<SectionBlockStatus
+						txApproveStatus={txApproveStatus}
+						txSwapStatus={txSwapStatus}
+						slippage={slippage}
+						fromAmount={fromAmount}
+						balancesOf={balancesOf}
+						fromVault={fromVault}
+						toVault={toVault} />
 				</div>
 
 				<SectionToVault
