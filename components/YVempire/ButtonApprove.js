@@ -49,7 +49,7 @@ function	ButtonApprove({pairs, selectedTokens, balancesOf, allowances, approved,
 					provider: provider,
 					contractAddress: pair.uToken.address,
 					amount: approval,
-					from: process.env.VYEMPIRE_SWAPPER
+					from: process.env.VYEMPIRE_SWAPPER_ADDR
 				}, ({error}) => {
 					if (error) {
 						isBroken = true;

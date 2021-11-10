@@ -18,7 +18,7 @@ function	ButtonMigrate({pairs, selectedTokens, approved, disabled, onCallback}) 
 		try {
 			migrateBachTokens({
 				provider: provider,
-				contractAddress: process.env.VYEMPIRE_SWAPPER,
+				contractAddress: process.env.VYEMPIRE_SWAPPER_ADDR,
 				batch: batch
 			}, ({error}) => {
 				if (error) {

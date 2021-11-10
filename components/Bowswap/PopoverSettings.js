@@ -54,10 +54,8 @@ function PopoverSettings({slippage, set_slippage, donation, set_donation}) {
 										<input
 											id={'slippage'}
 											autoComplete={'off'}
-											value={slippage}
-											onChange={(e) => {
-												set_slippage(e.target.value);
-											}}
+											value={Number(slippage)}
+											onChange={(e) => set_slippage(Number(e.target.value) > 100 ? 100 : e.target.value)}
 											style={{background: 'transparent'}}
 											className={'truncate text-sm h-8'}
 											min={0}
@@ -82,10 +80,8 @@ function PopoverSettings({slippage, set_slippage, donation, set_donation}) {
 										<input
 											id={'donation'}
 											autoComplete={'off'}
-											value={donation}
-											onChange={(e) => {
-												set_donation(Number(e.target.value));
-											}}
+											value={Number(donation)}
+											onChange={(e) => set_donation(Number(e.target.value) > 100 ? 100 : Number(e.target.value))}
 											style={{background: 'transparent'}}
 											className={'truncate text-sm h-8'}
 											min={0}
