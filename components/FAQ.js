@@ -1,9 +1,7 @@
 import	React, {useState}				from	'react';
 import	AnimateHeight					from	'react-animate-height';
-import	useDimensions					from	'hook/useDimensions';
 
 function	FAQElement({label, children}) {
-	const	[ref, dim] = useDimensions();
 	const	[isExpanded, set_isExpanded] = useState(false);
 	const	[isExpandedAnimation, set_isExpandedAnimation] = useState(false);
 
@@ -18,14 +16,14 @@ function	FAQElement({label, children}) {
 	}
 
 	return (
-		<AnimateHeight duration={250} height={(dim?.height || 72)}>
-			<div ref={ref} className={'bg-white rounded-lg w-full cursor-pointer'}>
+		<AnimateHeight duration={400}>
+			<div  className={'bg-white rounded-lg w-full cursor-pointer'}>
 				<div onClick={onExpand} className={'font-bold text-ygray-900 flex flex-row items-center justify-between p-6'}>
 					{label}
 					<svg
 						width={'24'}
 						height={'24'}
-						className={`transform transition-transform ${isExpanded ? '' : '-rotate-90'}`}
+						className={`transform transition-transform ${isExpandedAnimation ? '' : '-rotate-90'}`}
 						viewBox={'0 0 24 24'}
 						fill={'none'}
 						xmlns={'http://www.w3.org/2000/svg'}>
