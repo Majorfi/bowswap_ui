@@ -7,7 +7,7 @@ function	FAQElement({label, children}) {
 	function	onExpand() {
 		if (isExpanded) {
 			set_isExpandedAnimation(false);
-			setTimeout(() => set_isExpanded(false), 300);
+			setTimeout(() => set_isExpanded(false), 500);
 		} else {
 			set_isExpanded(true);
 			setTimeout(() => set_isExpandedAnimation(true), 1);
@@ -28,7 +28,7 @@ function	FAQElement({label, children}) {
 					<path fillRule={'evenodd'} clipRule={'evenodd'} d={'M17.7439 9.18558C18.0556 9.45834 18.0872 9.93216 17.8144 10.2439L12.5644 16.2439C12.422 16.4066 12.2163 16.5 12 16.5C11.7837 16.5 11.578 16.4066 11.4356 16.2439L6.18558 10.2439C5.91282 9.93216 5.9444 9.45834 6.25613 9.18558C6.56786 8.91282 7.04168 8.9444 7.31444 9.25613L12 14.6111L16.6856 9.25613C16.9583 8.9444 17.4321 8.91282 17.7439 9.18558Z'} fill={'#000000'}/>
 				</svg>
 			</div>
-			<div className={`w-full transition-max-height duration-300 overflow-hidden ${isExpandedAnimation ? 'max-h-96' : 'max-h-0'}`}>
+			<div className={`w-full transition-max-height duration-500 overflow-hidden ${isExpandedAnimation ? 'max-h-96' : 'max-h-0'}`}>
 				{isExpanded ? children : <div />}
 			</div>
 		</div>
