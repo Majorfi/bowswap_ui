@@ -428,7 +428,7 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, set_signature
 }
 
 function	Bowswap({prices}) {
-	const	{provider} = useWeb3();
+	const	{provider, active} = useWeb3();
 	const	{balancesOf, updateBalanceOf, allowances, yearnVaultData} = useAccount();
 	const	[, set_nonce] = useState(0);
 	const	[fromVault, set_fromVault] = useLocalStorage('fromVault', BOWSWAP_CRV_USD_VAULTS[0]);
@@ -467,6 +467,9 @@ function	Bowswap({prices}) {
 	}
 
 	const	fetchEstimateOut = useCallback(async (from, to, amount) => {
+		if (!provider || !active) {
+			return;
+		}
 		const	fromToken = new ethers.Contract(process.env.METAPOOL_SWAPPER_ADDRESS, [
 			'function metapool_estimate_out(address from, address to, uint256 amount) public view returns (uint256)',
 			'function estimate_out(address from, address to, uint256 amount, tuple(bool deposit, address pool, uint128 n)[] instructions) public view returns (uint256)'
@@ -489,7 +492,7 @@ function	Bowswap({prices}) {
 			set_isFetchingExpectedReceiveAmount(false);
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [fromVault.address, provider, toVault?.address, toVault?.decimals, toVault?.scope, toVault?.type]);
+	}, [fromVault.address, provider, active, toVault?.address, toVault?.decimals, toVault?.scope, toVault?.type]);
 
 	/**************************************************************************
 	**	This function will be used to compute the counter value of the want
@@ -580,6 +583,9 @@ function	Bowswap({prices}) {
 	**	@TRIGGER : any time the `FROM` vault changes
 	**************************************************************************/
 	useEffect(() => {
+		if (!provider || !active) {
+			return;
+		}
 		const	V2Paths = V2_PATHS.filter(e => toAddress(e[0]) === toAddress(fromVault.address)).map(e => e[1]);
 		const	V2VaultList = BOWSWAP_CRV_V2_VAULTS.filter(e => V2Paths.includes(toAddress(e.address)));
 		set_toVaultsListV2(V2VaultList);
@@ -610,7 +616,7 @@ function	Bowswap({prices}) {
 			fetchFromVaultVirtualPrice();
 		set_nonce(n => n + 1);
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [fromVault.address, provider]);
+	}, [fromVault.address, provider, active]);
 
 	/**************************************************************************
 	**	Any time the fromVault address is changed, we need to change the list
@@ -621,12 +627,12 @@ function	Bowswap({prices}) {
 	**	@TRIGGER : any time the `TO` vault changes
 	**************************************************************************/
 	useEffect(() => {
-		if (provider) {
+		if (provider && active) {
 			fetchToVaultVirtualPrice();
 			set_nonce(n => n + 1);
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [toVault?.address, provider]);
+	}, [toVault?.address, provider, active]);
 
 
 	/**************************************************************************

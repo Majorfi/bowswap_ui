@@ -1,12 +1,14 @@
 import	React, {useState, useEffect, useContext, createContext, useCallback}	from	'react';
-import	{ethers}																from	'ethers';
-import	QRCodeModal																from	'@walletconnect/qrcode-modal';
-import	{useWeb3React}															from	'@web3-react/core';
-import	{InjectedConnector}														from	'@web3-react/injected-connector';
-import	{ConnectorEvent}														from	'@web3-react/types';
-import	{WalletConnectConnector}												from	'@web3-react/walletconnect-connector';
-import	useLocalStorage															from	'hook/useLocalStorage';
-import	{toAddress}																from	'utils';
+import	{ethers}							from	'ethers';
+import	QRCodeModal							from	'@walletconnect/qrcode-modal';
+import	{useWeb3React}						from	'@web3-react/core';
+import	{InjectedConnector}					from	'@web3-react/injected-connector';
+import	{ConnectorEvent}					from	'@web3-react/types';
+import	{WalletConnectConnector}			from	'@web3-react/walletconnect-connector';
+import	useLocalStorage						from	'hook/useLocalStorage';
+import	useWindowInFocus					from	'hook/useWindowInFocus';
+import	useDebounce							from	'hook/useDebounce';
+import	{toAddress}							from	'utils';
 
 const walletType = {NONE: -1, METAMASK: 0, WALLET_CONNECT: 1};
 const Web3Context = createContext();
@@ -22,21 +24,24 @@ function getProvider(chain = 'ethereum') {
 
 export const Web3ContextApp = ({children}) => {
 	const	web3 = useWeb3React();
-	const	[initialized, set_initialized] = useState(false);
+	const	{activate, active, library, connector, account, chainId, deactivate} = web3;
 	const	[provider, set_provider] = useState(undefined);
 	const	[address, set_address] = useLocalStorage('address', '');
 	const	[ens, set_ens] = useLocalStorage('ens', '');
 	const	[chainID, set_chainID] = useLocalStorage('chainID', -1);
 	const	[lastWallet, set_lastWallet] = useLocalStorage('lastWallet', walletType.NONE);
 	const	[, set_nonce] = useState(0);
-	const	{activate, active, library, connector, account, chainId, deactivate} = web3;
+	const	[disableAutoChainChange, set_disableAutoChainChange] = useState(false);
+	const	debouncedChainID = useDebounce(chainID, 500);
+	const	windowInFocus = useWindowInFocus();
 
 	const onUpdate = useCallback(async (update) => {
 		if (update.provider) {
 			set_provider(library);
 		}
 		if (update.chainId) {
-			set_chainID(parseInt(update.chainId, 16));
+			const	isANumber = !isNaN(update.chainId) && !String(update.chainId).startsWith('0x');
+			set_chainID(isANumber ? Number(update.chainId) : parseInt(update.chainId, 16));
 		}
 		if (update.account) {
 			await getProvider().lookupAddress(toAddress(update.account)).then(_ens => set_ens(_ens || ''));
@@ -44,7 +49,7 @@ export const Web3ContextApp = ({children}) => {
 		}
 		set_nonce(n => n + 1);
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [library, set_address, set_chainID]);
+	}, [library]);
 
 	const onDesactivate = useCallback(() => {
 		set_chainID(-1);
@@ -58,20 +63,44 @@ export const Web3ContextApp = ({children}) => {
 				.off(ConnectorEvent.Deactivate, onDesactivate);
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [connector, onUpdate, set_address, set_chainID, set_lastWallet]);
+	}, [connector]);
 
 	const onActivate = useCallback(async () => {
 		set_provider(library);
 		set_address(toAddress(account));
-		set_chainID(parseInt(chainId, 16));
+		const	isANumber = !isNaN(chainId) && !String(chainId).startsWith('0x');
+		set_chainID(isANumber ? Number(chainId) : parseInt(chainId, 16));
 		await getProvider().lookupAddress(toAddress(account)).then(_ens => set_ens(_ens || ''));
 
 		connector
 			.on(ConnectorEvent.Update, onUpdate)
 			.on(ConnectorEvent.Deactivate, onDesactivate);
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [account, chainId, connector, library, onDesactivate, onUpdate, set_address, set_chainID]);
+	}, [account, chainId, connector, library, onDesactivate, onUpdate]);
 
+	const onSwitchChain = useCallback((force) => {
+		if (!force && (!active || disableAutoChainChange)) {
+			return;
+		}
+		const	isCompatibleChain = (
+			Number(debouncedChainID) === 1 ||
+			Number(debouncedChainID) === 1337
+		);
+		if (isCompatibleChain) {
+			return;
+		}
+		if (!provider || !active) {
+			console.error('Not initialized');
+			return;
+		}
+		provider
+			.send('wallet_switchEthereumChain', [{chainId: '0x1'}])
+			.catch(() => set_disableAutoChainChange(true));
+	}, [active, disableAutoChainChange, debouncedChainID, provider]);
+
+	useEffect(() => {
+		onSwitchChain();
+	}, [windowInFocus, onSwitchChain]);
 
 	/**************************************************************************
 	**	connect
@@ -91,12 +120,7 @@ export const Web3ContextApp = ({children}) => {
 			if (active) {
 				deactivate();
 			}
-			const	injected = new InjectedConnector({
-				supportedChainIds: [
-					1, // ETH MAINNET
-					1337, // MAJORNET
-				]
-			});
+			const	injected = new InjectedConnector();
 			activate(injected, undefined, true);
 			set_lastWallet(walletType.METAMASK);
 		} else if (_providerType === walletType.WALLET_CONNECT) {
@@ -126,7 +150,6 @@ export const Web3ContextApp = ({children}) => {
 
 	useEffect(() => {
 		if (active) {
-			set_initialized(true);
 			onActivate();
 		}
 	}, [active, onActivate]);
@@ -138,10 +161,6 @@ export const Web3ContextApp = ({children}) => {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [active]);
 
-	useEffect(() => {
-		setTimeout(() => set_initialized(true), 1500);
-	}, []);
-
 	return (
 		<Web3Context.Provider
 			value={{
@@ -152,11 +171,10 @@ export const Web3ContextApp = ({children}) => {
 				onDesactivate,
 				walletType,
 				chainID,
-				active,
-				initialized,
-				provider: active ? provider : getProvider(),
+				onSwitchChain,
+				active: active && (chainID === 1 || chainID === 1337),
+				provider,
 				getProvider,
-				currentRPCProvider: provider
 			}}>
 			{children}
 		</Web3Context.Provider>

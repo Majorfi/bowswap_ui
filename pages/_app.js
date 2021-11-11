@@ -133,7 +133,7 @@ function	AppWrapper(props) {
 					<div className={'z-10 pointer-events-auto w-full'}>
 						<Navbar shouldInitialPopup/>
 					</div>
-					<div className={'w-full h-full relative max-w-screen-lg mx-auto z-30 pt-2'}>
+					<div className={'w-full h-full relative max-w-screen-lg mx-auto z-30'}>
 						<WithLayout hasSecret={active && hasSecretCode}>
 							<Component
 								key={router.route}
@@ -166,7 +166,7 @@ function	AppWrapper(props) {
 }
 
 const getLibrary = (provider) => {
-	return new ethers.providers.Web3Provider(provider);
+	return new ethers.providers.Web3Provider(provider, 'any');
 };
 
 function	MyApp(props) {
