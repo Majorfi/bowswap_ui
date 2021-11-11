@@ -9,6 +9,7 @@ import	useWeb3, {Web3ContextApp}		from	'contexts/useWeb3';
 import	{AccountContextApp}				from	'contexts/useAccount';
 import	useLocalStorage					from	'hook/useLocalStorage';
 import	Credits							from	'components/Credits';
+import	FAQ								from	'components/FAQ';
 import	Navbar							from	'components/Commons/Navbar';
 import	ModalPong						from	'components/Commons/ModalPong';
 import	Tabs							from	'components/Commons/Tabs';
@@ -34,6 +35,9 @@ function	WithLayout({children, hasSecret}) {
 				</div>
 				<div className={'w-full max-w-2xl'}>
 					{children}
+				</div>
+				<div className={'w-full max-w-2xl'}>
+					<FAQ />
 				</div>
 			</div>
 			{hasSecret ? (
@@ -129,7 +133,7 @@ function	AppWrapper(props) {
 					<div className={'z-10 pointer-events-auto w-full'}>
 						<Navbar shouldInitialPopup/>
 					</div>
-					<div className={'w-full h-full relative max-w-screen-lg mx-auto z-30 pt-2'}>
+					<div className={'w-full h-full relative max-w-screen-lg mx-auto z-30'}>
 						<WithLayout hasSecret={active && hasSecretCode}>
 							<Component
 								key={router.route}
@@ -162,7 +166,7 @@ function	AppWrapper(props) {
 }
 
 const getLibrary = (provider) => {
-	return new ethers.providers.Web3Provider(provider);
+	return new ethers.providers.Web3Provider(provider, 'any');
 };
 
 function	MyApp(props) {

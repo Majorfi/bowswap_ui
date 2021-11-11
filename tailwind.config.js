@@ -62,8 +62,14 @@ module.exports = {
 				'7/11': '63.6363%',
 				150: '37.5rem'
 			},
+			spacing: {
+				18: '4.5rem',
+			},
 			boxShadow: {
 				base: '0px 16px 56px 0px #001D2D1A'
+			},
+			transitionProperty: {
+				'max-height': 'max-height'
 			},
 			animation: {
 				'scale-up-center': 'scale-up-center 0.4s cubic-bezier(0.390, 0.575, 0.565, 1.000)   both',
