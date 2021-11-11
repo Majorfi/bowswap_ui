@@ -9,6 +9,7 @@ import	useWeb3, {Web3ContextApp}		from	'contexts/useWeb3';
 import	{AccountContextApp}				from	'contexts/useAccount';
 import	useLocalStorage					from	'hook/useLocalStorage';
 import	Credits							from	'components/Credits';
+import	FAQ								from	'components/FAQ';
 import	Navbar							from	'components/Commons/Navbar';
 import	ModalPong						from	'components/Commons/ModalPong';
 import	Tabs							from	'components/Commons/Tabs';
@@ -34,6 +35,9 @@ function	WithLayout({children, hasSecret}) {
 				</div>
 				<div className={'w-full max-w-2xl'}>
 					{children}
+				</div>
+				<div className={'w-full max-w-2xl'}>
+					<FAQ />
 				</div>
 			</div>
 			{hasSecret ? (
