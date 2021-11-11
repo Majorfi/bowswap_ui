@@ -113,7 +113,7 @@ function	ModalLogin({open, set_open}) {
 
 									<p className={'pb-2 font-normal text-ygray-700 text-sm'}>
 										{'You can follow the detailed '}
-										<a href={'https://docs.flashbots.net/flashbots-protect/rpc/quick-start/'} target={'_blank'} className={'cursor-pointer text-yblue hover:text-yblue-hover font-medium'} rel={'noreferrer'}>{'instructions'}</a>
+										<a href={'https://docs.flashbots.net/flashbots-protect/rpc/quick-start/'} target={'_blank'} className={'cursor-pointer text-yblue hover:text-yblue-hover font-medium border-none focus:outline-none'} rel={'noreferrer'}>{'instructions'}</a>
 										{'.'}
 									</p>
 								</div>
