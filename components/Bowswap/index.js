@@ -59,7 +59,7 @@ function	Bowswap({prices}) {
 		if (!provider || !active) {
 			return;
 		}
-		const	fromToken = new ethers.Contract(process.env.METAPOOL_SWAPPER_ADDRESS, [
+		const	fromToken = new ethers.Contract(process.env.BOWSWAP_SWAPPER_ADDR, [
 			'function metapool_estimate_out(address from, address to, uint256 amount, uint256 donation) public view returns (uint256)',
 			'function estimate_out(address from, address to, uint256 amount, tuple(bool deposit, address pool, uint128 n)[] instructions, uint256 donation) public view returns (uint256)'
 		], provider);
