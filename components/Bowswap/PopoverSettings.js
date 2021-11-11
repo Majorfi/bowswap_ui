@@ -1,7 +1,7 @@
 import	React, {Fragment, useRef, useEffect, useState}	from	'react';
 import	{Popover, Transition}					from	'@headlessui/react';
 
-function PopoverSlippage({slippage, set_slippage}) {
+function PopoverSettings({slippage, set_slippage, donation, set_donation}) {
 	const	[open, set_open] = useState(false);
 	const	buttonRef = useRef(null);
 
@@ -54,10 +54,8 @@ function PopoverSlippage({slippage, set_slippage}) {
 										<input
 											id={'slippage'}
 											autoComplete={'off'}
-											value={slippage}
-											onChange={(e) => {
-												set_slippage(e.target.value);
-											}}
+											value={Number(slippage)}
+											onChange={(e) => set_slippage(Number(e.target.value) > 100 ? 100 : e.target.value)}
 											style={{background: 'transparent'}}
 											className={'truncate text-sm h-8'}
 											min={0}
@@ -71,6 +69,33 @@ function PopoverSlippage({slippage, set_slippage}) {
 										</div>
 									</label>
 								</div>
+
+								<div className={'flex flex-row items-center mt-4'}>
+									<div className={'mr-2'}>
+										<p className={'font-medium text-xs text-gray-600'}>{'Donation'}</p>
+									</div>
+									<label
+										htmlFor={'donation'}
+										className={'relative w-full text-left bg-white rounded-md border cursor-default focus:outline-none flex flex-row justify-between border-gray-200 text-gray-800 px-3'}>
+										<input
+											id={'donation'}
+											autoComplete={'off'}
+											value={Number(donation)}
+											onChange={(e) => set_donation(Number(e.target.value) > 100 ? 100 : Number(e.target.value))}
+											style={{background: 'transparent'}}
+											className={'truncate text-sm h-8'}
+											min={0}
+											max={100}
+											step={0.01}
+											type={'number'} />
+										<div className={'absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none'}>
+											<span className={'text-gray-300'} id={'percent'}>
+												{'%'}
+											</span>
+										</div>
+									</label>
+								</div>
+
 							</div>
 						</div>
 					</Popover.Panel>
@@ -81,4 +106,4 @@ function PopoverSlippage({slippage, set_slippage}) {
 }
 
 
-export default PopoverSlippage;
+export default PopoverSettings;
