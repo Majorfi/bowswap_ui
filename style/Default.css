@@ -257,3 +257,14 @@ input[type=number] {
 .filter-blur-4 {filter: blur(2px);}
 .filter-blur-12 {filter: blur(6px);}
 .filter-blur-20 {filter: blur(10px);}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}

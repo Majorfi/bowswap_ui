@@ -54,7 +54,7 @@ export const AccountContextApp = ({children}) => {
 		(crvVaultsNoDuplicates).forEach((vaultAddress) => {
 			const	contract = new Contract(vaultAddress, ERC20ABI);
 			multiCalls.push(contract.balanceOf(address));
-			multiCalls.push(contract.allowance(address, process.env.METAPOOL_SWAPPER_ADDRESS));
+			multiCalls.push(contract.allowance(address, process.env.BOWSWAP_SWAPPER_ADDR));
 		});
 		const callResult = await ethcallProvider.all(multiCalls);
 
@@ -75,7 +75,7 @@ export const AccountContextApp = ({children}) => {
 		vaultsNoDuplicates.forEach((vaultAddress) => {
 			const	vaulContract = new Contract(vaultAddress, ERC20ABI);
 			multiCalls.push(vaulContract.balanceOf(address));
-			multiCalls.push(vaulContract.allowance(address, toAddress(process.env.VYEMPIRE_SWAPPER)));
+			multiCalls.push(vaulContract.allowance(address, toAddress(process.env.VYEMPIRE_SWAPPER_ADDR)));
 		});
 		const callResult = await ethcallProvider.all(multiCalls);
 		let	index = 0;
@@ -174,7 +174,7 @@ export const AccountContextApp = ({children}) => {
 		addresses.forEach((addr) => {
 			const	vaulContract = new Contract(addr, ERC20ABI);
 			multiCalls.push(vaulContract.balanceOf(address));
-			multiCalls.push(vaulContract.allowance(address, toAddress(process.env.VYEMPIRE_SWAPPER)));
+			multiCalls.push(vaulContract.allowance(address, toAddress(process.env.VYEMPIRE_SWAPPER_ADDR)));
 		});
 		const callResult = await ethcallProvider.all(multiCalls);
 
