@@ -108,16 +108,13 @@ function	ModalLogin({open, set_open}) {
 								</div>
 								<div className={'mt-6'}>
 									<p className={'pb-2 font-normal text-ygray-700 text-sm'}>
-										{'The Flashbots Protect RPC allows regular users to easily submit their transactions to the Flashbots Auction by using a custom RPC endpoint in their wallet. Everything should be the same for users, except transactions are sent to Flashbots, and then directly to miners, instead of the public mempool.'}
+										{'To enable the MEV protection you have to add the Flashbots Protect RPC. It\'s a simple manual process in Metamask. Then you need to use it each time you do a swap on Ethereum. That way you will always be protected from hungry sandwich bots.'}
 									</p>
+
 									<p className={'pb-2 font-normal text-ygray-700 text-sm'}>
-										<b>{'Frontrunning protection:'}</b>{' your transaction will not be seen by hungry sandwich bots in the public mempool.'}
-									</p>
-									<p className={'pb-2 font-normal text-ygray-700 text-sm'}>
-										<b>{'No failed transactions:'}</b>{' your transaction will only be mined if it doesn\'t include any reverts, so you don\'t pay for failed transactions. Note: your transaction could be uncled, emitted to the mempool, and then included on-chain.'}
-									</p>
-									<p className={'font-normal text-ygray-700 text-sm'}>
-										<b>{'Priority in blocks:'}</b>{' transactions sent via Flashbots are mined at the top of blocks, giving them priority.'}
+										{'You can follow the detailed '}
+										<a href={'https://docs.flashbots.net/flashbots-protect/rpc/quick-start/'} target={'_blank'} className={'cursor-pointer text-yblue hover:text-yblue-hover font-medium'} rel={'noreferrer'}>{'instructions'}</a>
+										{'.'}
 									</p>
 								</div>
 							</div>
