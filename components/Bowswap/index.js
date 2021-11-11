@@ -29,7 +29,7 @@ function	Bowswap({prices}) {
 	const	[toCounterValue, set_toCounterValue] = useState(0);
 	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('');
 	const	[slippage, set_slippage] = useState(0.05);
-	const	[donation, set_donation] = useState(0.03);
+	const	[donation, set_donation] = useState(0.3);
 	const	[isFetchingExpectedReceiveAmount, set_isFetchingExpectedReceiveAmount] = useState(false);
 	const	debouncedFetchExpectedAmount = useDebounce(fromAmount, 750);
 	const	[txApproveStatus, set_txApproveStatus] = useState({none: true, pending: false, success: false, error: false});
@@ -42,7 +42,7 @@ function	Bowswap({prices}) {
 		set_toCounterValue(0);
 		set_expectedReceiveAmount('');
 		set_slippage(0.05);
-		set_donation(0.03);
+		set_donation(0.3);
 		set_txApproveStatus({none: true, pending: false, success: false, error: false});
 		set_txSwapStatus({none: true, pending: false, success: false, error: false});
 	}
