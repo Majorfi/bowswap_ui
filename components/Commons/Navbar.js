@@ -8,7 +8,7 @@ import	ModalMEV				from	'components/Commons/ModalMEV';
 function	Navbar({hasSecret, shouldInitialPopup}) {
 	const	{active, provider, address, ens, deactivate, onDesactivate, onSwitchChain} = useWeb3();
 	const	[modalLoginOpen, set_modalLoginOpen] = useState(false);
-	const	[modalMEVOpen, set_modalMEVOpen] = useState(true);
+	const	[modalMEVOpen, set_modalMEVOpen] = useState(false);
 	const	[initialPopup, set_initialPopup] = useState(false);
 
 	React.useEffect(() => {
