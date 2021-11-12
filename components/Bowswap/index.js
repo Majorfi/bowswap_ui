@@ -182,7 +182,7 @@ function	Bowswap({prices}) {
 			return;
 		}
 		const	V2Paths = V2_PATHS.filter(e => toAddress(e[0]) === toAddress(fromVault.address)).map(e => e[1]);
-		const	V2VaultList = BOWSWAP_CRV_V2_VAULTS.filter(e => V2Paths.includes(toAddress(e.address)));
+		const	V2VaultList = BOWSWAP_CRV_V2_VAULTS.filter(e => V2Paths.includes(toAddress(e.address)) && e.withdrawOnly === false);
 		set_toVaultsListV2(V2VaultList);
 
 		if (fromVault.scope === 'btc') {
@@ -284,7 +284,7 @@ function	Bowswap({prices}) {
 					expectedReceiveAmount={expectedReceiveAmount}
 					toCounterValue={toCounterValue}
 					slippage={slippage}
-					balanceOf={balancesOf[toVault.address]?.toString() || '0'}
+					balanceOf={balancesOf[toVault?.address]?.toString() || '0'}
 					isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount}
 					yearnVaultData={yearnVaultData} />
 
