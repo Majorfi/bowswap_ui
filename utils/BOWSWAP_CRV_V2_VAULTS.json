@@ -275,17 +275,6 @@
 		"poolAddress": "0x3eF6A01A0f81D6046290f3e2A8c5b843e738E604"
     },
     {
-        "icon": "https://rawcdn.githack.com/yearn/yearn-assets/3fa15c2e51ff3ed4dac8bd124a7bfa8888b3b78c/icons/tokens/0x3D980E50508CFd41a13837A60149927a11c03731/logo-128.png",
-        "symbol": "yvCurve-triCrypto",
-        "name": "yvCurve-triCrypto 0.4.2",
-        "decimals": 18,
-        "scope": "v2",
-        "type": "tri",
-        "address": "0x3D980E50508CFd41a13837A60149927a11c03731",
-        "tokenAddress": "0xcA3d75aC011BF5aD07a98d02f18225F9bD9A6BDF",
-        "poolAddress": "0x80466c64868e1ab14a1ddf27a676c3fcbe638fe5"
-    },
-    {
         "icon": "https://rawcdn.githack.com/yearn/yearn-assets/3fa15c2e51ff3ed4dac8bd124a7bfa8888b3b78c/icons/tokens/0x3D27705c64213A5DcD9D26880c1BcFa72d5b6B0E/logo-128.png",
         "symbol": "yvCurve-USDK",
         "name": "yvCurve-USDK 0.3.5",
