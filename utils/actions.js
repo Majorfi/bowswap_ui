@@ -218,7 +218,6 @@ export async function	swapTokens({provider, contractAddress, from, to, amount, m
 			BOWSWAP_UI_ORIGIN
 		);
 
-
 		const	safeGasLimit = ethers.BigNumber.from(shouldIncreaseGasLimit ? 3_000_000 : 2_000_000);
 		const	transaction = await contract.swap(
 			from,

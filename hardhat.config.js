@@ -27,12 +27,17 @@ module.exports = {
 	networks: {
 		hardhat: {
 			forking: {
-				url: 'http://localhost:8545'
-				// `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
+				url: 'http://localhost:8545',
+				// url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
 				// blockNumber: 13802665,
 			},
-			blockGasLimit: 12000000,
-		}
+			blockGasLimit: 12000000
+
+		},
+		localhost: {
+			url: 'http://localhost:8545',
+			timeout: 2000000000
+		},
 	},
 	mocha: {
 		timeout: 200000

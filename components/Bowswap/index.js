@@ -73,7 +73,6 @@ function	Bowswap({prices, yVaults}) {
 		} else {
 			const	possibleSwap = SWAPS.find(path => path[0] === fromVault.address && path[1] === toVault.address);
 			if (possibleSwap !== undefined) {
-				console.log(Bowswap_Contract);
 				const	estimate_out = await Bowswap_Contract.estimate_out(
 					from,
 					to,

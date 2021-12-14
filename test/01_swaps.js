@@ -19,7 +19,7 @@ describe('Tests', () => {
 
 		vaultSwapper = await VaultSwapper.new();
 		await expect(
-			vaultSwapper.initialize(rewarder.address)
+			vaultSwapper.initialize(user_0001.address)
 		).not.to.be.reverted;
 	});
 
@@ -78,27 +78,35 @@ describe('Tests', () => {
 					)
 				).not.to.be.reverted;
 
-				const	tovault = new ethers.Contract(
-					to,
-					['function balanceOf(address) external view returns (uint256)'],
-					user_0001
-				);
-				
-				let	balance = await tovault.balanceOf(user_0001.address);
-				console.log({balanceBeforeSwap: balance.toString()});
+				// const	fromVault = new ethers.Contract(
+				// 	from,
+				// 	['function balanceOf(address _spender) external view returns (uint256)'],
+				// 	user_0001
+				// );
+				// const	toVault = new ethers.Contract(
+				// 	to,
+				// 	['function balanceOf(address _spender) external view returns (uint256)'],
+				// 	user_0001
+				// );
+				// let fromBalanceBefore = await fromVault.balanceOf(user_0001.address);
+				// let toBalanceBefore = await toVault.balanceOf(user_0001.address);
+				// console.log({fromVaultBefore: fromBalanceBefore.toString()});
+				// console.log({toVaultBefore: toBalanceBefore.toString()});
+
 				await	expect(
 					vaultSwapper.swap(
 						from,
 						to,
 						amount,
-						estimate, //1,
+						estimate,
 						instructions,
 					)
 				).not.to.be.reverted;
 
-				balance = await tovault.balanceOf(user_0001.address);
-				console.log({balanceAfterSwap: balance.toString()});
-
+				// let fromBalanceAfter = await fromVault.balanceOf(user_0001.address);
+				// console.log({fromVaultAfter: fromBalanceAfter.toString()});
+				// let toBalanceAfter = await toVault.balanceOf(user_0001.address);
+				// console.log({toVaultAfter: toBalanceAfter.toString()});
 			});
 		}
 	});
