@@ -28,7 +28,7 @@ function	SectionToVault({
 						toCounterValue={toCounterValue}
 						slippage={slippage}
 						balanceOf={balanceOf}
-						decimals={toVault.decimals}
+						decimals={toVault?.decimals}
 						isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount} />
 				</div>
 			</div>

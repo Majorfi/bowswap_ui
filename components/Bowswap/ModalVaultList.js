@@ -106,13 +106,13 @@ function ModalVaultList({vaults, label, value, set_value, set_input, isFrom, dis
 					}}
 					className={`relative w-full px-4 text-left bg-ygray-100 hover:bg-ygray-50 rounded-lg focus:outline-none ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} h-24 py-2`}>
 					<div className={'flex flex-row items-center'}>
-						<Image
-							src={value.icon}
+						{value?.icon ? <Image
+							src={value?.icon || ''}
 							alt={value?.displayName || value?.name}
 							objectFit={'contain'}
 							loading={'eager'}
 							width={40}
-							height={40} />
+							height={40} /> : null}
 						<span className={'block truncate ml-2 font-bold text-sm text-gray-800'}>
 							{value?.symbol}
 						</span>

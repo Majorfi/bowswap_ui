@@ -54,14 +54,15 @@ function	SectionFromVault({
 						value={fromVault}
 						set_value={set_fromVault}
 						set_input={(v) => {
-							updateInputValue(ethers.utils.formatUnits(v, fromVault.decimals));
+							console.log(fromVault, v);
+							updateInputValue(ethers.utils.formatUnits((v || '0'), fromVault.decimals));
 						}} />
 				</div>
 				<div className={'w-full md:w-7/11'}>
 					<InputToken
 						disabled={disabled}
 						balanceOf={balanceOf}
-						decimals={fromVault.decimals}
+						decimals={fromVault?.decimals}
 						fromCounterValue={fromCounterValue}
 						value={fromAmount}
 						set_value={set_fromAmount}

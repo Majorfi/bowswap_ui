@@ -7,10 +7,6 @@ import	{fetchYearnVaults}					from	'utils/API';
 import	AAVE_V1								from	'utils/AaveV1';
 import	AAVE_V2								from	'utils/AaveV2';
 import	COMPOUND							from	'utils/Compound';
-import	BOWSWAP_CRV_EUR_VAULTS				from	'utils/BOWSWAP_CRV_EUR_VAULTS';
-import	BOWSWAP_CRV_BTC_VAULTS				from	'utils/BOWSWAP_CRV_BTC_VAULTS';
-import	BOWSWAP_CRV_USD_VAULTS				from	'utils/BOWSWAP_CRV_USD_VAULTS';
-import	BOWSWAP_CRV_V2_VAULTS				from	'utils/BOWSWAP_CRV_V2_VAULTS';
 
 const	LENDING_POOL_ADDRESS = '0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9';
 const	ERC20ABI = [
@@ -19,7 +15,6 @@ const	ERC20ABI = [
 const	LENDING_POOL_ABI = [
 	{'inputs':[{'internalType':'address','name':'asset','type':'address'}],'name':'getReserveData','outputs':[{'components':[{'components':[{'internalType':'uint256','name':'data','type':'uint256'}],'internalType':'struct DataTypes.ReserveConfigurationMap','name':'configuration','type':'tuple'},{'internalType':'uint128','name':'liquidityIndex','type':'uint128'},{'internalType':'uint128','name':'variableBorrowIndex','type':'uint128'},{'internalType':'uint128','name':'currentLiquidityRate','type':'uint128'},{'internalType':'uint128','name':'currentVariableBorrowRate','type':'uint128'},{'internalType':'uint128','name':'currentStableBorrowRate','type':'uint128'},{'internalType':'uint40','name':'lastUpdateTimestamp','type':'uint40'},{'internalType':'address','name':'aTokenAddress','type':'address'},{'internalType':'address','name':'stableDebtTokenAddress','type':'address'},{'internalType':'address','name':'variableDebtTokenAddress','type':'address'},{'internalType':'address','name':'interestRateStrategyAddress','type':'address'},{'internalType':'uint8','name':'id','type':'uint8'}],'internalType':'struct DataTypes.ReserveData','name':'','type':'tuple'}],'stateMutability':'view','type':'function'}
 ];
-
 
 const	PAIRS = [...COMPOUND, ...AAVE_V1, ...AAVE_V2];
 const	AccountContext = createContext();
@@ -46,8 +41,8 @@ export const AccountContextApp = ({children}) => {
 		return ethcallProvider;
 	}
 
-	async function	retrieveBowswapBalances() {
-		const	crvVaults = [...BOWSWAP_CRV_USD_VAULTS, ...BOWSWAP_CRV_BTC_VAULTS, ...BOWSWAP_CRV_EUR_VAULTS, ...BOWSWAP_CRV_V2_VAULTS].map(e => e.address);
+	async function	retrieveBalances(yVaults) {
+		const	crvVaults = yVaults.filter(e => e.type === 'v2').filter(e => !e.migration || e.migration?.available === false).map(e => e.address);
 		const	crvVaultsNoDuplicates = [...new Set(crvVaults)];
 		const	ethcallProvider = await multiCallProvider(provider);
 		const	multiCalls = [];
@@ -155,7 +150,7 @@ export const AccountContextApp = ({children}) => {
 			fetchYearnVaults()
 		]);
 		set_yearnVaultData(_yVaultsData);
-		retrieveBowswapBalances();
+		retrieveBalances(_yVaultsData);
 		retrieveYVempireBalances({_prices});
 		retrieveUTokenBalances({_yVaultsData});
 		set_nonce(n => n + 1);

@@ -186,7 +186,7 @@ export async function	swapTokens({provider, contractAddress, from, to, amount, m
 	const	signer = provider.getSigner();
 	const	contract = new ethers.Contract(
 		contractAddress,
-		['function swap(address from, address to, uint256 amount, uint256 min_amount_out, tuple(bool deposit, address pool, uint128 n)[] instructions, uint256 donation, uint256 origin) public'],
+		['function swap(address, address, uint256, uint256, tuple(bool, address, uint128)[], uint256, uint256) public'],
 		signer
 	);
 	if (shouldIncreaseGasLimit) {
@@ -197,6 +197,17 @@ export async function	swapTokens({provider, contractAddress, from, to, amount, m
 	**	If the call is successful, try to perform the actual TX
 	**********************************************************************/
 	try {
+		
+		console.log({
+			from,
+			to,
+			amount: amount.toString(),
+			minAmountOut: minAmountOut.toString(),
+			instructions,
+			donation,
+			BOWSWAP_UI_ORIGIN,
+		});
+
 		await contract.estimateGas.swap(
 			from,
 			to,

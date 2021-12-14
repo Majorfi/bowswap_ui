@@ -8,24 +8,21 @@ import	SectionButtons									from	'components/Bowswap/SectionButtons';
 import	SectionFromVault 								from	'components/Bowswap/SectionFromVault';
 import	SectionToVault 									from	'components/Bowswap/SectionToVault';
 import	SectionBlockStatus								from	'components/Bowswap/SectionBlockStatus';
-import	BOWSWAP_CRV_EUR_VAULTS							from	'utils/BOWSWAP_CRV_EUR_VAULTS';
-import	BOWSWAP_CRV_BTC_VAULTS							from	'utils/BOWSWAP_CRV_BTC_VAULTS';
-import	BOWSWAP_CRV_USD_VAULTS							from	'utils/BOWSWAP_CRV_USD_VAULTS';
-import	BOWSWAP_CRV_V2_VAULTS							from	'utils/BOWSWAP_CRV_V2_VAULTS';
-import	V2_PATHS										from	'utils/currentPaths';
 import	{bigNumber, toAddress}							from	'utils';
+import	METAPOOL_SWAPS									from	'utils/detected_metapoolSwaps';
+import	SWAPS											from	'utils/detected_swaps';
 
-function	Bowswap({prices}) {
+function	Bowswap({prices, yVaults}) {
 	const	{provider, active} = useWeb3();
-	const	{balancesOf, yearnVaultData} = useAccount();
+	const	{balancesOf} = useAccount();
 	const	[, set_nonce] = useState(0);
-	const	[fromVault, set_fromVault] = useLocalStorage('fromVault', BOWSWAP_CRV_USD_VAULTS[0]);
+	const	[fromVault, set_fromVault] = useLocalStorage('fromVault', yVaults[0]);
 	const	[fromCounterValue, set_fromCounterValue] = useLocalStorage('fromCounterValue', 0);
 	const	[fromAmount, set_fromAmount] = useLocalStorage('fromAmount', '');
 	const	[balanceOfFromVault, set_balanceOfFromVault] = useState(0);
-	const	[toVaultsListV2, set_toVaultsListV2] = useState(V2_PATHS.filter(e => e[0] === BOWSWAP_CRV_USD_VAULTS[0]));
-	const	[toVaultsList, set_toVaultsList] = useState(BOWSWAP_CRV_USD_VAULTS.slice(1));
-	const	[toVault, set_toVault] = useLocalStorage('toVault', BOWSWAP_CRV_USD_VAULTS[1]);
+	const	[toVaultsListV2, set_toVaultsListV2] = useState(SWAPS.filter(e => e[0] === yVaults[0]));
+	const	[toVaultsList, set_toVaultsList] = useState(yVaults.slice(1));
+	const	[toVault, set_toVault] = useLocalStorage('toVault', yVaults[1]);
 	const	[toCounterValue, set_toCounterValue] = useState(0);
 	const	[expectedReceiveAmount, set_expectedReceiveAmount] = useState('');
 	const	[slippage, set_slippage] = useState(0.05);
@@ -59,35 +56,37 @@ function	Bowswap({prices}) {
 		if (!provider || !active) {
 			return;
 		}
-		const	fromToken = new ethers.Contract(process.env.BOWSWAP_SWAPPER_ADDR, [
-			'function metapool_estimate_out(address from, address to, uint256 amount, uint256 donation) public view returns (uint256)',
-			'function estimate_out(address from, address to, uint256 amount, tuple(bool deposit, address pool, uint128 n)[] instructions, uint256 donation) public view returns (uint256)'
+		const	Bowswap_Contract = new ethers.Contract(process.env.BOWSWAP_SWAPPER_ADDR, [
+			'function metapool_estimate_out(address, address, uint256, uint256) public view returns (uint256)',
+			'function estimate_out(address, address, uint256, tuple(bool, address, uint128)[], uint256) public view returns (uint256)'
 		], provider);
 
-		if (toVault.scope === 'v2') {
-			if (V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address) !== undefined) {
-				const	estimate_out = await fromToken.estimate_out(
+		if (toVault.metapool) {
+			const	metapool_estimate_out = await Bowswap_Contract.metapool_estimate_out(
+				from,
+				to,
+				amount,
+				donation * 100
+			);
+			set_expectedReceiveAmount(ethers.utils.formatUnits(metapool_estimate_out, toVault.decimals));
+			set_isFetchingExpectedReceiveAmount(false);
+		} else {
+			const	possibleSwap = SWAPS.find(path => path[0] === fromVault.address && path[1] === toVault.address);
+			if (possibleSwap !== undefined) {
+				console.log(Bowswap_Contract);
+				const	estimate_out = await Bowswap_Contract.estimate_out(
 					from,
 					to,
 					amount,
-					V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2],
-					10_000 - donation * 100
+					possibleSwap[2],
+					donation * 100
 				);
 				set_expectedReceiveAmount(ethers.utils.formatUnits(estimate_out, toVault.decimals));
 				set_isFetchingExpectedReceiveAmount(false);
 			}
-		} else {
-			const	metapool_estimate_out = await fromToken.metapool_estimate_out(
-				from,
-				to,
-				amount,
-				10_000 - donation * 100
-			);
-			set_expectedReceiveAmount(ethers.utils.formatUnits(metapool_estimate_out, toVault.decimals));
-			set_isFetchingExpectedReceiveAmount(false);
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [fromVault.address, active, provider, toVault?.address, toVault?.decimals, toVault?.scope, toVault?.type, donation]);
+	}, [fromVault?.address, active, provider, toVault?.address, toVault?.decimals, toVault?.type, donation]);
 
 	/**************************************************************************
 	**	This function will be used to compute the counter value of the want
@@ -101,30 +100,43 @@ function	Bowswap({prices}) {
 	**	@TRIGGER : any time the `FROM` vault changes
 	**************************************************************************/
 	async function fetchFromVaultVirtualPrice() {
-		const	poolContract = new ethers.Contract(fromVault.poolAddress, ['function get_virtual_price() public view returns (uint256)'], provider);
+		const	poolContract = new ethers.Contract(
+			process.env.CURVE_REGISTRY_ADDR,
+			['function get_virtual_price_from_lp_token(address) public view returns (uint256)'],
+			provider
+		);
 		const	vaultContract = new ethers.Contract(fromVault.address, [
 			'function pricePerShare() public view returns (uint256)',
 			'function balanceOf(address) public view returns (uint256)'
 		], provider);
-		const	underlyingContract = new ethers.Contract(fromVault.tokenAddress, [
-			'function balanceOf(address) public view returns (uint256)'
-		], provider);
-		const	virtualPrice = await poolContract.get_virtual_price();
+		const	underlyingContract = new ethers.Contract(
+			fromVault?.token?.address,
+			['function balanceOf(address) public view returns (uint256)'],
+			provider
+		);
+		const	virtualPrice = await poolContract.get_virtual_price_from_lp_token(fromVault?.token?.address);
 		const	pricePerShare = await vaultContract.pricePerShare();
 		const	balanceOfVault = await underlyingContract.balanceOf(fromVault.address);
 		const	scaledBalanceOf = bigNumber.from(ethers.constants.WeiPerEther).mul(pricePerShare).div(bigNumber.from(10).pow(18)).mul(virtualPrice).div(bigNumber.from(10).pow(18));
 
-		if (fromVault.scope === 'btc' || (fromVault.scope === 'v2' && fromVault.type === 'btc')) {
+		const	isEUR = ((fromVault.display_name).toLowerCase()).includes('eur');
+		const	isBTC = ((fromVault.display_name).toLowerCase()).includes('btc');
+		const	isETH = ((fromVault.display_name).toLowerCase()).includes('eth');
+		const	isAAVE = ((fromVault.display_name).toLowerCase()).includes('aave');
+		const	isLINK = ((fromVault.display_name).toLowerCase()).includes('link');
+		const	isTRI = (((fromVault.display_name).toLowerCase()).includes('tri') || ((fromVault.display_name).toLowerCase()).includes('3crypto'));
+
+		if (isBTC) {
 			set_fromCounterValue(prices.bitcoin.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
-		} else if (fromVault.scope === 'eur' || (fromVault.scope === 'v2' && fromVault.type === 'eur')) {
+		} else if (isEUR) {
 			set_fromCounterValue((prices?.['tether-eurt'].usd || 1) * ethers.utils.formatUnits(scaledBalanceOf, 18));
-		} else if (fromVault.scope === 'v2' && fromVault.type === 'eth') {
+		} else if (isETH) {
 			set_fromCounterValue(prices.ethereum.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
-		} else if (fromVault.scope === 'v2' && fromVault.type === 'aave') {
+		} else if (isAAVE) {
 			set_fromCounterValue(prices.aave.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
-		} else if (fromVault.scope === 'v2' && fromVault.type === 'link') {
+		} else if (isLINK) {
 			set_fromCounterValue(prices.chainlink.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
-		} else if (fromVault.scope === 'v2' && fromVault.type === 'tri') {
+		} else if (isTRI) {
 			const	price = await computeTriCryptoPrice();
 			set_fromCounterValue(price * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else {
@@ -145,23 +157,41 @@ function	Bowswap({prices}) {
 	**	@TRIGGER : any time the `TO` vault changes
 	**************************************************************************/
 	async function fetchToVaultVirtualPrice() {
-		const	poolContract = new ethers.Contract(toVault.poolAddress, ['function get_virtual_price() public view returns (uint256)'], provider);
-		const	vaultContract = new ethers.Contract(toVault.address, ['function pricePerShare() public view returns (uint256)'], provider);
-		const	virtualPrice = await poolContract.get_virtual_price();
+		if (!toVault) {
+			return;
+		}
+		const	poolContract = new ethers.Contract(
+			process.env.CURVE_REGISTRY_ADDR,
+			['function get_virtual_price_from_lp_token(address) public view returns (uint256)'],
+			provider
+		);
+		const	vaultContract = new ethers.Contract(
+			toVault.address,
+			['function pricePerShare() public view returns (uint256)'],
+			provider
+		);
+		const	virtualPrice = await poolContract.get_virtual_price_from_lp_token(toVault?.token?.address);
 		const	pricePerShare = await vaultContract.pricePerShare();
 		const	scaledBalanceOf = bigNumber.from(ethers.constants.WeiPerEther).mul(pricePerShare).div(bigNumber.from(10).pow(18)).mul(virtualPrice).div(bigNumber.from(10).pow(18));
 
-		if (toVault.scope === 'btc' || (toVault.scope === 'v2' && toVault.type === 'btc')) {
+		const	isEUR = ((toVault.display_name).toLowerCase()).includes('eur');
+		const	isBTC = ((toVault.display_name).toLowerCase()).includes('btc');
+		const	isETH = ((toVault.display_name).toLowerCase()).includes('eth');
+		const	isAAVE = ((toVault.display_name).toLowerCase()).includes('aave');
+		const	isLINK = ((toVault.display_name).toLowerCase()).includes('link');
+		const	isTRI = (((toVault.display_name).toLowerCase()).includes('tri') || ((toVault.display_name).toLowerCase()).includes('3crypto'));
+
+		if (isBTC) {
 			set_toCounterValue(prices.bitcoin.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
-		} else if (toVault.scope === 'eur' || (toVault.scope === 'v2' && toVault.type === 'eur')) {
+		} else if (isEUR) {
 			set_toCounterValue((prices?.['tether-eurt'].usd || 1) * ethers.utils.formatUnits(scaledBalanceOf, 18));
-		} else if (toVault.scope === 'v2' && toVault.type === 'eth') {
+		} else if (isETH) {
 			set_toCounterValue(prices.ethereum.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
-		} else if (toVault.scope === 'v2' && toVault.type === 'aave') {
+		} else if (isAAVE) {
 			set_toCounterValue(prices.aave.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
-		} else if (toVault.scope === 'v2' && toVault.type === 'link') {
+		} else if (isLINK) {
 			set_toCounterValue(prices.chainlink.usd * ethers.utils.formatUnits(scaledBalanceOf, 18));
-		} else if (toVault.scope === 'v2' && toVault.type === 'tri') {
+		} else if (isTRI) {
 			const	price = await computeTriCryptoPrice();
 			set_toCounterValue(price * ethers.utils.formatUnits(scaledBalanceOf, 18));
 		} else {
@@ -178,40 +208,39 @@ function	Bowswap({prices}) {
 	**	@TRIGGER : any time the `FROM` vault changes
 	**************************************************************************/
 	useEffect(() => {
-		if (!provider || !active) {
+		if (!provider || !active || !fromVault?.token) {
 			return;
 		}
-		const	V2Paths = V2_PATHS.filter(e => toAddress(e[0]) === toAddress(fromVault.address)).map(e => e[1]);
-		const	V2VaultList = BOWSWAP_CRV_V2_VAULTS.filter(e => V2Paths.includes(toAddress(e.address)) && e.withdrawOnly === false);
-		set_toVaultsListV2(V2VaultList);
 
-		if (fromVault.scope === 'btc') {
-			const	vaultList = BOWSWAP_CRV_BTC_VAULTS.filter(e => e.address !== fromVault.address);
-			set_toVaultsList(vaultList);
-			if (toVault.scope !== 'btc' || fromVault.address === toVault.address || !V2Paths.includes(toAddress(toVault.address)))
-				set_toVault(vaultList[0]);
-		} else if (fromVault.scope === 'usd') {
-			const	vaultList = BOWSWAP_CRV_USD_VAULTS.filter(e => e.address !== fromVault.address);
-			set_toVaultsList(vaultList);
-			if (toVault.scope !== 'usd' || fromVault.address === toVault.address || !V2Paths.includes(toAddress(toVault.address)))
-				set_toVault(vaultList[0]);
-		} else if (fromVault.scope === 'eur') {
-			const	vaultList = BOWSWAP_CRV_EUR_VAULTS.filter(e => e.address !== fromVault.address);
-			set_toVaultsList(vaultList);
-			if (toVault.scope !== 'eur' || fromVault.address === toVault.address || !V2Paths.includes(toAddress(toVault.address)))
-				set_toVault(vaultList[0]);
-		} else {
-			set_toVaultsList([]);
-			if (!V2Paths.includes(toVault.address) || toVault.scope !== 'v2') {
-				set_toVault(V2VaultList[0]);
-			}
+		let		_hasPath = false;
+		const	_legacyPaths = METAPOOL_SWAPS
+			.filter(e => toAddress(e[0]) === toAddress(fromVault?.address))
+			.map(e => e[1]);
+		const	_toVault = yVaults
+			.filter(e => _legacyPaths.includes(toAddress(e.address)))
+			.map(e => ({...e, metapool: true}));
+		set_toVaultsList(_toVault);
+		if (_toVault.length > 0) {
+			_hasPath = true;
+			set_toVault(_toVault[0] || null);
+		}
+
+		const	_paths = SWAPS
+			.filter(e => toAddress(e[0]) === toAddress(fromVault.address))
+			.map(e => e[1]);
+		const	_toVault2 = yVaults
+			.filter(e => _paths.includes(toAddress(e.address)))
+			.map(e => ({...e, metapool: false}));
+		set_toVaultsListV2(_toVault2);
+		if (!_hasPath) {
+			set_toVault(_toVault2[0] || null);
 		}
 
 		if (provider)
 			fetchFromVaultVirtualPrice();
 		set_nonce(n => n + 1);
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [fromVault.address, provider, active]);
+	}, [fromVault?.address, provider, active]);
 
 	/**************************************************************************
 	**	Any time the fromVault address is changed, we need to change the list
@@ -237,33 +266,41 @@ function	Bowswap({prices}) {
 	**	plus when the `FROM` vault changes or the `TO` vault changes
 	**************************************************************************/
 	useEffect(() => {
-		if (Number(fromAmount) !== 0) {
+		if (Number(fromAmount) !== 0 && toVault?.address) {
 			set_isFetchingExpectedReceiveAmount(true);
-			fetchEstimateOut(fromVault.address, toVault.address, ethers.utils.parseUnits(fromAmount, fromVault.decimals));
+			fetchEstimateOut(
+				fromVault.address,
+				toVault.address,
+				ethers.utils.parseUnits(fromAmount, fromVault.decimals)
+			);
 			set_nonce(n => n + 1);
 		} else {
 			set_expectedReceiveAmount('');
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [debouncedFetchExpectedAmount, fromAmount, donation, fromVault.address, toVault?.address, fromVault.decimals]);
+	}, [debouncedFetchExpectedAmount, fromAmount, donation, fromVault?.address, toVault?.address, fromVault?.decimals]);
+
+	if (!fromVault) {
+		return null;
+	}
 
 	return (
 		<div className={'w-full max-w-2xl'}>
 			<div className={'bg-white rounded-xl shadow-base p-4 w-full relative space-y-0 md:space-y-4'}>
 				<SectionFromVault
 					disabled={!txApproveStatus.none || (!txSwapStatus.none && !txSwapStatus.success)}
-					vaults={[...BOWSWAP_CRV_USD_VAULTS, ...BOWSWAP_CRV_BTC_VAULTS, ...BOWSWAP_CRV_EUR_VAULTS, ...BOWSWAP_CRV_V2_VAULTS]}
+					vaults={yVaults}
 					fromVault={fromVault}
 					set_fromVault={set_fromVault}
 					fromAmount={fromAmount}
 					set_fromAmount={set_fromAmount}
 					fromCounterValue={fromCounterValue}
-					balanceOf={balancesOf[fromVault.address]?.toString() || '0'}
+					balanceOf={balancesOf[fromVault?.address]?.toString() || '0'}
 					slippage={slippage}
 					set_slippage={set_slippage}
 					donation={donation}
 					set_donation={set_donation}
-					yearnVaultData={yearnVaultData} />
+					yVaults={yVaults} />
 
 				<div className={'flex w-full justify-center pt-4'}>
 					<SectionBlockStatus
@@ -286,7 +323,7 @@ function	Bowswap({prices}) {
 					slippage={slippage}
 					balanceOf={balancesOf[toVault?.address]?.toString() || '0'}
 					isFetchingExpectedReceiveAmount={isFetchingExpectedReceiveAmount}
-					yearnVaultData={yearnVaultData} />
+					yVaults={yVaults} />
 
 				<SectionButtons
 					fromAmount={fromAmount}
