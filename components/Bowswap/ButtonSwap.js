@@ -31,7 +31,6 @@ function	ButtonSwap({
 		try {
 			swapTokens({
 				provider: provider,
-				contractAddress: process.env.BOWSWAP_SWAPPER_ADDR,
 				from: fromVault.address,
 				to: toVault.address,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
@@ -66,7 +65,6 @@ function	ButtonSwap({
 		try {
 			metapoolSwapTokens({
 				provider: provider,
-				contractAddress: process.env.BOWSWAP_SWAPPER_ADDR,
 				from: fromVault.address,
 				to: toVault.address,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),

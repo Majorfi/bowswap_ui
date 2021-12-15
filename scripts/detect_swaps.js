@@ -66,7 +66,7 @@ async function newWithBacktracking({from, to, path, i, max}) {
 				) {
 					continue;
 				}
-				if (path.some(([isDeposit, addr]) => (isDeposit === 'False' && addr === element.address))) {
+				if (path.some(([isDeposit, addr]) => (isDeposit === 1 && addr === element.address))) {
 					continue;
 				}
 				if (element.canWithdraw === false) {
@@ -75,7 +75,7 @@ async function newWithBacktracking({from, to, path, i, max}) {
 				const	result = await newWithBacktracking({
 					from: coinElement,
 					to,
-					path: [...path, ['False', element.address, coinIndex]],
+					path: [...path, [1, element.address, coinIndex, 0]],
 					i: i + 1,
 					max
 				});
@@ -104,7 +104,7 @@ async function newWithBacktracking({from, to, path, i, max}) {
 				if (intersectionIndex === -1) {
 					continue;
 				}
-				if (path.some(([isDeposit, addr]) => (isDeposit === 'False' && addr === minterAddress))) {
+				if (path.some(([isDeposit, addr]) => (isDeposit === 1 && addr === minterAddress))) {
 					continue;
 				}
 				if (minter.canWithdraw === false) {
@@ -113,7 +113,7 @@ async function newWithBacktracking({from, to, path, i, max}) {
 				const	result = await newWithBacktracking({
 					from: coin,
 					to,
-					path: [...path, ['False', minterAddress, intersectionIndex]],
+					path: [...path, [1, minterAddress, intersectionIndex, 0]],
 					i: i + 1,
 					max,
 				});
@@ -128,13 +128,13 @@ async function newWithBacktracking({from, to, path, i, max}) {
 				if (intersectionIndex === -1) {
 					continue;
 				}
-				if (path.some(([isDeposit, addr]) => (isDeposit === 'True' && addr === minterAddress))) {
+				if (path.some(([isDeposit, addr]) => (isDeposit === 0 && addr === minterAddress))) {
 					continue;
 				}
 				const	result = await newWithBacktracking({
 					from: coin,
 					to,
-					path: [...path, ['True', minterAddress, intersectionIndex]],
+					path: [...path, [0, minterAddress, intersectionIndex, 0]],
 					i: i + 1,
 					max,
 				});
@@ -152,14 +152,14 @@ async function newWithBacktracking({from, to, path, i, max}) {
 				const	lpToken = allPoolsAsArray.find(e => e.lpToken === element.lpToken);
 				const	lpTokenPool = lpToken.coins || [];
 				const	lpTokenPoolIndex = lpTokenPool.indexOf(from);
-				if (path.some(([isDeposit, addr]) => (isDeposit === 'True' && addr === element.address))) {
+				if (path.some(([isDeposit, addr]) => (isDeposit === 0 && addr === element.address))) {
 					continue;
 				}
 				if (lpTokenPoolIndex > -1) {
 					const	result = await newWithBacktracking({
 						from: element.lpToken,
 						to,
-						path: [...path, ['True', element.address, lpTokenPoolIndex]],
+						path: [...path, [0, element.address, lpTokenPoolIndex, 0]],
 						i: i + 1,
 						max,
 					});
@@ -181,7 +181,7 @@ async function newWithBacktracking({from, to, path, i, max}) {
 				continue;
 			}
 
-			if (path.some(([isDeposit, addr]) => (isDeposit === 'False' && addr === element))) {
+			if (path.some(([isDeposit, addr]) => (isDeposit === 1 && addr === element))) {
 				continue;
 			}
 
@@ -192,7 +192,7 @@ async function newWithBacktracking({from, to, path, i, max}) {
 			const	result = await newWithBacktracking({
 				from: element,
 				to,
-				path: [...path, ['False', currentFrom, index]],
+				path: [...path, [1, currentFrom, index, 0]],
 				i: i + 1,
 				max
 			});
@@ -214,7 +214,7 @@ async function findPath({from, to}) {
 	const	toToken = toAddress(await toVaults.token());
 	
 	let	returnValue = undefined;
-	for (let max = 0; max < 9; max++) {
+	for (let max = 0; max < 7; max++) {
 		const	result = await newWithBacktracking({
 			from: fromToken,
 			to: toToken,
@@ -268,7 +268,7 @@ async function	findAllPath() {
 			}
 		});
 	});
-	const toJSON = JSON.stringify(results, null, 2).replaceAll('"False"', 'false').replaceAll('"True"', 'true');
+	const toJSON = JSON.stringify(results, null, 2);
 	console.log(toJSON);
 }
 

@@ -58,7 +58,7 @@ function	Bowswap({prices, yVaults}) {
 		}
 		const	Bowswap_Contract = new ethers.Contract(process.env.BOWSWAP_SWAPPER_ADDR, [
 			'function metapool_estimate_out(address, address, uint256, uint256) public view returns (uint256)',
-			'function estimate_out(address, address, uint256, tuple(bool, address, uint128)[], uint256) public view returns (uint256)'
+			'function estimate_out(address, address, uint256, tuple(uint8, address, uint128, uint128)[], uint256) public view returns (uint256)'
 		], provider);
 
 		if (toVault.metapool) {

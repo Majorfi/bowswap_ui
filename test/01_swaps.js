@@ -40,7 +40,7 @@ describe('Tests', () => {
 				);
 
 				const	decimals = await vault.decimals();
-				const	amount = ethers.utils.parseUnits('1', Number(decimals));
+				const	amount = ethers.utils.parseUnits('100', Number(decimals));
 				await	initBalance(allUniqueFrom[index], amount);
 				const	approveTx = await vault.approve(vaultSwapper.address, ethers.constants.MaxUint256);
 				const	approveTxReceipt = await approveTx.wait();
@@ -60,12 +60,7 @@ describe('Tests', () => {
 					user_0001
 				);
 				const	decimals = await vault.decimals();
-				let		amount;
-
-				if (from === '0x5e69e8b51B71C8596817fD442849BD44219bb095')
-					amount = ethers.utils.parseUnits('1', 10);
-				else
-					amount = ethers.utils.parseUnits('1', decimals);
+				const	amount = ethers.utils.parseUnits('1', decimals);
 				await	depositUnderlying(from, amount);
 			
 				const	estimate = await expect(
@@ -78,21 +73,6 @@ describe('Tests', () => {
 					)
 				).not.to.be.reverted;
 
-				// const	fromVault = new ethers.Contract(
-				// 	from,
-				// 	['function balanceOf(address _spender) external view returns (uint256)'],
-				// 	user_0001
-				// );
-				// const	toVault = new ethers.Contract(
-				// 	to,
-				// 	['function balanceOf(address _spender) external view returns (uint256)'],
-				// 	user_0001
-				// );
-				// let fromBalanceBefore = await fromVault.balanceOf(user_0001.address);
-				// let toBalanceBefore = await toVault.balanceOf(user_0001.address);
-				// console.log({fromVaultBefore: fromBalanceBefore.toString()});
-				// console.log({toVaultBefore: toBalanceBefore.toString()});
-
 				await	expect(
 					vaultSwapper.swap(
 						from,
@@ -102,11 +82,6 @@ describe('Tests', () => {
 						instructions,
 					)
 				).not.to.be.reverted;
-
-				// let fromBalanceAfter = await fromVault.balanceOf(user_0001.address);
-				// console.log({fromVaultAfter: fromBalanceAfter.toString()});
-				// let toBalanceAfter = await toVault.balanceOf(user_0001.address);
-				// console.log({toVaultAfter: toBalanceAfter.toString()});
 			});
 		}
 	});

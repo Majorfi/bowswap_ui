@@ -65,7 +65,6 @@ describe('Tests', () => {
 						1,
 						{'from': user_0001.address},
 					)
-				// ).to.be.revertedWith('he');
 				).not.to.be.reverted;
 			});
 		}
