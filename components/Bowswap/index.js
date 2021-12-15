@@ -8,7 +8,7 @@ import	SectionButtons									from	'components/Bowswap/SectionButtons';
 import	SectionFromVault 								from	'components/Bowswap/SectionFromVault';
 import	SectionToVault 									from	'components/Bowswap/SectionToVault';
 import	SectionBlockStatus								from	'components/Bowswap/SectionBlockStatus';
-import	{bigNumber, toAddress}							from	'utils';
+import	{toAddress}										from	'utils';
 import	METAPOOL_SWAPS									from	'utils/detected_metapoolSwaps';
 import	SWAPS											from	'utils/detected_swaps';
 
@@ -116,7 +116,7 @@ function	Bowswap({prices, yVaults}) {
 		const	virtualPrice = await poolContract.get_virtual_price_from_lp_token(fromVault?.token?.address);
 		const	pricePerShare = await vaultContract.pricePerShare();
 		const	balanceOfVault = await underlyingContract.balanceOf(fromVault.address);
-		const	scaledBalanceOf = bigNumber.from(ethers.constants.WeiPerEther).mul(pricePerShare).div(bigNumber.from(10).pow(18)).mul(virtualPrice).div(bigNumber.from(10).pow(18));
+		const	scaledBalanceOf = ethers.BigNumber.from(ethers.constants.WeiPerEther).mul(pricePerShare).div(ethers.BigNumber.from(10).pow(18)).mul(virtualPrice).div(ethers.BigNumber.from(10).pow(18));
 
 		const	isEUR = ((fromVault.display_name).toLowerCase()).includes('eur');
 		const	isBTC = ((fromVault.display_name).toLowerCase()).includes('btc');
@@ -171,7 +171,7 @@ function	Bowswap({prices, yVaults}) {
 		);
 		const	virtualPrice = await poolContract.get_virtual_price_from_lp_token(toVault?.token?.address);
 		const	pricePerShare = await vaultContract.pricePerShare();
-		const	scaledBalanceOf = bigNumber.from(ethers.constants.WeiPerEther).mul(pricePerShare).div(bigNumber.from(10).pow(18)).mul(virtualPrice).div(bigNumber.from(10).pow(18));
+		const	scaledBalanceOf = ethers.BigNumber.from(ethers.constants.WeiPerEther).mul(pricePerShare).div(ethers.BigNumber.from(10).pow(18)).mul(virtualPrice).div(ethers.BigNumber.from(10).pow(18));
 
 		const	isEUR = ((toVault.display_name).toLowerCase()).includes('eur');
 		const	isBTC = ((toVault.display_name).toLowerCase()).includes('btc');
