@@ -15,18 +15,18 @@ function	InputTokenDisabled({
 				<div className={'flex flex-row items-center justify-end w-full'}>
 					<label
 						className={'font-normal text-ybase text-ygray-500 hidden md:flex flex-row items-center cursor-pointer'}>
-						{`Balance: ${tokenBalance !== 0 && tokenBalance < 1 ? '< 1' : tokenBalance}`}
+						{`Balance: ${tokenBalance !== 0 && tokenBalance < 0.001 ? '< 0.0011' : tokenBalance}`}
 					</label>
 					<label
 						className={'font-normal text-ybase text-ygray-500 flex flex-row items-center md:hidden cursor-pointer'}>
-						{`Balance: ${tokenBalance !== 0 && tokenBalance < 1 ? '< 1' : tokenBalance.toFixed(8)}`}
+						{`Balance: ${tokenBalance !== 0 && tokenBalance < 0.001 ? '< 0.001' : tokenBalance.toFixed(8)}`}
 					</label>
 				</div>
 			</div>
 			<div className={`flex w-full h-10 ${isFetchingExpectedReceiveAmount ? 'hidden' : ''}`}>
 				<label
 					htmlFor={'fromInput'}
-					className={`with-placeholder placeholder-${value.length} flex justify-end w-full h-10 text-4xl font-medium text-ygray-700 text-opacity-20 proportional-nums cursor-text`}>
+					className={`with-placeholder placeholder-${String(value).length} flex justify-end w-full h-10 text-4xl font-medium text-ygray-700 text-opacity-20 proportional-nums cursor-default`}>
 					<input
 						value={expectedOutWithSettings.toFixed(6)}
 						disabled

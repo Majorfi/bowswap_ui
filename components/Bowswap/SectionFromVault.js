@@ -54,7 +54,6 @@ function	SectionFromVault({
 						value={fromVault}
 						set_value={set_fromVault}
 						set_input={(v) => {
-							console.log(fromVault, v);
 							updateInputValue(ethers.utils.formatUnits((v || '0'), fromVault.decimals));
 						}} />
 				</div>

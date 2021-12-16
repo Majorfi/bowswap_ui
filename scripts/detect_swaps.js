@@ -232,7 +232,9 @@ async function findPath({from, to}) {
 
 async function	findAllPath() {
 	const	allVaults = await axios.get('https://api.yearn.finance/v1/chains/1/vaults/all');
-	const	validVaults = allVaults.data.filter(e => e.type === 'v2').filter(e => !e.migration || e.migration?.available === false);
+	const	validVaults = allVaults.data
+		.filter(e => e.type === 'v2')
+		.filter(e => !e.migration || e.migration?.available === false);
 	const	vaultsWithDepositLimit = [];
 	const	calls = [];
 

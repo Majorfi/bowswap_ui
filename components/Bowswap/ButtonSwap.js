@@ -34,7 +34,7 @@ function	ButtonSwap({
 				from: fromVault.address,
 				to: toVault.address,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(18), fromVault.decimals),
+				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(fromVault.decimals || 18), fromVault.decimals),
 				instructions: SWAPS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2],
 				donation: donation * 100,
 				shouldIncreaseGasLimit
@@ -68,7 +68,7 @@ function	ButtonSwap({
 				from: fromVault.address,
 				to: toVault.address,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(18), fromVault.decimals),
+				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(fromVault.decimals || 18), fromVault.decimals),
 				donation: donation * 100,
 				shouldIncreaseGasLimit
 			}, ({error}) => {
@@ -116,7 +116,7 @@ function	ButtonSwap({
 			from: fromVault.address,
 			to: toVault.address,
 			amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-			minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(18), fromVault.decimals),
+			minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(fromVault.decimals || 18), fromVault.decimals),
 			instructions: SWAPS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2],
 			signature,
 			donation: donation * 100,
@@ -153,7 +153,7 @@ function	ButtonSwap({
 				from: fromVault.address,
 				to: toVault.address,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(18), fromVault.decimals),
+				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(fromVault.decimals || 18), fromVault.decimals),
 				signature,
 				donation: donation * 100,
 				shouldIncreaseGasLimit
@@ -186,6 +186,7 @@ function	ButtonSwap({
 				set_transactionProcessing(false);
 				return onCallback('error', 'User denied transaction signature');
 			} else if (v2PathExists) {
+				console.warn(error);
 				console.log('FALLBACK_WITH_V2');
 				return performV2Swap();
 			} else {

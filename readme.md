@@ -43,8 +43,8 @@ node scripts/upgrade_swaps.js > utils/detected_swaps.json
 
 ## Tests
 You can test the paths with :   
-- `npx hardhat test test/00_metapoolswaps.js`  
-- `npx hardhat test test/01_swaps.js`  
+- `npx hardhat test tests/00_metapoolswaps.js`  
+- `npx hardhat test tests/01_swaps.js`  
 
 ## Links
 - [Yearn](http://yearn.finance/) 

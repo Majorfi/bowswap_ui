@@ -1,8 +1,8 @@
 import	React, {useContext, useState, useEffect, createContext}	from	'react';
 import	{ethers}							from	'ethers';
-import	{Provider, Contract}				from	'ethcall';
+import	{Contract}							from	'ethcall';
 import	useWeb3								from	'contexts/useWeb3';
-import	{toAddress}							from	'utils';
+import	{toAddress, newEthCallProvider}		from	'utils';
 import	{fetchYearnVaults}					from	'utils/API';
 import	AAVE_V1								from	'utils/AaveV1';
 import	AAVE_V2								from	'utils/AaveV2';
@@ -20,26 +20,6 @@ const	PAIRS = [...COMPOUND, ...AAVE_V1, ...AAVE_V2];
 const	AccountContext = createContext();
 const	fetcher = (...args) => fetch(...args).then(res => res.json());
 
-
-export async function newEthCallProvider(provider, chainID) {
-	const	ethcallProvider = new Provider();
-	console.warn(ethcallProvider);
-	if (chainID === 1337 || chainID === 31337) {
-		await	ethcallProvider.init(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
-		ethcallProvider.multicall = {
-			address: '0xeefba1e63905ef1d7acba5a8513c70307c1ce441',
-			block: 0
-		};
-		ethcallProvider.multicall2 = {
-			address: '0x5ba1e12693dc8f9c48aad8770482f4739beed696',
-			block: 0
-		};
-		return ethcallProvider;
-	}
-	await	ethcallProvider.init(provider);
-	return	ethcallProvider;
-}
-
 export const AccountContextApp = ({children}) => {
 	const	{active, provider, chainID, address} = useWeb3();
 	const	[yVempireData, set_yVempireData] = useState(PAIRS);
@@ -48,19 +28,6 @@ export const AccountContextApp = ({children}) => {
 	const	[yearnVaultData, set_yearnVaultData] = useState([]);
 	const	[balancesOf, set_balancesOf] = useState({});
 	const	[allowances, set_allowances] = useState({});
-
-	// async function	newEthCallProvider(provider) {
-	// 	const	ethcallProvider = new Provider();
-	// 	const	{chainId} = await provider.getNetwork();
-	// 	console.warn({chainId});
-	// 	if (chainId === 1337 || chainId === 31337) {
-	// 		await ethcallProvider.init(getProvider('major'));
-	// 		ethcallProvider.multicallAddress = '0xeefba1e63905ef1d7acba5a8513c70307c1ce441';
-	// 	} else {
-	// 		await ethcallProvider.init(provider);
-	// 	}
-	// 	return ethcallProvider;
-	// }
 
 	async function	retrieveBalances(yVaults) {
 		const	crvVaults = yVaults.filter(e => e.type === 'v2').filter(e => !e.migration || e.migration?.available === false).map(e => e.address);
@@ -172,8 +139,8 @@ export const AccountContextApp = ({children}) => {
 		]);
 		set_yearnVaultData(_yVaultsData);
 		retrieveBalances(_yVaultsData);
-		// retrieveYVempireBalances({_prices});
-		// retrieveUTokenBalances({_yVaultsData});
+		retrieveYVempireBalances({_prices});
+		retrieveUTokenBalances({_yVaultsData});
 		set_nonce(n => n + 1);
 	}
 

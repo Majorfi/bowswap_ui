@@ -126,7 +126,7 @@ export async function	metapoolSwapTokensWithSignature({provider, contractAddress
 	const	signer = provider.getSigner();
 	const	contract = new ethers.Contract(
 		contractAddress,
-		['function metapool_swap_with_signature(address from_vault, address to_vault, uint256 amount, uint256 min_amount_out, uint256 expiry, bytes calldata signature, uint256 donation, uint256 origin) public'],
+		['function metapool_swap_with_signature(address, address, uint256, uint256, uint256, bytes calldata, uint256, uint256) public'],
 		signer
 	);
 	if (shouldIncreaseGasLimit) {
@@ -196,17 +196,6 @@ export async function	swapTokens({provider, from, to, amount, minAmountOut, inst
 	**	If the call is successful, try to perform the actual TX
 	**********************************************************************/
 	try {
-		
-		console.log({
-			from,
-			to,
-			amount,
-			minAmountOut,
-			instructions,
-			donation,
-			BOWSWAP_UI_ORIGIN,
-		});
-
 		await Bowswap_Contract.estimateGas.swap(
 			from,
 			to,
@@ -216,7 +205,6 @@ export async function	swapTokens({provider, from, to, amount, minAmountOut, inst
 			donation,
 			BOWSWAP_UI_ORIGIN
 		);
-
 
 		const	safeGasLimit = ethers.BigNumber.from(shouldIncreaseGasLimit ? 3_000_000 : 2_000_000);
 		const	transaction = await Bowswap_Contract.swap(
@@ -230,7 +218,6 @@ export async function	swapTokens({provider, from, to, amount, minAmountOut, inst
 			{gasLimit: safeGasLimit}
 		);
 		const	transactionResult = await transaction.wait();
-		console.dir(transactionResult);
 
 		if (transactionResult.status === 1) {
 			callback({error: false, data: amount});
@@ -247,7 +234,7 @@ export async function	swapTokensWithSignature({provider, contractAddress, from, 
 	const	signer = provider.getSigner();
 	const	contract = new ethers.Contract(
 		contractAddress,
-		['function swap_with_signature(address from, address to, uint256 amount, uint256 min_amount_out, tuple(bool deposit, address pool, uint128 n)[] instructions, uint256 expiry, bytes calldata signature, uint256 donation, uint256 origin)'],
+		['function swap_with_signature(address from, address to, uint256 amount, uint256 min_amount_out, tuple(uint8 action, address pool, uint128 n, uint128 m)[] instructions, uint256 expiry, bytes calldata signature, uint256 donation, uint256 origin)'],
 		signer
 	);
 	if (shouldIncreaseGasLimit) {

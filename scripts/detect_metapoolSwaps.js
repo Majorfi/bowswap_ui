@@ -99,7 +99,9 @@ async function detectMetapools(vaultSwapper) {
 	[user_0001] = await ethers.getSigners();
 
 	const	allVaults = await axios.get('https://api.yearn.finance/v1/chains/1/vaults/all');
-	const	validVaults = allVaults.data.filter(e => e.type === 'v2').filter(e => !e.migration || e.migration?.available === false).filter(e => ((e.display_name).toLowerCase()).includes('curve'));
+	const	validVaults = allVaults.data
+		.filter(e => e.type === 'v2')
+		.filter(e => !e.migration || e.migration?.available === false);
 	const	possibleSwaps = [];
 	const	checked = [];
 
@@ -140,7 +142,7 @@ async function detectMetapools(vaultSwapper) {
 				);
 
 				const	decimals = await vault.decimals();
-				const	amount = ethers.utils.parseUnits('1', decimals);
+				const	amount = ethers.utils.parseUnits('10', decimals);
 				await	depositUnderlying(from, amount);
 
 				try {

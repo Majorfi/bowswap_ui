@@ -15,7 +15,12 @@ function	SectionButtons({
 	const	[canSign, set_canSign] = useState(true);
 	const	{balancesOf, updateBalanceOf, allowances} = useAccount();
 
-	const	isAllowed = fromAmount !== '' && Number(fromAmount) > 0 && ethers.BigNumber.from(allowances?.[fromVault.address] || 0)?.gte(ethers.utils.parseUnits(fromAmount || '0', fromVault.decimals || 18));
+	const	isAllowed = (
+		fromAmount !== '' && 
+		Number(fromAmount) > 0 &&
+		ethers.BigNumber.from(allowances?.[fromVault.address] || 0)
+			?.gte(ethers.utils.parseUnits(Number(fromAmount || '0').toFixed(fromVault.decimals || 18), fromVault.decimals || 18))
+	);
 
 	return (
 		<div className={'flex flex-row justify-center pt-8 w-full space-x-4'}>
