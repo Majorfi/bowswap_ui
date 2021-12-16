@@ -217,7 +217,7 @@ function	Bowswap({prices, yVaults}) {
 	**	@TRIGGER : any time the `TO` vault changes
 	**************************************************************************/
 	useEffect(() => {
-		if (provider && active && toVault) {
+		if (provider && active && toVault?.token) {
 			set_isFetchingExpectedReceiveAmount(true);
 			set_expectedReceiveAmount('');
 			Promise.all([
