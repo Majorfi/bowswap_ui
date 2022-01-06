@@ -15,7 +15,7 @@ function	InputTokenDisabled({
 				<div className={'flex flex-row items-center justify-end w-full'}>
 					<label
 						className={'font-normal text-ybase text-ygray-500 hidden md:flex flex-row items-center cursor-pointer'}>
-						{`Balance: ${tokenBalance !== 0 && tokenBalance < 0.001 ? '< 0.0011' : tokenBalance}`}
+						{`Balance: ${tokenBalance !== 0 && tokenBalance < 0.001 ? '< 0.001' : tokenBalance}`}
 					</label>
 					<label
 						className={'font-normal text-ybase text-ygray-500 flex flex-row items-center md:hidden cursor-pointer'}>
