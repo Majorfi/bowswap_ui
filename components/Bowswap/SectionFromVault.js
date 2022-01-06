@@ -3,6 +3,22 @@ import	{ethers}						from	'ethers';
 import	InputToken						from	'components/Bowswap/InputToken';
 import	ModalVaultList					from	'components/Bowswap/ModalVaultList';
 
+function parseAmount(amount) {
+	let		_value = amount.replaceAll('..', '.').replaceAll(/[^0-9.]/g, '');
+	const	[dec, frac] = _value.split('.');
+	if (frac) _value = `${dec}.${frac.slice(0, 12)}`;
+
+	if (_value === '.') {
+		return ('0.');
+	} else if (_value.length > 0 && _value[0] === '-') {
+		return ('');
+	} else if (_value.length >= 2 && _value[0] === '0' && _value[1] !== '.') {
+		return (_value.slice(1) || '');
+	} else {
+		return (_value || '');
+	}
+}
+
 function	SectionFromVault({
 	vaults, fromVault, set_fromVault,
 	fromAmount, set_fromAmount,
@@ -13,32 +29,14 @@ function	SectionFromVault({
 }) {
 	const	[isInit, set_isInit] = useState(false);
 
-	function	updateInputValue(newValue) {
-		let		_value = newValue.replaceAll('..', '.').replaceAll(/[^0-9.]/g, '');
-		const	[dec, frac] = _value.split('.');
-		if (frac) _value = `${dec}.${frac.slice(0, 12)}`;
-
-		if (_value === '.') {
-			set_fromAmount('0.');
-		} else if (_value.length > 0 && _value[0] === '-') {
-			set_fromAmount('');
-		} else if (_value.length >= 2 && _value[0] === '0' && _value[1] !== '.') {
-			set_fromAmount(_value.slice(1) || '');
-		} else {
-			set_fromAmount(_value || '');
-		}
-	}
-
 	useEffect(() => {
 		if (!isInit && (fromAmount !== '' && fromAmount !== '0.0' && Number(fromAmount) !== 0)) {
-			updateInputValue(fromAmount);
+			set_fromAmount(parseAmount(fromAmount));
+			set_isInit(true);
+		} else if (!isInit && balanceOf !== '0') {
 			set_isInit(true);
 		}
-		else if (!isInit && balanceOf !== '0') {
-			set_fromAmount(ethers.utils.formatUnits(balanceOf, fromVault.decimals));
-			set_isInit(true);
-		}
-	}, [isInit, balanceOf, fromAmount]);
+	}, [isInit, balanceOf]);
 
 	return (
 		<section aria-label={'FROM_VAULT'}>
@@ -53,9 +51,7 @@ function	SectionFromVault({
 						yearnVaultData={yearnVaultData}
 						value={fromVault}
 						set_value={set_fromVault}
-						set_input={(v) => {
-							updateInputValue(ethers.utils.formatUnits((v || '0'), fromVault.decimals));
-						}} />
+						set_input={(v) => set_fromAmount(parseAmount(ethers.utils.formatUnits((v || '0'), fromVault.decimals)))} />
 				</div>
 				<div className={'w-full md:w-7/11'}>
 					<InputToken

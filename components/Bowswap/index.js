@@ -12,6 +12,22 @@ import	{toAddress, computeTriCryptoPrice}				from	'utils';
 import	METAPOOL_SWAPS									from	'utils/detected_metapoolSwaps';
 import	SWAPS											from	'utils/detected_swaps';
 
+function parseAmount(amount) {
+	let		_value = amount.replaceAll('..', '.').replaceAll(/[^0-9.]/g, '');
+	const	[dec, frac] = _value.split('.');
+	if (frac) _value = `${dec}.${frac.slice(0, 12)}`;
+
+	if (_value === '.') {
+		return ('0.');
+	} else if (_value.length > 0 && _value[0] === '-') {
+		return ('');
+	} else if (_value.length >= 2 && _value[0] === '0' && _value[1] !== '.') {
+		return (_value.slice(1) || '');
+	} else {
+		return (_value || '');
+	}
+}
+
 function	Bowswap({prices, yVaults}) {
 	const	{provider, active} = useWeb3();
 	const	{balancesOf} = useAccount();
@@ -201,6 +217,9 @@ function	Bowswap({prices, yVaults}) {
 			provider
 		);
 		underlyingContract.balanceOf(fromVault.address).then((balanceOfVault) => {
+			const	balance = balancesOf[fromVault?.address];
+			if (balance)
+				set_fromAmount(parseAmount(ethers.utils.formatUnits(balance, fromVault.decimals)));
 			set_balanceOfFromVault(ethers.utils.formatUnits(balanceOfVault, fromVault.decimals));
 		});
 
