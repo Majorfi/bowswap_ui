@@ -29,11 +29,14 @@ module.exports = {
 			forking: {
 				url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
 				// url: 'http://localhost:8545',
-				// blockNumber: 13802665,
+				blockNumber: 13992195,
 			},
 			// blockGasLimit: 12000000,
 			initialBaseFeePerGas: 0,
-
+		},
+		fantomfork: {
+			url: 'https://rpc.ftm.tools/',
+			timeout: 2000000000
 		},
 		localhost: {
 			url: 'http://localhost:8545',

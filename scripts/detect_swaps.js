@@ -10,6 +10,7 @@ const {Provider, Contract} = require('ethcall');
 const LISTING = require('./detected_listing');
 const allPools = LISTING;
 const allPoolsAsArray = Object.values(allPools);
+const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
 const vaultABI = [{'stateMutability':'view','type':'function','name':'depositLimit','inputs':[],'outputs':[{'name':'','type':'uint256'}],'gas':4008}];
 
@@ -29,9 +30,9 @@ const toAddress = (address) => {
 const getIntersection = (a, ...arr) => [...new Set(a)].filter(v => arr.every(b => b.includes(v)));
 
 async function	multiCallProvider() {
-	const	provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+	const	_provider = await ethers.getDefaultProvider();
 	const	ethcallProvider = new Provider();
-	await	ethcallProvider.init(provider);
+	await	ethcallProvider.init(_provider);
 	return	ethcallProvider;
 }
 
@@ -207,7 +208,6 @@ async function newWithBacktracking({from, to, path, i, max}) {
 }
 
 async function findPath({from, to}) {
-	const	provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 	const	fromVaults = new ethers.Contract(from, ['function token() public view returns (address)'], provider);
 	const	toVaults = new ethers.Contract(to, ['function token() public view returns (address)'], provider);
 	const	fromToken = toAddress(await fromVaults.token());

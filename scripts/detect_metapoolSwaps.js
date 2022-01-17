@@ -1,9 +1,8 @@
 const {default: axios} = require('axios');
 const {expect} = require('chai');
-const hre = require('hardhat');
-const ethers = hre.ethers;
-let user_0001;
+const {ethers} = require('hardhat');
 
+const	vaultSwapperAddress = '0x000000000037d42ab4e2226ce6f44c5dc0cf5b16';
 
 const toBytes32 = (bn) => {
 	return ethers.utils.hexlify(ethers.utils.zeroPad(bn.toHexString(), 32));
@@ -42,39 +41,39 @@ async function	getSolidityTokens(addr, user, amount, slot) {
 		//
 	}
 }
-async function initBalance(from, amount) {
+async function initBalance(provider, from, amount) {
 	const	vault = new ethers.Contract(
 		from,
 		['function balanceOf(address _spender) external view returns (uint256)'],
-		user_0001
+		provider
 	);
 
 	for (let index = 2; index < 25; index++) {
-		await	getVyperTokens(from, user_0001.address, amount, index);
-		let balance = await vault.balanceOf(user_0001.address);
+		await	getVyperTokens(from, provider.address, amount, index);
+		let balance = await vault.balanceOf(provider.address);
 		if (balance.gt(0)) {
 			return true;
 		}
 
-		await	getSolidityTokens(from, user_0001.address, amount, index);
-		balance = await vault.balanceOf(user_0001.address);
+		await	getSolidityTokens(from, provider.address, amount, index);
+		balance = await vault.balanceOf(provider.address);
 		if (balance.gt(0)) {
 			return true;
 		}
 	}
 	return false;
 }
-async function depositUnderlying(from, amount) {
+async function depositUnderlying(provider, from, amount) {
 	const	vault = new ethers.Contract(
 		from, [
 			'function balanceOf(address _spender) external view returns (uint256)',
 			'function token() public view returns (address)',
 			'function totalSupply() public view returns (uint256)',
 			'function deposit(uint256) public returns (uint256)',
-		], user_0001
+		], provider
 	);
 	const	underlying = await vault.token();
-	await	initBalance(underlying, amount);
+	await	initBalance(provider, underlying, amount);
 
 	const	totalSupply = await vault.totalSupply();
 	if (totalSupply.gte(amount)) {
@@ -84,19 +83,25 @@ async function depositUnderlying(from, amount) {
 	const	token = new ethers.Contract(
 		underlying,
 		['function approve(address, uint256) public'],
-		user_0001
+		provider
 	);
-	const	approveTx = await token.approve(from, amount);
+	const	approveTx = await token.approve(from, amount, {from: provider.address});
 	const	approveTxReceipt = await approveTx.wait();
 	await	expect(approveTxReceipt.status).to.be.eq(1);
 
-	const	depositTx = await vault.deposit(amount);
+	const	depositTx = await vault.deposit(amount, {from: provider.address});
 	const	depositTxReceipt = await depositTx.wait();
 	await	expect(depositTxReceipt.status).to.be.eq(1);
 }
 
-async function detectMetapools(vaultSwapper) {
-	[user_0001] = await ethers.getSigners();
+async function detectMetapools() {
+	const	[provider] = await ethers.getSigners();
+	const	vaultSwapper = new ethers.Contract(
+		vaultSwapperAddress,
+		['function metapool_swap(address,address,uint256,uint256)'],
+		provider
+	);
+
 
 	const	allVaults = await axios.get('https://api.yearn.finance/v1/chains/1/vaults/all');
 	const	validVaults = allVaults.data
@@ -120,13 +125,13 @@ async function detectMetapools(vaultSwapper) {
 						'function approve(address _spender, uint256 _value) external',
 						'function decimals() external view returns (uint256)'
 					],
-					user_0001
+					provider
 				);
 
 				const	decimals = await vault.decimals();
 				const	amount = ethers.utils.parseUnits('1000', Number(decimals));
-				await	initBalance(from, amount);
-				const	approveTx = await vault.approve(vaultSwapper.address, ethers.constants.MaxUint256);
+				await	initBalance(provider, from, amount);
+				const	approveTx = await vault.approve(vaultSwapper.address, ethers.constants.MaxUint256, {from: provider.address});
 				const	approveTxReceipt = await approveTx.wait();
 				await	expect(approveTxReceipt.status).to.be.eq(1);
 			}
@@ -134,27 +139,29 @@ async function detectMetapools(vaultSwapper) {
 			{
 				const	vault = new ethers.Contract(
 					from,
-					[
-						'function decimals() external view returns (uint256)',
-						'function depositLimit() external view returns (uint256)'
-					],
-					user_0001
+					['function decimals() external view returns (uint256)'],
+					provider
 				);
 
 				const	decimals = await vault.decimals();
 				const	amount = ethers.utils.parseUnits('10', decimals);
-				await	depositUnderlying(from, amount);
-
 				try {
-					await	expect(
-						vaultSwapper['metapool_swap(address,address,uint256,uint256)'](
-							from,
-							to,
-							amount,
-							1
-						)
-					).not.to.be.reverted;
-					possibleSwaps.push([from, to]);
+					await	depositUnderlying(provider, from, amount);
+
+					try {
+						await	expect(
+							vaultSwapper.metapool_swap(
+								from,
+								to,
+								amount,
+								1,
+								{from: provider.address}
+							)
+						).not.to.be.reverted;
+						possibleSwaps.push([from, to]);
+					} catch (error) {
+						//
+					}
 				} catch (error) {
 					//
 				}
@@ -168,10 +175,7 @@ async function detectMetapools(vaultSwapper) {
 
 
 async function main() {
-	const VaultSwapper = await hre.ethers.getContractFactory('VaultSwapper');
-	const vaultSwapper = await VaultSwapper.deploy();
-	await vaultSwapper.deployed();
-	await detectMetapools(vaultSwapper);
+	await detectMetapools();
 }
 
 // We recommend this pattern to be able to use async/await everywhere
