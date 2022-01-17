@@ -28,15 +28,13 @@ module.exports = {
 		hardhat: {
 			forking: {
 				url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
+				// url: 'https://rpc.ftm.tools/',
 				// url: 'http://localhost:8545',
-				blockNumber: 13992195,
+				// blockNumber: 13992195,
+				// blockNumber: 28255693
 			},
 			// blockGasLimit: 12000000,
 			initialBaseFeePerGas: 0,
-		},
-		fantomfork: {
-			url: 'https://rpc.ftm.tools/',
-			timeout: 2000000000
 		},
 		localhost: {
 			url: 'http://localhost:8545',

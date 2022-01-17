@@ -12,6 +12,7 @@ const allPools = LISTING;
 const allPoolsAsArray = Object.values(allPools);
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
+const YEARN_API_ROUTE = 'https://api.yearn.finance/v1/chains/250/vaults/all';
 const vaultABI = [{'stateMutability':'view','type':'function','name':'depositLimit','inputs':[],'outputs':[{'name':'','type':'uint256'}],'gas':4008}];
 
 const toAddress = (address) => {
@@ -30,17 +31,13 @@ const toAddress = (address) => {
 const getIntersection = (a, ...arr) => [...new Set(a)].filter(v => arr.every(b => b.includes(v)));
 
 async function	multiCallProvider() {
-	const	_provider = await ethers.getDefaultProvider();
 	const	ethcallProvider = new Provider();
-	await	ethcallProvider.init(_provider);
+	await	ethcallProvider.init(provider);
+	ethcallProvider.multicall = {address: '0xc04d660976c923ddba750341fe5923e47900cf24'};
+	ethcallProvider.multicall2 = {address: '0x470ADB45f5a9ac3550bcFFaD9D990Bf7e2e941c9'};
 	return	ethcallProvider;
 }
 
-async function asyncForEach(array, callback) {
-	for (let index = 0; index < array.length; index++) {
-		await callback(array[index], index, array);
-	}
-}
 async function newWithBacktracking({from, to, path, i, max}) {
 	if (path.length > 0) {
 		if (from === to) {
@@ -231,9 +228,8 @@ async function findPath({from, to}) {
 }
 
 async function	findAllPath() {
-	const	allVaults = await axios.get('https://api.yearn.finance/v1/chains/1/vaults/all');
+	const	allVaults = await axios.get(YEARN_API_ROUTE);
 	const	validVaults = allVaults.data
-		.filter(e => e.type === 'v2')
 		.filter(e => !e.migration || e.migration?.available === false);
 	const	vaultsWithDepositLimit = [];
 	const	calls = [];
@@ -244,7 +240,7 @@ async function	findAllPath() {
 		const	contract = new Contract(element.address, vaultABI);
 		calls.push(contract.depositLimit());
 	}
-	const callResult = await ethcallProvider.all(calls);
+	const callResult = await ethcallProvider.tryAll(calls);
 	for (let index = 0; index < validVaults.length; index++) {
 		const	element = validVaults[index];
 		const	depositLimit = callResult[index].toString();
@@ -254,12 +250,14 @@ async function	findAllPath() {
 	}
 
 	const	results = [];
-	await asyncForEach(vaultsWithDepositLimit, async (_element) => {
+	for (let index = 0; index < vaultsWithDepositLimit.length; index++) {
+		const	_element = vaultsWithDepositLimit[index];
 		const	element = _element.address;
-		await asyncForEach(vaultsWithDepositLimit, async (_secondElement) => {
+		for (let jindex = 0; jindex < vaultsWithDepositLimit.length; jindex++) {
+			const _secondElement = vaultsWithDepositLimit[jindex];
 			const	secondElement = _secondElement.address;
 			if (element === secondElement) {
-				return;
+				continue;
 			}
 			const	result = await findPath({from: element, to: secondElement});
 			if (result) {
@@ -268,8 +266,9 @@ async function	findAllPath() {
 			} else {
 				// console.log(`${_element.display_name} (${element}) to ${_secondElement.display_name} (${secondElement}) ❌`);
 			}
-		});
-	});
+		}
+	}	
+
 	const toJSON = JSON.stringify(results, null, 2);
 	console.log(toJSON);
 }

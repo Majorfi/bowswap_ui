@@ -3,7 +3,7 @@ const {expect, use} = require('chai');
 const {solidity} = require('ethereum-waffle');
 const {deployments, ethers} = require('hardhat');
 const VaultSwapper = artifacts.require('VaultSwapper');
-const detected_swap = require('../utils/detected_swaps.json');
+const detected_swap = require('../utils/swaps/ethereum/swaps.json');
 
 use(solidity);
 

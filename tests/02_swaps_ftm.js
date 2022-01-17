@@ -2,26 +2,28 @@
 const {expect, use} = require('chai');
 const {solidity} = require('ethereum-waffle');
 const {deployments, ethers} = require('hardhat');
-const detected_metapoolSwaps = require('../utils/swaps/ethereum/metapoolSwaps.json');
-
-const VaultSwapper = artifacts.require('VaultSwapper');
+const VaultSwapper = artifacts.require('VaultSwapperFtm');
+const detected_swap = require('../utils/swaps/fantom/swaps.json');
 
 use(solidity);
 
-const	PATHS = detected_metapoolSwaps;
-let		user_0001;
+let user_0001;
+const	PATHS = detected_swap;
 
 describe('Tests', () => {
 	let vaultSwapper;
 	
 	before(async () => {
 		await deployments.fixture();
-		[user_0001] = await ethers.getSigners();
+		[user_0001, rewarder] = await ethers.getSigners();
 
 		vaultSwapper = await VaultSwapper.new();
+		await expect(
+			vaultSwapper.initialize(user_0001.address)
+		).not.to.be.reverted;
 	});
 
-	describe('MetapoolSwap', async () => {
+	describe('Swaps', async () => {
 		it('should be possible to approve all', async () => {
 			const	allFrom = [];
 			for (let i = 0; i < PATHS.length; i++) {
@@ -38,7 +40,7 @@ describe('Tests', () => {
 				);
 
 				const	decimals = await vault.decimals();
-				const	amount = ethers.utils.parseUnits('1000', Number(decimals));
+				const	amount = ethers.utils.parseUnits('100', Number(decimals));
 				await	initBalance(allUniqueFrom[index], amount);
 				const	approveTx = await vault.approve(vaultSwapper.address, ethers.constants.MaxUint256);
 				const	approveTxReceipt = await approveTx.wait();
@@ -49,21 +51,35 @@ describe('Tests', () => {
 		for (let i = 0; i < PATHS.length; i++) {
 			const from = PATHS[i][0];
 			const to = PATHS[i][1];
+			const instructions = PATHS[i][2];
+
 			it(`From ${from} -> To ${to}`, async () => {
 				const	vault = new ethers.Contract(
-					from, ['function decimals() external view returns (uint256)'], user_0001
+					from,
+					['function decimals() external view returns (uint256)'],
+					user_0001
 				);
 				const	decimals = await vault.decimals();
-				const	amount = ethers.utils.parseUnits('1', decimals);
+				const	amount = ethers.utils.parseUnits('1', decimals - 2);
 				await	depositUnderlying(from, amount);
-
-				await	expect(
-					vaultSwapper.metapool_swap(
+			
+				const	estimate = await expect(
+					vaultSwapper.estimate_out(
 						from,
 						to,
 						amount,
-						1,
-						{'from': user_0001.address},
+						instructions,
+						10000
+					)
+				).not.to.be.reverted;
+
+				await	expect(
+					vaultSwapper.swap(
+						from,
+						to,
+						amount,
+						estimate,
+						instructions,
 					)
 				).not.to.be.reverted;
 			});
@@ -81,7 +97,6 @@ const setStorageAt = async (address, index, value) => {
 	await ethers.provider.send('hardhat_setStorageAt', [address, index, value]);
 	await ethers.provider.send('evm_mine', []); // Just mines to the next block
 };
-
 
 async function	getVyperTokens(addr, user, amount, slot) {
 	const index = ethers.utils.solidityKeccak256(
@@ -113,6 +128,7 @@ async function	getSolidityTokens(addr, user, amount, slot) {
 		//
 	}
 }
+
 async function initBalance(from, amount) {
 	const	vault = new ethers.Contract(
 		from,
@@ -135,6 +151,7 @@ async function initBalance(from, amount) {
 	}
 	return false;
 }
+
 async function depositUnderlying(from, amount) {
 	const	vault = new ethers.Contract(
 		from, [

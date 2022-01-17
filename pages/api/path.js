@@ -1,6 +1,6 @@
 import	{toAddress}				from	'utils';
-import	METAPOOL_SWAPS			from	'utils/detected_metapoolSwaps';
-import	SWAPS					from	'utils/detected_swaps';
+import	METAPOOL_SWAPS			from	'utils/swaps/ethereum/metapoolSwaps';
+import	SWAPS					from	'utils/swaps/ethereum/swaps';
 
 export default async function handler(req, res) {
 	let		{from, to} = req.query;

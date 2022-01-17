@@ -1,7 +1,7 @@
 import	React, {useState, useEffect}				from	'react';
 import	{ethers}									from	'ethers';
 import	useWeb3										from	'contexts/useWeb3';
-import	SWAPS										from	'utils/detected_swaps';
+import	SWAPS										from	'utils/swaps/ethereum/swaps';
 import	{metapoolSwapTokens, swapTokens,
 	metapoolSwapTokensWithSignature,
 	swapTokensWithSignature}						from	'utils/actions';

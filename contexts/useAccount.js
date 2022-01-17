@@ -4,9 +4,9 @@ import	{Contract}							from	'ethcall';
 import	useWeb3								from	'contexts/useWeb3';
 import	{toAddress, newEthCallProvider}		from	'utils';
 import	{fetchYearnVaults}					from	'utils/API';
-import	AAVE_V1								from	'utils/AaveV1';
-import	AAVE_V2								from	'utils/AaveV2';
-import	COMPOUND							from	'utils/Compound';
+import	AAVE_V1								from	'utils/yVempire/AaveV1';
+import	AAVE_V2								from	'utils/yVempire/AaveV2';
+import	COMPOUND							from	'utils/yVempire/Compound';
 
 const	LENDING_POOL_ADDRESS = '0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9';
 const	ERC20ABI = [

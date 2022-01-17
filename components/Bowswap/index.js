@@ -9,8 +9,8 @@ import	SectionFromVault 								from	'components/Bowswap/SectionFromVault';
 import	SectionToVault 									from	'components/Bowswap/SectionToVault';
 import	SectionBlockStatus								from	'components/Bowswap/SectionBlockStatus';
 import	{toAddress, computeTriCryptoPrice}				from	'utils';
-import	METAPOOL_SWAPS									from	'utils/detected_metapoolSwaps';
-import	SWAPS											from	'utils/detected_swaps';
+import	METAPOOL_SWAPS									from	'utils/swaps/ethereum/metapoolSwaps';
+import	SWAPS											from	'utils/swaps/ethereum/swaps';
 
 function parseAmount(amount) {
 	let		_value = amount.replaceAll('..', '.').replaceAll(/[^0-9.]/g, '');

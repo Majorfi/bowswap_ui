@@ -2,7 +2,8 @@ const {default: axios} = require('axios');
 const {expect} = require('chai');
 const {ethers} = require('hardhat');
 
-const	vaultSwapperAddress = '0x000000000037d42ab4e2226ce6f44c5dc0cf5b16';
+const	DEPLOYED_VAULT_SWAPPER_ADDRESS = '0x000000000037d42ab4e2226ce6f44c5dc0cf5b16';
+const	YEARN_API_ROUTE = 'https://api.yearn.finance/v1/chains/1/vaults/all';
 
 const toBytes32 = (bn) => {
 	return ethers.utils.hexlify(ethers.utils.zeroPad(bn.toHexString(), 32));
@@ -97,13 +98,13 @@ async function depositUnderlying(provider, from, amount) {
 async function detectMetapools() {
 	const	[provider] = await ethers.getSigners();
 	const	vaultSwapper = new ethers.Contract(
-		vaultSwapperAddress,
+		DEPLOYED_VAULT_SWAPPER_ADDRESS,
 		['function metapool_swap(address,address,uint256,uint256)'],
 		provider
 	);
 
 
-	const	allVaults = await axios.get('https://api.yearn.finance/v1/chains/1/vaults/all');
+	const	allVaults = await axios.get(YEARN_API_ROUTE);
 	const	validVaults = allVaults.data
 		.filter(e => e.type === 'v2')
 		.filter(e => !e.migration || e.migration?.available === false);

@@ -1,8 +1,8 @@
 import	React			from	'react';
 import	axios			from	'axios';
 import	Bowswap			from	'components/Bowswap';
-import	METAPOOL_SWAPS	from	'utils/detected_metapoolSwaps';
-import	SWAPS			from	'utils/detected_swaps';
+import	METAPOOL_SWAPS	from	'utils/swaps/ethereum/metapoolSwaps';
+import	SWAPS			from	'utils/swaps/ethereum/swaps';
 
 const	fetcher = url => axios.get(url).then(res => res.data);
 
