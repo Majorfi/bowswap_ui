@@ -1,17 +1,17 @@
 import	React					from	'react';
-import	{ethers}				from	'ethers';
+import	usePaths				from	'contexts/usePaths';
 import	BlockStatus				from	'components/Bowswap/BlockStatus';
 import	Success					from	'components/Icons/Success';
 import	Error					from	'components/Icons/Error';
 import	Pending					from	'components/Icons/Pending';
 
-const	getArgs = ({fromDisplayName, fromAddress, fromDecimals, toDisplayName, txApproveStatus, txSwapStatus, slippage, fromAmount, balancesOf}) => {
-	const	fromIsEUR = (fromDisplayName.toLowerCase()).includes('eur');
-	const	fromIsBTC = (fromDisplayName.toLowerCase()).includes('btc');
-	const	fromIsETH = (fromDisplayName.toLowerCase()).includes('eth');
-	const	fromIsAAVE = (fromDisplayName.toLowerCase()).includes('aave');
-	const	fromIsLINK = (fromDisplayName.toLowerCase()).includes('link');
-	const	fromIsTRI = ((fromDisplayName.toLowerCase()).includes('tri') || (fromDisplayName.toLowerCase()).includes('3crypto'));
+const	getArgs = ({fromDisplayName, fromAddress, toDisplayName, txApproveStatus, txSwapStatus, options, fromAmount, balancesOf}) => {
+	const	fromIsEUR = ((fromDisplayName || '').toLowerCase()).includes('eur');
+	const	fromIsBTC = ((fromDisplayName || '').toLowerCase()).includes('btc');
+	const	fromIsETH = ((fromDisplayName || '').toLowerCase()).includes('eth');
+	const	fromIsAAVE = ((fromDisplayName || '').toLowerCase()).includes('aave');
+	const	fromIsLINK = ((fromDisplayName || '').toLowerCase()).includes('link');
+	const	fromIsTRI = (((fromDisplayName || '').toLowerCase()).includes('tri') || ((fromDisplayName || '').toLowerCase()).includes('3crypto'));
 	const	fromIsUSD = (!fromIsEUR && !fromIsBTC && !fromIsETH && !fromIsAAVE && !fromIsLINK && !fromIsTRI);
 	const	toIsEUR = ((toDisplayName || '').toLowerCase()).includes('eur');
 	const	toIsBTC = ((toDisplayName || '').toLowerCase()).includes('btc');
@@ -35,12 +35,12 @@ const	getArgs = ({fromDisplayName, fromAddress, fromDecimals, toDisplayName, txA
 		return {open: true, title: txApproveStatus.message, color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 	if (txApproveStatus.error)
 		return {open: true, title: 'APPROVE TRANSACTION FAILURE', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
-	if (Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromAddress]?.toString() || '0', fromDecimals)))
+	if (Number(fromAmount) > Number(balancesOf[fromAddress]))
 		return {open: true, title: 'EXCEEDED BALANCE LIMIT !', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 
-	if (Number(slippage) >= 3)
+	if (Number(options.slippage) >= 3)
 		return {open: true, title: 'HEAVY SLIPPAGE, USE IT AT YOUR OWN RISK', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
-	if (Number(slippage) === 0)
+	if (Number(options.slippage) === 0)
 		return {open: true, title: 'NO SLIPPAGE, USE IT AT YOUR OWN RISK', color: 'bg-error', icon: <Error width={28} height={24} className={'mr-4'} />};
 
 	if ((fromIsBTC || toIsETH || fromIsAAVE || fromIsLINK || fromIsTRI) && toIsUSD)
@@ -56,24 +56,23 @@ const	getArgs = ({fromDisplayName, fromAddress, fromDecimals, toDisplayName, txA
 };
 
 const SectionBlockStatus = React.memo(
-	function SectionBlockStatus({txApproveStatus, txSwapStatus, slippage, fromAmount, balancesOf, fromVault, toVault}) {
+	function SectionBlockStatus({txApproveStatus, txSwapStatus, options, fromAmount, balancesOf}) {
+		const	{fromVault, toVault} = usePaths();
 		const	[args, set_args] = React.useState(getArgs({
-			fromDisplayName: fromVault.display_name,
-			fromAddress: fromVault.address,
-			fromDecimals: fromVault.decimals,
+			fromDisplayName: fromVault?.display_name,
+			fromAddress: fromVault?.address,
 			toDisplayName: toVault?.display_name,
-			txApproveStatus, txSwapStatus, slippage, fromAmount, balancesOf
+			txApproveStatus, txSwapStatus, options, fromAmount, balancesOf
 		}));
 
 		React.useEffect(() => {
 			set_args(getArgs({
-				fromDisplayName: fromVault.display_name,
-				fromAddress: fromVault.address,
-				fromDecimals: fromVault.decimals,
+				fromDisplayName: fromVault?.display_name,
+				fromAddress: fromVault?.address,
 				toDisplayName: toVault?.display_name,
-				txApproveStatus, txSwapStatus, slippage, fromAmount, balancesOf
+				txApproveStatus, txSwapStatus, options, fromAmount, balancesOf
 			}));
-		}, [txApproveStatus, txSwapStatus, slippage, fromAmount, balancesOf, fromVault, toVault]);
+		}, [txApproveStatus, txSwapStatus, options, fromAmount, balancesOf, fromVault, toVault]);
 
 		return (
 			<BlockStatus {...args} />

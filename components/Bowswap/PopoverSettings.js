@@ -1,7 +1,7 @@
 import	React, {Fragment, useRef, useEffect, useState}	from	'react';
 import	{Popover, Transition}					from	'@headlessui/react';
 
-function PopoverSettings({slippage, set_slippage, donation, set_donation}) {
+function PopoverSettings({options, set_options}) {
 	const	[open, set_open] = useState(false);
 	const	buttonRef = useRef(null);
 
@@ -54,8 +54,8 @@ function PopoverSettings({slippage, set_slippage, donation, set_donation}) {
 										<input
 											id={'slippage'}
 											autoComplete={'off'}
-											value={Number(slippage)}
-											onChange={(e) => set_slippage(Number(e.target.value) > 100 ? 100 : e.target.value)}
+											value={Number(options.slippage)}
+											onChange={(e) => set_options({...options, slippage: Number(e.target.value) > 100 ? 100 : e.target.value})}
 											style={{background: 'transparent'}}
 											className={'truncate text-sm h-8'}
 											min={0}
@@ -80,8 +80,8 @@ function PopoverSettings({slippage, set_slippage, donation, set_donation}) {
 										<input
 											id={'donation'}
 											autoComplete={'off'}
-											value={Number(donation)}
-											onChange={(e) => set_donation(Number(e.target.value) > 100 ? 100 : Number(e.target.value))}
+											value={Number(options.donation)}
+											onChange={(e) => set_options({...options, donation: Number(e.target.value) > 100 ? 100 : Number(e.target.value)})}
 											style={{background: 'transparent'}}
 											className={'truncate text-sm h-8'}
 											min={0}

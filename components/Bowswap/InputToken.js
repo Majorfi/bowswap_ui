@@ -1,14 +1,17 @@
 import	React, {useEffect, useRef}		from	'react';
-import	{ethers}						from	'ethers';
+import	usePaths						from	'contexts/usePaths';
+import	usePrices						from	'contexts/usePrices';
 import	PopoverSettings					from	'components/Bowswap/PopoverSettings';
+import	{toAddress}						from	'utils';
 
 function	InputToken({
 	value, set_value,
-	slippage, set_slippage,
-	donation, set_donation,
-	balanceOf, decimals, fromCounterValue, disabled
+	options, set_options,
+	balanceOf, disabled
 }) {
 	const	inputRef = useRef();
+	const	{fromVault} = usePaths();
+	const	{virtualPrices} = usePrices();
 	const	[isMounted, set_isMounted] = React.useState(false);
 
 	useEffect(() => {
@@ -53,14 +56,14 @@ function	InputToken({
 			<div className={'h-4'}>
 				<div className={'flex flex-row items-center justify-end w-full'}>
 					<label
-						onClick={() => updateInputValue(ethers.utils.formatUnits(balanceOf, decimals))}
+						onClick={() => updateInputValue(balanceOf)}
 						className={`font-normal text-ybase text-ygray-500 hidden md:flex flex-row items-center ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
-						{`Balance: ${Number(ethers.utils.formatUnits(balanceOf, decimals)) !== 0 && Number(ethers.utils.formatUnits(balanceOf, decimals)) < 0.001 ? '< 0.001' : Number(ethers.utils.formatUnits(balanceOf, decimals))}`}
+						{`Balance: ${Number(balanceOf) !== 0 && Number(balanceOf) < 0.001 ? '< 0.001' : Number(balanceOf)}`}
 					</label>
 					<label
-						onClick={() => updateInputValue(ethers.utils.formatUnits(balanceOf, decimals))}
+						onClick={() => updateInputValue(balanceOf)}
 						className={`font-normal text-ybase text-ygray-500 flex flex-row items-center md:hidden ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
-						{`Balance: ${Number(ethers.utils.formatUnits(balanceOf, decimals)).toFixed(8)}`}
+						{`Balance: ${Number(balanceOf).toFixed(8)}`}
 					</label>
 				</div>
 			</div>
@@ -77,26 +80,22 @@ function	InputToken({
 					value={value}
 					onChange={(e) => updateInputValue(e.target.value)}
 					style={{backgroundColor: 'transparent'}}
-					className={`block w-full text-4xl font-medium h-full text-right ${disabled ? 'cursor-not-allowed' : 'cursor-text'} ${Number(value) > Number(ethers.utils.formatUnits(balanceOf, decimals)) ? 'text-error' : 'text-ygray-900'}`}
+					className={`block w-full text-4xl font-medium h-full text-right ${disabled ? 'cursor-not-allowed' : 'cursor-text'} ${Number(value) > Number(balanceOf) ? 'text-error' : 'text-ygray-900'}`}
 					type={'text'}
 					min={0} />
 			</label>
 			<div className={'h-4'}>
 				<div className={'flex w-full justify-between items-center relative'}>
 					<div className={'items-center text-ybase text-ygray-500'}>
-						<span>{`≃ $${(fromCounterValue * Number(value)).toFixed(2)}`}</span>
+						<span>{`≃ $${((virtualPrices?.[toAddress(fromVault?.address)] || 1) * Number(value)).toFixed(2)}`}</span>
 					</div>
 					<div className={'flex flex-row items-center'}>
 						<button
-							onClick={() => updateInputValue(ethers.utils.formatUnits(balanceOf, decimals))}
+							onClick={() => updateInputValue(balanceOf)}
 							className={`items-center text-xxs font-medium py-0.5 text-white bg-yblue hover:bg-yblue-hover focus:outline-none px-3 rounded-lg transition-colors h-5 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
 							<span>{'MAX'}</span>
 						</button>
-						<PopoverSettings
-							slippage={slippage}
-							set_slippage={set_slippage}
-							donation={donation}
-							set_donation={set_donation} />
+						<PopoverSettings options={options} set_options={set_options} />
 					</div>
 				</div>
 			</div>

@@ -1,24 +1,23 @@
 import	React			from	'react';
 import	{useRouter}		from	'next/router';
-import	useAccount		from	'contexts/useAccount';
+import	useYVempire		from	'contexts/useYVempire';
 
 export default function Tabs() {
 	const	router = useRouter();
 	const	[amount, set_amount] = React.useState(0);
 
-	const	{yVempireNotificationCounter, yVempireData, balancesOf} = useAccount();
-
-	React.useEffect(() => {
-		set_amount(0);
-		Object.entries(yVempireNotificationCounter).forEach(([key, value]) => {
-			const pair = yVempireData.find(e => (e?.uToken?.address || '').toLowerCase() === key.toLowerCase());
-			if (Number(pair.uToken.apy) <= Number(pair.yvToken.apy)) {
-				if (value >= 100) {
-					set_amount(a => a + 1);
-				}
-			}
-		});
-	}, [yVempireNotificationCounter, balancesOf, yVempireData]);
+	// const	{yVempireNotificationCounter, yVempireData, balancesOf} = useYVempire();
+	// React.useEffect(() => {
+	// 	set_amount(0);
+	// 	Object.entries(yVempireNotificationCounter).forEach(([key, value]) => {
+	// 		const pair = yVempireData.find(e => (e?.uToken?.address || '').toLowerCase() === key.toLowerCase());
+	// 		if (Number(pair.uToken.apy) <= Number(pair.yvToken.apy)) {
+	// 			if (value >= 100) {
+	// 				set_amount(a => a + 1);
+	// 			}
+	// 		}
+	// 	});
+	// }, [yVempireNotificationCounter, balancesOf, yVempireData]);
 
 	return (
 		<div className={'flex items-center justify-between bg-white rounded-xl shadow-base p-1 w-full relative space-x-2'}>

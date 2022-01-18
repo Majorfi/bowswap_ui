@@ -1,7 +1,8 @@
 import	React, {useState, useEffect}		from	'react';
 import	{ethers}							from	'ethers';
 import	useWeb3								from	'contexts/useWeb3';
-import	useAccount							from	'contexts/useAccount';
+import	useYearn							from	'contexts/useYearn';
+import	useYVempire							from	'contexts/useYVempire';
 import	BlockStatus							from	'components/YVempire/BlockStatus';
 import	ButtonMigrate						from	'components/YVempire/ButtonMigrate';
 import	ButtonApprove						from	'components/YVempire/ButtonApprove';
@@ -13,7 +14,8 @@ import	Pending								from	'components/Icons/Pending';
 
 function	YVempire() {
 	const	{address} = useWeb3();
-	const	{balancesOf, allowances, set_balancesOf, set_allowances, yearnVaultData, yVempireData} = useAccount();
+	const	{yearnData} = useYearn();
+	const	{balancesOf, allowances, set_balancesOf, set_allowances, yVempireData} = useYVempire();
 	const	[, set_nonce] = useState(0);
 	const	[selectedTokens, set_selectedTokens] = useState([]);
 
@@ -89,7 +91,7 @@ function	YVempire() {
 
 							set_selectedTokens(_selectedTokens);
 						}}
-						yearnVaultData={yearnVaultData}
+						yearnVaultData={yearnData}
 						isApproved={txApproveStatus.success}
 						set_nonce={set_nonce} />
 				</div>

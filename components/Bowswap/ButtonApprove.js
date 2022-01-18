@@ -1,10 +1,12 @@
 import	React, {useState, useEffect}				from	'react';
 import	{ethers}									from	'ethers';
 import	useWeb3										from	'contexts/useWeb3';
+import	usePaths									from	'contexts/usePaths';
 import	{approveToken, signTransaction}				from	'utils/actions';
 
-function	ButtonApprove({fromVault, fromAmount, approved, disabled, set_signature, canSign, onCallback}) {
-	const	{provider} = useWeb3();
+function	ButtonApprove({fromAmount, approved, disabled, set_signature, canSign, onCallback}) {
+	const	{chainID, provider} = useWeb3();
+	const	{fromVault} = usePaths();
 	const	[transactionProcessing, set_transactionProcessing] = useState(false);
 	const	[DEBUG_TX, set_DEBUG_TX] = useState(-1);
 
@@ -23,7 +25,7 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, set_signature
 				provider: provider,
 				contractAddress: fromVault.address,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-				from: process.env.BOWSWAP_SWAPPER_ADDR
+				from: chainID === 250 ? process.env.BOWSWAP_SWAPPER_FTM_ADDR : process.env.BOWSWAP_SWAPPER_ADDR
 			}, ({error}) => {
 				if (error) {
 					set_transactionProcessing(false);
@@ -51,7 +53,7 @@ function	ButtonApprove({fromVault, fromAmount, approved, disabled, set_signature
 			signTransaction({
 				provider: provider,
 				vaultAddress: fromVault.address,
-				contractAddress: process.env.BOWSWAP_SWAPPER_ADDR,
+				contractAddress: chainID === 250 ? process.env.BOWSWAP_SWAPPER_FTM_ADDR : process.env.BOWSWAP_SWAPPER_ADDR,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
 				nonceOverwrite 
 			}, ({error, data}) => {

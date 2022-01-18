@@ -6,7 +6,7 @@ import	ModalLogin				from	'components/Commons/ModalLogin';
 import	ModalMEV				from	'components/Commons/ModalMEV';
 
 function	Navbar({hasSecret, shouldInitialPopup}) {
-	const	{active, provider, address, ens, deactivate, onDesactivate, onSwitchChain} = useWeb3();
+	const	{active, provider, address, ens, deactivate, onDesactivate, chainID, onSwitchChain} = useWeb3();
 	const	[modalLoginOpen, set_modalLoginOpen] = useState(false);
 	const	[modalMEVOpen, set_modalMEVOpen] = useState(false);
 	const	[initialPopup, set_initialPopup] = useState(false);
@@ -19,9 +19,8 @@ function	Navbar({hasSecret, shouldInitialPopup}) {
 			set_modalLoginOpen(true);
 		}
 		set_initialPopup(true);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [address]);
-
+	
 	const stringToColour = function(str) {
 		let hash = 0;
 		for (let i = 0; i < str.length; i++) {
@@ -34,6 +33,32 @@ function	Navbar({hasSecret, shouldInitialPopup}) {
 		}
 		return color;
 	};
+
+	function	switchChain(newChainID) {
+		if (newChainID === chainID) {
+			return;
+		}
+		if (!provider || !active) {
+			console.error('Not initialized');
+			return;
+		}
+		if (Number(newChainID) === 1) {
+			provider.send('wallet_switchEthereumChain', [{chainId: '0x1'}]).catch((error) => console.error(error));
+		} else if (Number(newChainID) === 250) {
+			const fantomChainData = {
+				chainId: '0xFA',
+				blockExplorerUrls: ['https://ftmscan.com'],
+				chainName: 'Fantom Opera',
+				rpcUrls: ['https://rpc.ftm.tools'],
+				nativeCurrency: {
+					name: 'Fantom',
+					symbol: 'FTM',
+					decimals: 18
+				}
+			};
+			provider.send('wallet_addEthereumChain', [fantomChainData, address]).catch((error) => console.error(error));
+		}
+	}
 
 	function	addMevChain() {
 		set_modalMEVOpen(true);
@@ -111,6 +136,21 @@ function	Navbar({hasSecret, shouldInitialPopup}) {
 
 	}
 
+	function	renderChain() {
+		const options = [['Ethereum', 1], ['Fantom', 250]];
+		return (
+			<select
+				value={chainID === 250 ? 'Fantom' : 'Ethereum'}
+				className={'ml-2 inline-flex px-3 py-2 pr-8 items-center leading-4 rounded-lg text-sm cursor-pointer whitespace-nowrap bg-white text-gray-800 border border-solid border-gray-100 hover:bg-white hover:text-gray-900 transition-colors h-10 relative'}
+				onChange={e => switchChain(e.target.value)}>
+				{options.map(([name, id], index) => (
+					<option className={'cursor-pointer'} key={index} value={id}>{name}</option>
+				))}
+			</select>
+		);
+
+	}
+
 	return (
 		<nav className={'w-full h-10 my-4 justify-center flex flex-row'}>
 			<div className={'max-w-2xl items-center justify-between flex flex-row w-full'}>
@@ -122,6 +162,7 @@ function	Navbar({hasSecret, shouldInitialPopup}) {
 				</Link>
 				<div className={'flex flex-row items-center'}>
 					{renderMEVProtection()}
+					{renderChain()}
 					{renderWalletButton()}
 				</div>
 			</div>

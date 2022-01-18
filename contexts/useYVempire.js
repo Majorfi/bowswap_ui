@@ -1,9 +1,9 @@
-import	React, {useContext, useState, useEffect, createContext}	from	'react';
+import	React, {useContext, createContext}	from	'react';
 import	{ethers}							from	'ethers';
 import	{Contract}							from	'ethcall';
 import	useWeb3								from	'contexts/useWeb3';
+import	useYearn							from	'contexts/useYearn';
 import	{toAddress, newEthCallProvider}		from	'utils';
-import	{fetchYearnVaults}					from	'utils/API';
 import	AAVE_V1								from	'utils/yVempire/AaveV1';
 import	AAVE_V2								from	'utils/yVempire/AaveV2';
 import	COMPOUND							from	'utils/yVempire/Compound';
@@ -17,43 +17,36 @@ const	LENDING_POOL_ABI = [
 ];
 
 const	PAIRS = [...COMPOUND, ...AAVE_V1, ...AAVE_V2];
-const	AccountContext = createContext();
+const	YVempireContext = createContext();
 const	fetcher = (...args) => fetch(...args).then(res => res.json());
 
-export const AccountContextApp = ({children}) => {
-	const	{active, provider, chainID, address} = useWeb3();
-	const	[yVempireData, set_yVempireData] = useState(PAIRS);
-	const	[nonce, set_nonce] = useState(0);
-	const	[yVempireNotificationCounter, set_yVempireNotificationCounter] = useState([]);
-	const	[yearnVaultData, set_yearnVaultData] = useState([]);
-	const	[balancesOf, set_balancesOf] = useState({});
-	const	[allowances, set_allowances] = useState({});
+export const YVempireContextApp = ({children}) => {
+	const	{active, provider, chainID, address, disconnected} = useWeb3();
+	const	{yearnData} = useYearn();
+	const	[yVempireData, set_yVempireData] = React.useState(PAIRS);
+	const	[yVempireNotificationCounter, set_yVempireNotificationCounter] = React.useState([]);
+	const	[balancesOf, set_balancesOf] = React.useState({});
+	const	[allowances, set_allowances] = React.useState({});
 
-	async function	retrieveBalances(yVaults) {
-		const	crvVaults = yVaults.filter(e => e.type === 'v2').filter(e => !e.migration || e.migration?.available === false).map(e => e.address);
-		const	crvVaultsNoDuplicates = [...new Set(crvVaults)];
-		const	ethcallProvider = await newEthCallProvider(provider, chainID);
-		const	multiCalls = [];
-		(crvVaultsNoDuplicates).forEach((vaultAddress) => {
-			const	contract = new Contract(vaultAddress, ERC20ABI);
-			multiCalls.push(contract.balanceOf(address));
-			multiCalls.push(contract.allowance(address, process.env.BOWSWAP_SWAPPER_ADDR));
-		});
-		const callResult = await ethcallProvider.all(multiCalls);
+	/* 🏹 - Bowswap Finance ************************************************************************
+	**	On disconnect, clear balances and allowances.
+	**********************************************************************************************/
+	React.useEffect(() => {
+		if (disconnected) {
+			set_balancesOf({});
+			set_allowances({});
+		}
+	}, [disconnected]);
 
-		let	index = 0;
-		(crvVaultsNoDuplicates).forEach((vaultAddress) => {
-			set_balancesOf((b) => {b[vaultAddress] = callResult[index]; return b;});
-			set_allowances((b) => {b[vaultAddress] = callResult[index + 1]; return b;});			
-			index += 2;
-		});
-	}
-
-	async function	retrieveYVempireBalances({_prices}) {
+	/* 🏹 - Bowswap Finance ************************************************************************
+	**	When using yVempire, we need to retrieve the balances of the user's tokens in some other
+	**	protocole to incentive to move to Yearn
+	**********************************************************************************************/
+	const retrieveYVempireBalances = React.useCallback(async ({_prices}) => {
 		const	LENDERS = [...COMPOUND, ...AAVE_V1, ...AAVE_V2];
 		const	vaults = LENDERS.map(e => e.uToken.address);
 		const	vaultsNoDuplicates = [...new Set(vaults)];
-		const	ethcallProvider = await newEthCallProvider(provider, chainID);
+		const	ethcallProvider = await newEthCallProvider(provider);
 		const	multiCalls = [];
 		vaultsNoDuplicates.forEach((vaultAddress) => {
 			const	vaulContract = new Contract(vaultAddress, ERC20ABI);
@@ -79,9 +72,13 @@ export const AccountContextApp = ({children}) => {
 		});
 
 		set_yVempireNotificationCounter(_yVempireNotificationCounter);
-	}
+	}, [address, chainID, provider]);
 
-	async function retrieveUTokenBalances({_yVaultsData}) {
+	/* 🏹 - Bowswap Finance ************************************************************************
+	**	When using yVempire, we need to retrieve the balances of the user's tokens in some other
+	**	protocole to incentive to move to Yearn
+	**********************************************************************************************/
+	const retrieveUTokenBalances = React.useCallback(async () => {
 		const	aLendingPoolContract = new ethers.Contract(LENDING_POOL_ADDRESS, LENDING_POOL_ABI, provider);
 		const	_yVempireData = yVempireData;
 
@@ -90,7 +87,7 @@ export const AccountContextApp = ({children}) => {
 			const	fromTokenContract = new ethers.Contract(pair.uToken.address, [
 				'function supplyRatePerBlock() view returns (uint256)'
 			], provider);
-			const	currentYearnVault = _yVaultsData.find(yv => yv.address === pair.yvToken.address);
+			const	currentYearnVault = yearnData.find(yv => yv.address === pair.yvToken.address);
 			_yVempireData[index].yvToken.apy = (currentYearnVault?.apy?.net_apy || 0) * 100;
 
 			if (pair.service === 0) {
@@ -112,80 +109,33 @@ export const AccountContextApp = ({children}) => {
 			}
 			set_yVempireData(p => {p[index] = _yVempireData[index]; return p;});
 		}
-	}
+	}, [provider, yVempireData, yearnData]);
 
-	useEffect(() => {
-		if (!active) {
-			set_balancesOf({});
-			set_allowances({});
-			set_nonce(0);
-		}
-	}, [active]);
-
-	useEffect(() => {
-		if (!address) {
-			set_balancesOf({});
-			set_allowances({});
-			set_nonce(0);
-		}
-	}, [address]);
-
-	async function updateData() {
-		const	LENDERS = [...COMPOUND, ...AAVE_V1, ...AAVE_V2];
-		const	ids = [...new Set(LENDERS.map(e => e.cgID))];
-		const	[_prices, _yVaultsData] = await Promise.all([
-			fetcher(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`),
-			fetchYearnVaults()
-		]);
-		set_yearnVaultData(_yVaultsData);
-		retrieveBalances(_yVaultsData);
-		retrieveYVempireBalances({_prices});
-		retrieveUTokenBalances({_yVaultsData});
-		set_nonce(n => n + 1);
-	}
-
-	useEffect(() => {
+	const updateData = React.useCallback(async () => {
 		if (active && provider && address) {
-			updateData();
+			const	LENDERS = [...COMPOUND, ...AAVE_V1, ...AAVE_V2];
+			const	ids = [...new Set(LENDERS.map(e => e.cgID))];
+			const	_prices = await fetcher(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`);
+			retrieveYVempireBalances({_prices});
+			retrieveUTokenBalances();
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [provider, address, active]);
-
-	async function	updateBalanceOf(addresses) {
-		const	ethcallProvider = await newEthCallProvider(provider, chainID);
-		const	multiCalls = [];
-		addresses.forEach((addr) => {
-			const	vaulContract = new Contract(addr, ERC20ABI);
-			multiCalls.push(vaulContract.balanceOf(address));
-			multiCalls.push(vaulContract.allowance(address, toAddress(process.env.VYEMPIRE_SWAPPER_ADDR)));
-		});
-		const callResult = await ethcallProvider.all(multiCalls);
-
-		let	index = 0;
-		(addresses).forEach((addr) => {
-			set_balancesOf((b) => {b[addr] = callResult[index]; return b;});
-			set_allowances((b) => {b[addr] = callResult[index + 1]; return b;});			
-			index += 2;
-		});
-	}
+	}, [active, address, provider, retrieveUTokenBalances, retrieveYVempireBalances]);
+	React.useEffect(() => updateData(), [updateData]);
 
 	return (
-		<AccountContext.Provider value={{
+		<YVempireContext.Provider value={{
 			balancesOf, 
-			updateBalanceOf, 
 			allowances, 
 			set_balancesOf, 
 			set_allowances, 
-			balancesNonce: nonce,
 			yVempireNotificationCounter,
 			set_yVempireNotificationCounter,
-			yearnVaultData,
 			yVempireData,
 		}}>
 			{children}
-		</AccountContext.Provider>
+		</YVempireContext.Provider>
 	);
 };
 
-export const useAccount = () => useContext(AccountContext);
-export default useAccount;
+export const useYVempire = () => useContext(YVempireContext);
+export default useYVempire;

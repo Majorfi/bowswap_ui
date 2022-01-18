@@ -16,6 +16,8 @@ const Web3Context = createContext();
 function getProvider(chain = 'ethereum') {
 	if (chain === 'ethereum') {
 		return new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY);
+	} else if (chain === 'fantom') {
+		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools');
 	} else if (chain === 'major') {
 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
 	}
@@ -32,6 +34,7 @@ export const Web3ContextApp = ({children}) => {
 	const	[lastWallet, set_lastWallet] = useLocalStorage('lastWallet', walletType.NONE);
 	const	[, set_nonce] = useState(0);
 	const	[disableAutoChainChange, set_disableAutoChainChange] = useState(false);
+	const	[disconnected, set_disconnected] = useState(false);
 	const	debouncedChainID = useDebounce(chainID, 500);
 	const	windowInFocus = useWindowInFocus();
 
@@ -44,14 +47,16 @@ export const Web3ContextApp = ({children}) => {
 			set_chainID(isANumber ? Number(update.chainId) : parseInt(update.chainId, 16));
 		}
 		if (update.account) {
+			set_disconnected(true);
 			await getProvider().lookupAddress(toAddress(update.account)).then(_ens => set_ens(_ens || ''));
 			set_address(toAddress(update.account));
+			set_disconnected(false);
 		}
 		set_nonce(n => n + 1);
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [library]);
 
 	const onDesactivate = useCallback(() => {
+		set_disconnected(true);
 		set_chainID(-1);
 		set_provider(undefined);
 		set_lastWallet(walletType.NONE);
@@ -62,20 +67,19 @@ export const Web3ContextApp = ({children}) => {
 				.off(ConnectorEvent.Update, onUpdate)
 				.off(ConnectorEvent.Deactivate, onDesactivate);
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [connector]);
 
 	const onActivate = useCallback(async () => {
+		connector
+			.on(ConnectorEvent.Update, onUpdate)
+			.on(ConnectorEvent.Deactivate, onDesactivate);
+		
+		set_disconnected(false);
 		set_provider(library);
 		set_address(toAddress(account));
 		const	isANumber = !isNaN(chainId) && !String(chainId).startsWith('0x');
 		set_chainID(isANumber ? Number(chainId) : parseInt(chainId, 16));
 		await getProvider().lookupAddress(toAddress(account)).then(_ens => set_ens(_ens || ''));
-
-		connector
-			.on(ConnectorEvent.Update, onUpdate)
-			.on(ConnectorEvent.Deactivate, onDesactivate);
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [account, chainId, connector, library, onDesactivate, onUpdate]);
 
 	const onSwitchChain = useCallback((force) => {
@@ -84,6 +88,7 @@ export const Web3ContextApp = ({children}) => {
 		}
 		const	isCompatibleChain = (
 			Number(debouncedChainID) === 1 ||
+			Number(debouncedChainID) === 250 ||
 			Number(debouncedChainID) === 1337 ||
 			Number(debouncedChainID) === 31337
 		);
@@ -131,6 +136,7 @@ export const Web3ContextApp = ({children}) => {
 			const walletconnect = new WalletConnectConnector({
 				rpc: {
 					1: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
+					250: 'https://rpc.ftm.tools',
 					1337: 'http://localhost:8545',
 					31337: 'http://localhost:8545',
 				},
@@ -160,7 +166,6 @@ export const Web3ContextApp = ({children}) => {
 		if (!active && lastWallet !== walletType.NONE) {
 			connect(lastWallet);
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [active]);
 
 	return (
@@ -171,10 +176,11 @@ export const Web3ContextApp = ({children}) => {
 				connect,
 				deactivate,
 				onDesactivate,
+				disconnected,
 				walletType,
-				chainID,
+				chainID: process.env.IS_TEST ? process.env.TESTED_NETWORK : chainID,
 				onSwitchChain,
-				active: active && (chainID === 1 || chainID === 1337 || chainID === 31337),
+				active: active && (chainID === 1 || chainID === 250 || chainID === 1337 || chainID === 31337),
 				provider,
 				getProvider,
 			}}>

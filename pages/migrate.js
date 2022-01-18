@@ -1,8 +1,18 @@
-import	React		from	'react';
-import	YVempire	from	'components/YVempire';
+import	React					from	'react';
+import	{YVempireContextApp}	from	'contexts/useYVempire';
+import	YVempire				from	'components/YVempire';
 
-function	FromDefi() {
+function	Index() {
 	return <YVempire />;
 }
 
-export default FromDefi;
+Index.getLayout = function getLayout(page) {
+	return (
+		<YVempireContextApp>
+			{page}
+		</YVempireContextApp>
+	);
+};
+
+
+export default Index;

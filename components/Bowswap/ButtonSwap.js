@@ -1,19 +1,19 @@
 import	React, {useState, useEffect}				from	'react';
 import	{ethers}									from	'ethers';
 import	useWeb3										from	'contexts/useWeb3';
-import	SWAPS										from	'utils/swaps/ethereum/swaps';
+import	usePaths									from	'contexts/usePaths';
 import	{metapoolSwapTokens, swapTokens,
 	metapoolSwapTokensWithSignature,
 	swapTokensWithSignature}						from	'utils/actions';
 
 function	ButtonSwap({
-	fromVault, toVault,
-	fromAmount, expectedReceiveAmount,
-	slippage, donation,
+	fromAmount, estimateOut,
+	options,
 	signature, shouldIncreaseGasLimit,
 	approved, disabled, onCallback
 }) {
-	const	{provider} = useWeb3();
+	const	{provider, chainID} = useWeb3();
+	const	{fromVault, toVault, currentPath} = usePaths();
 	const	[transactionProcessing, set_transactionProcessing] = useState(false);
 
 	const	[DEBUG_TX, set_DEBUG_TX] = useState(-1);
@@ -31,17 +31,18 @@ function	ButtonSwap({
 		try {
 			swapTokens({
 				provider: provider,
+				contractAddress: chainID === 250 ? process.env.BOWSWAP_SWAPPER_FTM_ADDR : process.env.BOWSWAP_SWAPPER_ADDR,
 				from: fromVault.address,
 				to: toVault.address,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(fromVault.decimals || 18), fromVault.decimals),
-				instructions: SWAPS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2],
-				donation: donation * 100,
+				minAmountOut: ethers.utils.parseUnits((estimateOut - (estimateOut * options.slippage / 100)).toFixed(fromVault.decimals || 18), fromVault.decimals),
+				instructions: currentPath.data[2],
+				donation: options.donation * 100,
 				shouldIncreaseGasLimit
 			}, ({error}) => {
 				if (error) {
 					let message = undefined;
-					if (error?.data?.message?.includes('revert out too low')) {
+					if (error?.data?.message?.includes('out too low')) {
 						message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
 					}
 					set_transactionProcessing(false);
@@ -52,7 +53,7 @@ function	ButtonSwap({
 			});
 		} catch (error) {
 			let message = undefined;
-			if (error?.data?.message?.includes('revert out too low')) {
+			if (error?.data?.message?.includes('out too low')) {
 				message = 'SLIPPAGE TOO HIGH. TO PROCEED, PLEASE INCREASE THE SLIPPAGE TOLERANCE';
 			}
 			set_transactionProcessing(false);
@@ -60,25 +61,21 @@ function	ButtonSwap({
 		}
 	}
 	function	performV1Swap() {
-		const	v2PathExists = SWAPS.find(path => path[0] === fromVault.address && path[1] === toVault.address);
-
 		try {
 			metapoolSwapTokens({
 				provider: provider,
+				contractAddress: chainID === 250 ? process.env.BOWSWAP_SWAPPER_FTM_ADDR : process.env.BOWSWAP_SWAPPER_ADDR,
 				from: fromVault.address,
 				to: toVault.address,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(fromVault.decimals || 18), fromVault.decimals),
-				donation: donation * 100,
+				minAmountOut: ethers.utils.parseUnits((estimateOut - (estimateOut * options.slippage / 100)).toFixed(fromVault.decimals || 18), fromVault.decimals),
+				donation: options.donation * 100,
 				shouldIncreaseGasLimit
 			}, ({error}) => {
 				if (error) {
 					if (error?.message?.includes('User denied transaction signature')) {
 						set_transactionProcessing(false);
 						return onCallback('error', 'User denied transaction signature');
-					} else if (v2PathExists) {
-						console.log('FALLBACK_WITH_V2');
-						return performV2Swap();
 					} else {
 						let message = undefined;
 						if (error?.data?.message?.includes('revert out too low')) {
@@ -95,9 +92,6 @@ function	ButtonSwap({
 			if (error?.message?.includes('User denied transaction signature')) {
 				set_transactionProcessing(false);
 				return onCallback('error', 'User denied transaction signature');
-			} else if (v2PathExists) {
-				console.log('FALLBACK_WITH_V2');
-				return performV2Swap();
 			} else {
 				let message = undefined;
 				if (error?.data?.message?.includes('revert out too low')) {
@@ -112,14 +106,14 @@ function	ButtonSwap({
 	function	performV2SwapWithSignature() {
 		swapTokensWithSignature({
 			provider: provider,
-			contractAddress: process.env.BOWSWAP_SWAPPER_ADDR,
+			contractAddress: chainID === 250 ? process.env.BOWSWAP_SWAPPER_FTM_ADDR : process.env.BOWSWAP_SWAPPER_ADDR,
 			from: fromVault.address,
 			to: toVault.address,
 			amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-			minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(fromVault.decimals || 18), fromVault.decimals),
-			instructions: SWAPS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2],
+			minAmountOut: ethers.utils.parseUnits((estimateOut - (estimateOut * options.slippage / 100)).toFixed(fromVault.decimals || 18), fromVault.decimals),
+			instructions: currentPath.data[2],
 			signature,
-			donation: donation * 100,
+			donation: options.donation * 100,
 			shouldIncreaseGasLimit
 		}, ({error}) => {
 			if (error) {
@@ -144,27 +138,22 @@ function	ButtonSwap({
 		});
 	}
 	function	performV1SwapWithSignature() {
-		const	v2PathExists = SWAPS.find(path => path[0] === fromVault.address && path[1] === toVault.address);
-
 		try {
 			metapoolSwapTokensWithSignature({
 				provider: provider,
-				contractAddress: process.env.BOWSWAP_SWAPPER_ADDR,
+				contractAddress: chainID === 250 ? process.env.BOWSWAP_SWAPPER_FTM_ADDR : process.env.BOWSWAP_SWAPPER_ADDR,
 				from: fromVault.address,
 				to: toVault.address,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(fromVault.decimals || 18), fromVault.decimals),
+				minAmountOut: ethers.utils.parseUnits((estimateOut - (estimateOut * options.slippage / 100)).toFixed(fromVault.decimals || 18), fromVault.decimals),
 				signature,
-				donation: donation * 100,
+				donation: options.donation * 100,
 				shouldIncreaseGasLimit
 			}, ({error}) => {
 				if (error) {
 					if (error?.message?.includes('User denied transaction signature')) {
 						set_transactionProcessing(false);
 						return onCallback('error', 'User denied transaction signature');
-					} else if (v2PathExists) {
-						console.log('FALLBACK_WITH_V2');
-						return performV2SwapWithSignature();
 					} else {
 						let message = undefined;
 						if (error?.data?.message?.includes('revert out too low')) {
@@ -185,10 +174,6 @@ function	ButtonSwap({
 			if (error?.message?.includes('User denied transaction signature')) {
 				set_transactionProcessing(false);
 				return onCallback('error', 'User denied transaction signature');
-			} else if (v2PathExists) {
-				console.warn(error);
-				console.log('FALLBACK_WITH_V2');
-				return performV2Swap();
 			} else {
 				let message = undefined;
 				if (error?.message?.includes('revert out too low')) {
@@ -206,15 +191,13 @@ function	ButtonSwap({
 		}
 		set_transactionProcessing(true);
 		onCallback('pending');
-		if (toVault.scope === 'v2') {
-			if (signature) {
-				return performV2SwapWithSignature();
-			}
+		if (currentPath.type === 'standard' && signature) {
+			performV2SwapWithSignature();
+		} else if (currentPath.type === 'standard') {
 			performV2Swap();
+		} else if (signature) {
+			performV1SwapWithSignature();
 		} else {
-			if (signature) {
-				return performV1SwapWithSignature();
-			}
 			performV1Swap();
 		}
 	}

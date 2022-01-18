@@ -26,7 +26,6 @@ function	Index() {
 			new Parallax(document.getElementById('target1'));
 			new Parallax(document.getElementById('target2'));
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [typeof(window)]);
 
 	return (

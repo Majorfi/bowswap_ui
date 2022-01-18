@@ -3,11 +3,9 @@ import	Head							from	'next/head';
 import	{DefaultSeo}					from	'next-seo';
 import	{Web3ReactProvider}				from	'@web3-react/core';
 import	{ethers}						from	'ethers';
-import	useSWR							from	'swr';
-import	FullConfetti					from	'react-confetti';
 import	useWeb3, {Web3ContextApp}		from	'contexts/useWeb3';
-import	{AccountContextApp}				from	'contexts/useAccount';
-import	useLocalStorage					from	'hook/useLocalStorage';
+import	{YearnContextApp}				from	'contexts/useYearn';
+import	{PricesContextApp}				from	'contexts/usePrices';
 import	Credits							from	'components/Credits';
 import	FAQ								from	'components/FAQ';
 import	Navbar							from	'components/Commons/Navbar';
@@ -18,7 +16,6 @@ import	useSecret						from	'hook/useSecret';
 import	'style/Default.css';
 import	'tailwindcss/tailwind.css';
 
-const	fetcher = (...args) => fetch(...args).then(res => res.json());
 const	useSecretCode = () => {
 	const secretCode = process.env.SECRET.split(',');
 	const success = useSecret(secretCode);
@@ -27,6 +24,7 @@ const	useSecretCode = () => {
 
 function	WithLayout({children, hasSecret}) {
 	const	[triggerPong, set_triggerPong] = useState(false);
+
 	return (
 		<section className={'w-full md:px-12 px-4 space-y-12 mb-64 z-10 relative'}>
 			<div className={'flex flex-col w-full justify-center items-center'}>
@@ -58,24 +56,7 @@ function	WithLayout({children, hasSecret}) {
 	);
 }
 
-function	AppWrapper(props) {
-	const	{active, address} = useWeb3();
-	const	{Component, pageProps, router} = props;
-	const	hasSecretCode = useSecretCode();
-	const	[prices, set_prices] = useLocalStorage('cgPrices', []);
-	const	{data} = useSWR(`https://api.coingecko.com/api/v3/simple/price?ids=${['bitcoin', 'ethereum', 'aave', 'chainlink', 'tether-eurt']}&vs_currencies=usd`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, refreshInterval: 30000, shouldRetryOnError: true, dedupingInterval: 1000, focusThrottleInterval: 5000});
-
-	useEffect(() => {
-		set_prices(data);
-	}, [data]);
-
-	useEffect(() => {
-		if (active && router.asPath === '/') {
-			router.push('/swap');
-		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [active, address]);
-
+function	AppSEO() {
 	return (
 		<>
 			<Head>
@@ -114,6 +95,23 @@ function	AppWrapper(props) {
 					site: '@iearnfinance',
 					cardType: 'summary_large_image',
 				}} />
+		</>
+	);
+}
+function	AppWrapper(props) {
+	const	{active, address} = useWeb3();
+	const	{Component, pageProps, router} = props;
+	const	hasSecretCode = useSecretCode();
+
+	useEffect(() => {
+		if (active && router.asPath === '/')
+			router.push('/swap');
+	}, [active, address]);
+
+	const getLayout = Component.getLayout || ((page) => page);
+	return (
+		<>
+			<AppSEO />
 
 			{router.asPath === '/' ?
 				<main id={'app'} className={'flex w-full h-full relative min-h-screen'} style={{background: '#F2F3F5', overflow: 'hidden'}}>
@@ -135,13 +133,14 @@ function	AppWrapper(props) {
 					</div>
 					<div className={'w-full h-full relative max-w-screen-lg mx-auto z-30'}>
 						<WithLayout hasSecret={active && hasSecretCode}>
-							<Component
-								key={router.route}
-								element={props.element}
-								router={props.router}
-								hasSecret={active && hasSecretCode}
-								prices={prices}
-								{...pageProps} />
+							{getLayout(
+								<Component
+									key={router.route}
+									element={props.element}
+									router={props.router}
+									hasSecret={active && hasSecretCode}
+									{...pageProps} />
+							)}
 						</WithLayout>
 					</div>
 
@@ -150,14 +149,6 @@ function	AppWrapper(props) {
 						<div className={'z-30 pointer-events-auto w-full absolute top-0'}>
 							<Navbar hasSecret={active && hasSecretCode} shouldInitialPopup={false} />
 						</div>
-						{active && hasSecretCode ?
-							<div className={'z-50 pointer-events-none fixed inset-0'}>
-								<FullConfetti
-									recycle={false}
-									numberOfPieces={600}
-									width={typeof(window) !== 'undefined' && window.innerWidth || 1920}
-									height={typeof(window) !== 'undefined' && window.innerHeight || 1080} />
-							</div> : null}
 					</div>
 				</main>
 			}
@@ -175,13 +166,15 @@ function	MyApp(props) {
 	return (
 		<Web3ReactProvider getLibrary={getLibrary}>
 			<Web3ContextApp>
-				<AccountContextApp>
-					<AppWrapper
-						Component={Component}
-						pageProps={pageProps}
-						element={props.element}
-						router={props.router} />
-				</AccountContextApp>
+				<YearnContextApp>
+					<PricesContextApp>
+						<AppWrapper
+							Component={Component}
+							pageProps={pageProps}
+							element={props.element}
+							router={props.router} />
+					</PricesContextApp>
+				</YearnContextApp>
 			</Web3ContextApp>
 		</Web3ReactProvider>
 	);

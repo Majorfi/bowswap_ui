@@ -84,10 +84,10 @@ export async function	approveToken({provider, contractAddress, amount, from}, ca
 }
 
 //BowswapV1
-export async function	metapoolSwapTokens({provider, from, to, amount, minAmountOut, shouldIncreaseGasLimit, donation}, callback) {
+export async function	metapoolSwapTokens({provider, contractAddress, from, to, amount, minAmountOut, shouldIncreaseGasLimit, donation}, callback) {
 	const	signer = provider.getSigner();
 	const	contract = new ethers.Contract(
-		process.env.BOWSWAP_SWAPPER_ADDR,
+		contractAddress,
 		['function metapool_swap(address from, address to, uint256 amount, uint256 min_amount_out, uint256 donation, uint256 origin) public'],
 		signer
 	);
@@ -182,9 +182,9 @@ export async function	metapoolSwapTokensWithSignature({provider, contractAddress
 }
 
 //BowswapV2
-export async function	swapTokens({provider, from, to, amount, minAmountOut, instructions, shouldIncreaseGasLimit, donation}, callback) {
+export async function	swapTokens({provider, contractAddress, from, to, amount, minAmountOut, instructions, shouldIncreaseGasLimit, donation}, callback) {
 	const	signer = provider.getSigner();
-	const	Bowswap_Contract = new ethers.Contract(process.env.BOWSWAP_SWAPPER_ADDR, [
+	const	Bowswap_Contract = new ethers.Contract(contractAddress, [
 		'function swap(address, address, uint256, uint256, tuple(uint8, address, uint128, uint128)[], uint256, uint256) public'
 	], signer);
 
@@ -225,6 +225,7 @@ export async function	swapTokens({provider, from, to, amount, minAmountOut, inst
 			callback({error: true, data: undefined});
 		}
 	} catch (error) {
+		console.log(error);
 		callback({error: error, data: undefined});
 	}
 }

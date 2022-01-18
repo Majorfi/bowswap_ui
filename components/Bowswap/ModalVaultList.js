@@ -1,10 +1,8 @@
-import	React, {useState, useEffect, Fragment}	from	'react';
-import	Image									from	'next/image';
-import	{List}									from	'react-virtualized';
-import	{ethers}								from	'ethers';
-import	{Transition}							from	'@headlessui/react';
-import	useAccount								from	'contexts/useAccount';
-import	{toAddress}								from	'utils';
+import	React, {useState, Fragment}		from	'react';
+import	Image							from	'next/image';
+import	{List}							from	'react-virtualized';
+import	{Transition}					from	'@headlessui/react';
+import	useBowswap						from	'contexts/useBowswap';
 
 function	VaultList({element, onClick, style, balanceOf}) {
 	return (
@@ -27,10 +25,10 @@ function	VaultList({element, onClick, style, balanceOf}) {
 						</span>
 					</div>
 					<span className={'text-white text-ylg font-bold text-right'}>
-						<p className={'pb-1'}>{ethers.utils.formatUnits(balanceOf?.toString() || '0', element.decimals)}</p>
+						<p className={'pb-1'}>{balanceOf || '0.0'}</p>
 						<span className={'text-white text-xxs'}>
 							<p className={'inline opacity-70 text-xxs'}>{'APY: '}</p>
-							<p className={'inline opacity-100 text-ysm'}>{`${element?.apy > 0 ? `${((element?.apy || 0) * 100).toFixed(2)}%` : ' new'}`}</p>
+							<p className={'inline opacity-100 text-ysm'}>{`${element?.apy?.net_apy > 0 ? `${((element?.apy?.net_apy || 0) * 100).toFixed(2)}%` : ' new'}`}</p>
 						</span>
 					</span>
 				</div>
@@ -39,70 +37,29 @@ function	VaultList({element, onClick, style, balanceOf}) {
 	);
 }
 
-function ModalVaultList({vaults, label, value, set_value, set_input, isFrom, disabled}) {
-	const	{balancesOf, yearnVaultData} = useAccount();
+function ModalVaultList({vaults, label, value, set_value, set_input, disabled}) {
+	const	{balancesOf} = useBowswap();
 	const	[open, set_open] = useState(false);
-	const	[nonce, set_nonce] = useState(0);
 	const	[searchFilter, set_searchFilter] = useState('');
-	const	[filteredVaultList, set_filteredVaultList] = useState(vaults);
+	const	[filteredVaults, set_filteredVaults] = useState(vaults);
 
-	useEffect(() => {
-		const	_vaults = [...vaults].map((v) => {
-			v.balanceOf = ethers.utils.formatUnits(balancesOf[v.address]?.toString() || '0', v.decimals);
-			v.apy = yearnVaultData.find(yv => yv.address === v.address)?.apy?.net_apy;
-			return (v);
-		}).filter((v, i, a) => (
-			a.findIndex(t => (toAddress(t.address) === toAddress(v.address))) === i
-		)).sort((a, b) => {
-			if (isFrom)
-				return b.balanceOf - a.balanceOf;
-			return b.apy - a.apy;
-		});
-		set_filteredVaultList(_vaults);
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [nonce, open]);
-
-	useEffect(() => {
-		if (!open) {
-			set_searchFilter('');
-		}
-	}, [open]);
-
-	useEffect(() => {
-		const	_vaults = [...vaults].map((v) => {
-			v.balanceOf = ethers.utils.formatUnits(balancesOf[v.address]?.toString() || '0', v.decimals);
-			v.apy = yearnVaultData.find(yv => yv.address === v.address)?.apy?.net_apy;
-			return (v);
-		}).filter((v, i, a) => (
-			a.findIndex(t => (toAddress(t.address) === toAddress(v.address))) === i)
-		).sort((a, b) => {
-			if (isFrom)
-				return b.balanceOf - a.balanceOf;
-			return b.apy - a.apy;
-		});
-
-		if (searchFilter === '') {
-			set_filteredVaultList(_vaults);
+	React.useEffect(() => {
+		if (searchFilter) {
+			const	_vaults = JSON.parse(JSON.stringify(vaults));
+			const	_filteredVaults = _vaults.filter(vault => vault.display_name.toLowerCase().includes(searchFilter.toLowerCase()));
+			set_filteredVaults(_filteredVaults);
 		} else {
-			const	searchFilterLower = searchFilter.toLowerCase();
-			set_filteredVaultList((_vaults).filter(e => (
-				(e.name).toLowerCase().includes(searchFilterLower) ||
-				(e.symbol).toLowerCase().includes(searchFilterLower) ||
-				toAddress(e.address).includes(toAddress(searchFilterLower))
-			)));
+			set_filteredVaults(vaults);
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [searchFilter, balancesOf]);
+	}, [searchFilter, vaults]);
 
 	return (
 		<div className={'w-full'}>
 			<div className={'relative'}>
 				<button
 					onClick={() => {
-						if (!disabled) {
-							set_nonce(n => n + 1);
+						if (!disabled)
 							set_open(true);
-						}
 					}}
 					className={`relative w-full px-4 text-left bg-ygray-100 hover:bg-ygray-50 rounded-lg focus:outline-none ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} h-24 py-2`}>
 					<div className={'flex flex-row items-center'}>
@@ -181,15 +138,15 @@ function ModalVaultList({vaults, label, value, set_value, set_input, isFrom, dis
 												<VaultList
 													key={key}
 													style={style}
-													element={filteredVaultList[index]}
-													balanceOf={balancesOf[filteredVaultList[index].address]}
+													element={filteredVaults[index]}
+													balanceOf={balancesOf[filteredVaults[index].address]}
 													onClick={() => {
-														set_value(filteredVaultList[index]);
-														set_input(balancesOf[filteredVaultList[index].address]);
+														set_value(filteredVaults[index]);
+														set_input(balancesOf[filteredVaults[index].address]);
 														set_open(false);
 													}} />
 											)}
-											rowCount={filteredVaultList.length} />
+											rowCount={filteredVaults.length} />
 									</div>
 								</div>
 							</div>
