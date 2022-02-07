@@ -16,7 +16,7 @@ This will create a new json file with the detected listings. This will be used i
 
 2. The second and main feature of Bowswap is the `swap` command. This command will try to find the best path to swap the tokens.
 ```
-npx hardhat run scripts/ethereum/1_detect_swaps.js > scripts/ethereum/detected_swaps.json
+npx hardhat run scripts/ethereum/1_detect_swaps.js
 ```
 This is the big backtracking function that will try to find the valid path. Depending on the depth (see Line ~217 : `for (let max = 0; max < 7; max++) {` where `7` is depth) it can be very slow. A new file will be created in the `scripts` folder and will be used the next script.
 

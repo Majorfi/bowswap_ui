@@ -22,7 +22,6 @@
     "@web3-react/network-connector": "^6.2.9",
     "@web3-react/types": "^6.0.7",
     "@web3-react/walletconnect-connector": "^6.2.8",
-    "autoprefixer": "^10.4.2",
     "axios": "^0.24.0",
     "dotenv-webpack": "^7.0.3",
     "ethcall": "4.3.1",
@@ -36,9 +35,19 @@
     "react-dom": "^17.0.2",
     "react-virtualized": "^9.22.3",
     "swr": "^1.1.2",
-    "tailwindcss": "^3.0.13",
-
+    "tailwindcss": "^3.0.13"
+  },
+  "devDependencies": {
+    "@openzeppelin/contracts": "^4.4.2",
+    "autoprefixer": "^10.4.2",
+    "chai": "^4.3.4",
+    "eslint": "^8.6.0",
+    "eslint-config-next": "^12.0.7",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "ganache-cli": "^6.12.2",
     "hardhat": "^2.8.2",
+    "ethereum-waffle": "^3.4.0",
     "hardhat-deploy": "^0.9.24",
     "hardhat-deploy-ethers": "^0.3.0-beta.13",
     "hardhat-tracer": "^1.0.0-alpha.6",
@@ -47,16 +56,6 @@
     "@nomiclabs/hardhat-ganache": "^2.0.1",
     "@nomiclabs/hardhat-truffle5": "^2.0.3",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "@nomiclabs/hardhat-web3": "^2.0.0",
-    "ethereum-waffle": "^3.4.0"
-  },
-  "devDependencies": {
-    "@openzeppelin/contracts": "^4.4.2",
-    "chai": "^4.3.4",
-    "eslint": "^8.6.0",
-    "eslint-config-next": "^12.0.7",
-    "eslint-plugin-react": "^7.28.0",
-    "eslint-plugin-react-hooks": "^4.3.0",
-    "ganache-cli": "^6.12.2"
+    "@nomiclabs/hardhat-web3": "^2.0.0"
   }
 }

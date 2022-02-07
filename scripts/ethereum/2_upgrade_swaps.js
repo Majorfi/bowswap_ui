@@ -26,7 +26,8 @@ async function	upgradeSwaps() {
 				previousInstruction = instruction;
 			}
 		}
-		upgradedSwaps.push([swap[0], swap[1], path]);
+		if (swap[0] !== swap[1])
+			upgradedSwaps.push([swap[0], swap[1], path]);
 	}
 
 	const toJSON = JSON.stringify(upgradedSwaps, null, 0);

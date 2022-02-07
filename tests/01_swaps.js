@@ -3,7 +3,7 @@ const {expect, use} = require('chai');
 const {solidity} = require('ethereum-waffle');
 const {deployments, ethers} = require('hardhat');
 const VaultSwapper = artifacts.require('VaultSwapper');
-const detected_swap = require('../utils/swaps/ethereum/swaps.json');
+const detected_swap = require('../utils/swaps/ethereum/swaps_limited.json');
 
 use(solidity);
 
@@ -60,28 +60,42 @@ describe('Tests', () => {
 					user_0001
 				);
 				const	decimals = await vault.decimals();
-				const	amount = ethers.utils.parseUnits('1', decimals);
+				const	amount = ethers.utils.parseUnits('1', decimals - 1);
 				await	depositUnderlying(from, amount);
-			
-				const	estimate = await expect(
-					vaultSwapper.estimate_out(
-						from,
-						to,
-						amount,
-						instructions,
-						3000
-					)
-				).not.to.be.reverted;
 
-				await	expect(
-					vaultSwapper.swap(
+				// const	estimate = await expect(
+				// 	vaultSwapper.estimate_out(
+				// 		from,
+				// 		to,
+				// 		amount,
+				// 		instructions,
+				// 		3000
+				// 	)
+				// ).not.to.be.reverted;
+
+				try {
+					const	tx = await vaultSwapper.swap(
 						from,
 						to,
 						amount,
-						estimate,
+						1, //estimate,
 						instructions,
-					)
-				).not.to.be.reverted;
+					);
+					expect(tx.receipt.status).to.be.true;
+				} catch (error) {
+					expect(error.message).to.be.eq("VM Exception while processing transaction: reverted with reason string '!depositLimit'");
+				}
+
+				// await	expect(
+				// 	vaultSwapper.swap(
+				// 		from,
+				// 		to,
+				// 		amount,
+				// 		1, //estimate,
+				// 		instructions,
+				// 	)
+				// // ).not.to.be.reverted;
+				// ).to.be.revertedWith('he');
 			});
 		}
 	});

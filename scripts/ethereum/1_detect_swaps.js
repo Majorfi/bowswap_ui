@@ -5,15 +5,13 @@
 ******************************************************************************/
 
 const {default: axios} = require('axios');
+const fs = require('fs');
 const {ethers} = require('hardhat');
-const {Provider, Contract} = require('ethcall');
 const LISTING = require('./detected_listing');
 const allPools = LISTING;
 const allPoolsAsArray = Object.values(allPools);
-const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
 const YEARN_API_ROUTE = 'https://api.yearn.finance/v1/chains/1/vaults/all';
-const vaultABI = [{'stateMutability':'view','type':'function','name':'depositLimit','inputs':[],'outputs':[{'name':'','type':'uint256'}],'gas':4008}];
 
 const toAddress = (address) => {
 	if (!address) {
@@ -29,13 +27,6 @@ const toAddress = (address) => {
 	}
 };
 const getIntersection = (a, ...arr) => [...new Set(a)].filter(v => arr.every(b => b.includes(v)));
-
-async function	multiCallProvider() {
-	const	_provider = await ethers.getDefaultProvider();
-	const	ethcallProvider = new Provider();
-	await	ethcallProvider.init(_provider);
-	return	ethcallProvider;
-}
 
 async function newWithBacktracking({from, to, path, i, max}) {
 	if (path.length > 0) {
@@ -164,6 +155,24 @@ async function newWithBacktracking({from, to, path, i, max}) {
 						return result;
 					}
 				}
+			} else {
+				const	elementCoins = element.coins || [];
+				const	elementIndex = elementCoins.indexOf(from);
+				if (path.some(([isDeposit, addr]) => (isDeposit === 0 && addr === element.address))) {
+					continue;
+				}
+				if (elementIndex > -1) {
+					const	result = await newWithBacktracking({
+						from: element.address,
+						to,
+						path: [...path, [0, element.address, elementIndex, 0]],
+						i: i + 1,
+						max,
+					});
+					if (result) {
+						return result;
+					}
+				}
 			}
 		}
 	}
@@ -204,16 +213,11 @@ async function newWithBacktracking({from, to, path, i, max}) {
 }
 
 async function findPath({from, to}) {
-	const	fromVaults = new ethers.Contract(from, ['function token() public view returns (address)'], provider);
-	const	toVaults = new ethers.Contract(to, ['function token() public view returns (address)'], provider);
-	const	fromToken = toAddress(await fromVaults.token());
-	const	toToken = toAddress(await toVaults.token());
-	
 	let	returnValue = undefined;
-	for (let max = 0; max < 7; max++) {
+	for (let max = 0; max <= 6; max++) {
 		const	result = await newWithBacktracking({
-			from: fromToken,
-			to: toToken,
+			from,
+			to,
 			path: [],
 			i: 0,
 			max: max
@@ -225,52 +229,36 @@ async function findPath({from, to}) {
 	}
 	return returnValue;
 }
-
 async function	findAllPath() {
 	const	allVaults = await axios.get(YEARN_API_ROUTE);
 	const	validVaults = allVaults.data
 		.filter(e => e.type === 'v2')
 		.filter(e => !e.migration || e.migration?.available === false);
-	const	vaultsWithDepositLimit = [];
-	const	calls = [];
-
-	const	ethcallProvider = await multiCallProvider();
-	for (let index = 0; index < validVaults.length; index++) {
-		const	element = validVaults[index];
-		const	contract = new Contract(element.address, vaultABI);
-		calls.push(contract.depositLimit());
-	}
-	const callResult = await ethcallProvider.all(calls);
-	for (let index = 0; index < validVaults.length; index++) {
-		const	element = validVaults[index];
-		const	depositLimit = callResult[index].toString();
-		if (depositLimit !== '0') {
-			vaultsWithDepositLimit.push(element);
-		}
-	}
 
 	const	results = [];
-	for (let index = 0; index < vaultsWithDepositLimit.length; index++) {
-		const	_element = vaultsWithDepositLimit[index];
+	for (let index = 0; index < validVaults.length; index++) {
+		const	_element = validVaults[index];
 		const	element = _element.address;
-		for (let jindex = 0; jindex < vaultsWithDepositLimit.length; jindex++) {
-			const _secondElement = vaultsWithDepositLimit[jindex];
-			const	secondElement = _secondElement.address;
-			if (element === secondElement) {
-				continue;
-			}
-			const	result = await findPath({from: element, to: secondElement});
+		// create a promise.all for all the paths
+		const	_results = await Promise.all([
+			...validVaults.map(_secondElement => findPath({from: toAddress(_element.token.address), to: toAddress(_secondElement.token.address)}))
+		]);
+
+		for (let jindex = 0; jindex < _results.length; jindex++) {
+			const result = _results[jindex];
 			if (result) {
-				// console.log(`${_element.display_name} (${element}) to ${_secondElement.display_name} (${secondElement}) ✅`);
-				results.push([element, secondElement, [...result]]);
+				console.log(`${_element.display_name} (${element}) to ${validVaults[jindex].display_name} (${validVaults[jindex].address}) ✅`);
+				results.push([element, validVaults[jindex].address, [...result]]);
 			} else {
-				// console.log(`${_element.display_name} (${element}) to ${_secondElement.display_name} (${secondElement}) ❌`);
+				console.log(`${_element.display_name} (${element}) to ${validVaults[jindex].display_name} (${validVaults[jindex].address}) ❌`);
 			}
 		}
 	}	
 
 	const toJSON = JSON.stringify(results, null, 2);
-	console.log(toJSON);
+	fs.writeFile('./scripts/ethereum/detected_swaps.json', toJSON, function (err) {
+		if (err) return console.log(err);
+	});
 }
 
 findAllPath();
