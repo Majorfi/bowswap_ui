@@ -9,6 +9,7 @@ import	SectionFromVault 								from	'components/Bowswap/SectionFromVault';
 import	SectionToVault 									from	'components/Bowswap/SectionToVault';
 import	SectionBlockStatus								from	'components/Bowswap/SectionBlockStatus';
 import	{parseAmount, isObjectEmpty}					from	'utils';
+import	performBatchedUpdates							from	'utils/performBatchedUpdates';
 
 function	OverlayNoDeposits() {
 	return (
@@ -48,12 +49,14 @@ function	Bowswap() {
 	const	[signature, set_signature] = useState(null);
 
 	function	resetStates() {
-		set_signature(null);
-		set_fromAmount('');
-		set_estimateOut(0);
-		set_options({slippage: 0.05, donation: 0.3});
-		set_txApproveStatus({none: true, pending: false, success: false, error: false});
-		set_txSwapStatus({none: true, pending: false, success: false, error: false});
+		performBatchedUpdates(() => {
+			set_signature(null);
+			set_fromAmount('');
+			set_estimateOut(0);
+			set_options({slippage: 0.05, donation: 0.3});
+			set_txApproveStatus({none: true, pending: false, success: false, error: false});
+			set_txSwapStatus({none: true, pending: false, success: false, error: false});
+		});
 	}
 	React.useEffect(() => {
 		if (disconnected)
@@ -119,8 +122,6 @@ function	Bowswap() {
 	useEffect(() => {
 		set_fromAmount(parseAmount((balancesOf?.[fromVault?.address] || '0')));
 	}, [fromVault, balancesOf]);
-
-	console.count('render');
 
 	return (
 		<div className={'w-full max-w-2xl'}>

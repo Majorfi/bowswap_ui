@@ -14,7 +14,7 @@ const	MIXED_ABI = [
 
 const	PricesContext = createContext();
 export const PricesContextApp = ({children}) => {
-	const	{provider, chainID, getProvider} = useWeb3();
+	const	{chainID, getProvider} = useWeb3();
 	const	{yearnData} = useYearn();
 	const	[prices, set_prices] = useIndexDB('cgPrices', null);
 	const	[virtualPrices, set_virtualPrices] = useIndexDB('virtualPrices', {});
@@ -27,7 +27,7 @@ export const PricesContextApp = ({children}) => {
 		]);
 		data['triCrypto'] = {usd: Number(triCryptoPrice)};
 		set_prices(data);
-	}, [provider]);
+	}, []);
 	React.useEffect(() => fetchPrices(), [fetchPrices]);
 
 	const	assignVirtualPrices = React.useCallback(async () => {

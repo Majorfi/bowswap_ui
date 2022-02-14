@@ -4,6 +4,7 @@ import	axios								from	'axios';
 import	METAPOOL_SWAPS						from	'utils/swaps/ethereum/metapoolSwaps';
 import	SWAPS								from	'utils/swaps/ethereum/swaps';
 import	SWAPS_FANTOM						from	'utils/swaps/fantom/swaps';
+import	performBatchedUpdates				from	'utils/performBatchedUpdates';
 
 const	YearnContext = createContext();
 
@@ -17,7 +18,7 @@ export const YearnContextApp = ({children}) => {
 		if (safeChain === 250) {
 			const	allFrom = SWAPS_FANTOM.map(e => e[0]);
 			const	allTo = SWAPS_FANTOM.map(e => e[1]);
-			setTimeout(() => {
+			performBatchedUpdates(() => {
 				set_yearnData(data.map((e) => {
 					e.icon = (
 						e.icon
@@ -27,13 +28,13 @@ export const YearnContextApp = ({children}) => {
 					);
 					return e;
 				}).filter(e => allFrom.includes(e.address) || allTo.includes(e.address)));
-			}, 1);
+			});
 		} else {
 			const	allFrom = [...new Set([...METAPOOL_SWAPS.map(e => e[0]), ...SWAPS.map(e => e[0])])];
 			const	allTo = [...new Set([...METAPOOL_SWAPS.map(e => e[1]), ...SWAPS.map(e => e[1])])];
-			setTimeout(() => {
+			performBatchedUpdates(() => {
 				set_yearnData(data.filter(e => allFrom.includes(e.address) || allTo.includes(e.address)));
-			}, 1);
+			});
 		}
 	}, [chainID]);
 	React.useEffect(() => getYearnVaults(), [getYearnVaults]);

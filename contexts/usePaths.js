@@ -8,6 +8,7 @@ import	METAPOOL_SWAPS						from	'utils/swaps/ethereum/metapoolSwaps';
 import	SWAPS								from	'utils/swaps/ethereum/swaps';
 import	SWAPS_FANTOM						from	'utils/swaps/fantom/swaps';
 import	{toAddress, isObjectEmpty}			from	'utils';
+import	performBatchedUpdates				from	'utils/performBatchedUpdates';
 
 function	findToVaultList(fromAddress, yearnData, metapoolSwapsList, swapsList, currentToVault = null) {
 	const	_metapoolSwaps = metapoolSwapsList.filter(e => toAddress(e[0]) === toAddress(fromAddress)).map(e => e[1]);
@@ -46,9 +47,11 @@ export const PathsContextApp = ({children}) => {
 
 	React.useEffect(() => {
 		if (disconnected) {
-			set_fromVault({});
-			set_toVault({});
-			set_path({});
+			performBatchedUpdates(() => {
+				set_fromVault({});
+				set_toVault({});
+				set_path({});
+			});
 		}
 	}, [disconnected]);
 
@@ -60,7 +63,7 @@ export const PathsContextApp = ({children}) => {
 			return;
 		}
 		if (chainID === 250) {
-			setTimeout(() => {
+			performBatchedUpdates(() => {
 				const	_allFromPaths = [...SWAPS_FANTOM.map(e => e[0])];
 				const	_allFromAddresses = _allFromPaths.map(e => toAddress(e));
 				const	_allFromVaults = yearnData.filter(e => _allFromAddresses.includes(e.address));
@@ -69,9 +72,9 @@ export const PathsContextApp = ({children}) => {
 
 				set_allFromVaults(_allSortedFromVaultWithBalance);
 				set_fromVault(_allSortedFromVaultWithBalance[0]);
-			}, 1);
+			});
 		} else {
-			setTimeout(() => {
+			performBatchedUpdates(() => {
 				const	_allFromPaths = [...new Set([...METAPOOL_SWAPS.map(e => e[0]), ...SWAPS.map(e => e[0])])];
 				const	_allFromAddresses = _allFromPaths.map(e => toAddress(e));
 				const	_allFromVaults = yearnData.filter(e => _allFromAddresses.includes(e.address));
@@ -80,7 +83,7 @@ export const PathsContextApp = ({children}) => {
 
 				set_allFromVaults(_allSortedFromVaultWithBalance);
 				set_fromVault(_allSortedFromVaultWithBalance[0]);
-			}, 1);
+			});
 		}
 	}, [yearnData, chainID, balancesOf, regeneration]);
 	React.useEffect(() => prepareFrom(), [prepareFrom]);
@@ -93,7 +96,7 @@ export const PathsContextApp = ({children}) => {
 			return;
 		}
 		if (chainID === 250) {
-			setTimeout(() => {
+			performBatchedUpdates(() => {
 				const	_allToPaths = [...SWAPS_FANTOM.map(e => e[1])];
 				const	_allToAddresses = _allToPaths.map(e => toAddress(e));
 				const	_allToVaults = yearnData.filter(e => _allToAddresses.includes(e.address));
@@ -103,9 +106,9 @@ export const PathsContextApp = ({children}) => {
 				if (toVault === toVaultAssign.toVault) {
 					preparePath();
 				}
-			}, 1);
+			});
 		} else {
-			setTimeout(() => {
+			performBatchedUpdates(() => {
 				const	_allToPaths = [...new Set([...METAPOOL_SWAPS.map(e => e[1]), ...SWAPS.map(e => e[1])])];
 				const	_allToAddresses = _allToPaths.map(e => toAddress(e));
 				const	_allToVaults = yearnData.filter(e => _allToAddresses.includes(e.address));
@@ -115,7 +118,7 @@ export const PathsContextApp = ({children}) => {
 				if (toVault === toVaultAssign.toVault) {
 					preparePath();
 				}
-			}, 1);
+			});
 		}
 	}, [chainID, fromVault, yearnData]);
 
@@ -127,12 +130,12 @@ export const PathsContextApp = ({children}) => {
 			return;
 		}
 		if (chainID === 250) {
-			setTimeout(() => {
+			performBatchedUpdates(() => {
 				const	standardPath = SWAPS_FANTOM.find(e => toAddress(e[0]) === toAddress(fromVault?.address) && toAddress(e[1]) === toAddress(toVault?.address));
 				set_path({type: 'standard', data: standardPath, fromDecimals: fromVault?.decimals || 18, toDecimals: toVault?.decimals || 18});
-			}, 1);
+			});
 		} else {
-			setTimeout(() => {
+			performBatchedUpdates(() => {
 				const	metapoolPath = METAPOOL_SWAPS.find(e => toAddress(e[0]) === toAddress(fromVault?.address) && toAddress(e[1]) === toAddress(toVault?.address));
 				if (metapoolPath) {
 					set_path({type: 'metapool', data: metapoolPath, fromDecimals: fromVault?.decimals || 18, toDecimals: toVault?.decimals || 18});
@@ -140,7 +143,7 @@ export const PathsContextApp = ({children}) => {
 					const	standardPath = SWAPS.find(e => toAddress(e[0]) === toAddress(fromVault?.address) && toAddress(e[1]) === toAddress(toVault?.address));
 					set_path({type: 'standard', data: standardPath, fromDecimals: fromVault?.decimals || 18, toDecimals: toVault?.decimals || 18});
 				}
-			}, 1);
+			});
 		}
 	}, [chainID, toVault, yearnData]);
 	React.useEffect(() => preparePath(), [preparePath]);

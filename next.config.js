@@ -6,7 +6,7 @@ module.exports = ({
 	],
 	env: {
 		IS_TEST: true,
-		TESTED_NETWORK: 250,
+		TESTED_NETWORK: 1,
 
 		ALCHEMY_KEY: process.env.ALCHEMY_KEY,
 		BOWSWAP_SWAPPER_ADDR: '0x000000000037D42ab4e2226CE6f44C5dC0Cf5b16',

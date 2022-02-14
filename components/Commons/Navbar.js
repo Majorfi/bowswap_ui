@@ -4,6 +4,7 @@ import	Link					from	'next/link';
 import	useWeb3					from	'contexts/useWeb3';
 import	ModalLogin				from	'components/Commons/ModalLogin';
 import	ModalMEV				from	'components/Commons/ModalMEV';
+import	useClientEffect			from	'hook/useClientEffect';
 
 function	Navbar({hasSecret, shouldInitialPopup}) {
 	const	{active, provider, address, ens, deactivate, onDesactivate, chainID, onSwitchChain} = useWeb3();
@@ -11,16 +12,16 @@ function	Navbar({hasSecret, shouldInitialPopup}) {
 	const	[modalMEVOpen, set_modalMEVOpen] = useState(false);
 	const	[initialPopup, set_initialPopup] = useState(false);
 
-	React.useEffect(() => {
+	useClientEffect(() => {
 		if (initialPopup || !shouldInitialPopup)
 			return;
 
-		if (!address) {
+		if (active && !address) {
 			set_modalLoginOpen(true);
 		}
 		set_initialPopup(true);
-	}, [address]);
-	
+	}, [active, address]);
+
 	const stringToColour = function(str) {
 		let hash = 0;
 		for (let i = 0; i < str.length; i++) {
@@ -85,7 +86,10 @@ function	Navbar({hasSecret, shouldInitialPopup}) {
 		if ((address && active) || (address && !provider)) 
 			return (
 				<p
-					onClick={() => {deactivate(); onDesactivate();}}
+					onClick={() => {
+						deactivate();
+						onDesactivate();
+					}}
 					suppressHydrationWarning
 					className={'ml-2 inline-flex px-3 py-2 items-center leading-4 rounded-lg text-sm cursor-pointer whitespace-nowrap bg-white text-gray-800 border border-solid border-gray-100 hover:bg-white hover:text-gray-900 transition-colors h-10'}>
 					<svg className={'mr-2'} width={'16'} height={'16'} viewBox={'0 0 16 16'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>

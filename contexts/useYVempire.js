@@ -7,6 +7,7 @@ import	{toAddress, newEthCallProvider}		from	'utils';
 import	AAVE_V1								from	'utils/yVempire/AaveV1';
 import	AAVE_V2								from	'utils/yVempire/AaveV2';
 import	COMPOUND							from	'utils/yVempire/Compound';
+import	performBatchedUpdates				from	'utils/performBatchedUpdates';
 
 const	LENDING_POOL_ADDRESS = '0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9';
 const	ERC20ABI = [
@@ -33,8 +34,10 @@ export const YVempireContextApp = ({children}) => {
 	**********************************************************************************************/
 	React.useEffect(() => {
 		if (disconnected) {
-			set_balancesOf({});
-			set_allowances({});
+			performBatchedUpdates(() => {
+				set_balancesOf({});
+				set_allowances({});
+			});
 		}
 	}, [disconnected]);
 
@@ -56,19 +59,21 @@ export const YVempireContextApp = ({children}) => {
 		const callResult = await ethcallProvider.all(multiCalls);
 		let	index = 0;
 		let	_yVempireNotificationCounter = {};
-		(vaultsNoDuplicates).forEach((vaultAddress) => {
-			if (!callResult[index].isZero()) {
-				const	lender = LENDERS.find(e => e.uToken.address === vaultAddress);
-				const	price = _prices[lender.cgID].usd;
-				const	decimals = lender.decimals;
-				const	value = ethers.utils.formatUnits(callResult[index], decimals) * price;
-				if (Number(value) >= 100) {
-					_yVempireNotificationCounter[vaultAddress] = value;
+		performBatchedUpdates(() => {
+			(vaultsNoDuplicates).forEach((vaultAddress) => {
+				if (!callResult[index].isZero()) {
+					const	lender = LENDERS.find(e => e.uToken.address === vaultAddress);
+					const	price = _prices[lender.cgID].usd;
+					const	decimals = lender.decimals;
+					const	value = ethers.utils.formatUnits(callResult[index], decimals) * price;
+					if (Number(value) >= 100) {
+						_yVempireNotificationCounter[vaultAddress] = value;
+					}
 				}
-			}
-			set_balancesOf((b) => {b[vaultAddress] = callResult[index]; return b;});
-			set_allowances((b) => {b[vaultAddress] = callResult[index + 1]; return b;});			
-			index += 2;
+				set_balancesOf((b) => {b[vaultAddress] = callResult[index]; return b;});
+				set_allowances((b) => {b[vaultAddress] = callResult[index + 1]; return b;});			
+				index += 2;
+			});
 		});
 
 		set_yVempireNotificationCounter(_yVempireNotificationCounter);
