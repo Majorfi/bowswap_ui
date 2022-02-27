@@ -1,10 +1,10 @@
 import	React			from	'react';
 import	{useRouter}		from	'next/router';
-import	useYVempire		from	'contexts/useYVempire';
+// import	useYVempire		from	'contexts/useYVempire';
 
 export default function Tabs() {
 	const	router = useRouter();
-	const	[amount, set_amount] = React.useState(0);
+	const	[amount] = React.useState(0);
 
 	// const	{yVempireNotificationCounter, yVempireData, balancesOf} = useYVempire();
 	// React.useEffect(() => {
