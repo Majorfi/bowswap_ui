@@ -29,10 +29,11 @@ const toAddress = (address) => {
 };
 const getIntersection = (a, ...arr) => [...new Set(a)].filter(v => arr.every(b => b.includes(v)));
 
-async function	multiCallProvider() {
-	const	_provider = await ethers.getDefaultProvider();
+async function multiCallProvider() {
 	const	ethcallProvider = new Provider();
-	await	ethcallProvider.init(_provider);
+	await	ethcallProvider.init(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
+	ethcallProvider.multicall = {address: '0xeefba1e63905ef1d7acba5a8513c70307c1ce441', block: 0};
+	ethcallProvider.multicall2 = {address: '0x5ba1e12693dc8f9c48aad8770482f4739beed696', block: 0};
 	return	ethcallProvider;
 }
 
@@ -168,6 +169,24 @@ async function newWithBacktracking({from, to, path, i, max}) {
 						return result;
 					}
 				}
+			} else {
+				const	elementPool = element.coins || [];
+				const	elementPoolIndex = elementPool.indexOf(from);
+				if (path.some(([isDeposit, addr]) => (isDeposit === 0 && addr === element.address))) {
+					continue;
+				}
+				if (elementPoolIndex > -1) {
+					const	result = await newWithBacktracking({
+						from: element.address,
+						to,
+						path: [...path, [0, element.address, elementPoolIndex, 0]],
+						i: i + 1,
+						max,
+					});
+					if (result) {
+						return result;
+					}
+				}
 			}
 		}
 	}
@@ -263,7 +282,7 @@ async function	findAllPath() {
 			}
 			const	result = await findPath({from: element, to: secondElement});
 			if (result) {
-				// console.log(`${_element.display_name} (${element}) to ${_secondElement.display_name} (${secondElement}) ✅`);
+				console.log(`${_element.display_name} (${element}) to ${_secondElement.display_name} (${secondElement}) ✅`);
 				results.push([element, secondElement, [...result]]);
 			} else {
 				// console.log(`${_element.display_name} (${element}) to ${_secondElement.display_name} (${secondElement}) ❌`);
