@@ -84,7 +84,8 @@ export const Web3ContextApp = ({children}) => {
 		}
 		const	isCompatibleChain = (
 			Number(debouncedChainID) === 1 ||
-			Number(debouncedChainID) === 1337
+			Number(debouncedChainID) === 1337 ||
+			Number(debouncedChainID) === 31337
 		);
 		if (isCompatibleChain) {
 			return;
@@ -131,6 +132,7 @@ export const Web3ContextApp = ({children}) => {
 				rpc: {
 					1: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
 					1337: 'http://localhost:8545',
+					31337: 'http://localhost:8545',
 				},
 				chainId: 1,
 				bridge: 'https://bridge.walletconnect.org',
@@ -172,7 +174,7 @@ export const Web3ContextApp = ({children}) => {
 				walletType,
 				chainID,
 				onSwitchChain,
-				active: active && (chainID === 1 || chainID === 1337),
+				active: active && (chainID === 1 || chainID === 1337 || chainID === 31337),
 				provider,
 				getProvider,
 			}}>

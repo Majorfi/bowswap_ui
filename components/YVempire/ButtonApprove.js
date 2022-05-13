@@ -1,7 +1,6 @@
 import	React, {useState}			from	'react';
 import	{ethers}					from	'ethers';
 import	useWeb3						from	'contexts/useWeb3';
-import	{asyncForEach}				from	'utils';
 import	{approveToken}				from	'utils/actions';
 
 function	ButtonApprove({pairs, selectedTokens, balancesOf, allowances, approved, disabled, onStep, onStepComplete, onCallback}) {
@@ -23,7 +22,8 @@ function	ButtonApprove({pairs, selectedTokens, balancesOf, allowances, approved,
 		}
 		set_transactionProcessing(true);
 		onCallback('pending');
-		await asyncForEach(selectedPairs, async (pair) => {
+		for (let index = 0; index < selectedPairs.length; index++) {
+			const	pair = selectedPairs[index];
 			if (isBroken) {
 				return;
 			}
@@ -61,7 +61,7 @@ function	ButtonApprove({pairs, selectedTokens, balancesOf, allowances, approved,
 				isBroken = true;
 				return;
 			}
-		});
+		}
 		if (isBroken) {
 			set_transactionProcessing(false);
 			return onCallback('error', message);

@@ -11,7 +11,7 @@ export default function Tabs() {
 	React.useEffect(() => {
 		set_amount(0);
 		Object.entries(yVempireNotificationCounter).forEach(([key, value]) => {
-			const pair = yVempireData.find(e => (e?.uToken?.address).toLowerCase() === key.toLowerCase());
+			const pair = yVempireData.find(e => (e?.uToken?.address || '').toLowerCase() === key.toLowerCase());
 			if (Number(pair.uToken.apy) <= Number(pair.yvToken.apy)) {
 				if (value >= 100) {
 					set_amount(a => a + 1);

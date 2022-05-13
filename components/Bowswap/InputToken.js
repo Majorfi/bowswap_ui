@@ -13,7 +13,7 @@ function	InputToken({
 
 	useEffect(() => {
 		if (inputRef?.current) {
-			let inputWitdh = (value.length * 20) + 3;
+			let inputWitdh = ((value?.length || 0) * 20) + 3;
 			if (String(value).includes('.')) {
 				inputWitdh -= 10;
 			}
@@ -55,7 +55,7 @@ function	InputToken({
 					<label
 						onClick={() => updateInputValue(ethers.utils.formatUnits(balanceOf, decimals))}
 						className={`font-normal text-ybase text-ygray-500 hidden md:flex flex-row items-center ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
-						{`Balance: ${Number(ethers.utils.formatUnits(balanceOf, decimals))}`}
+						{`Balance: ${Number(ethers.utils.formatUnits(balanceOf, decimals)) !== 0 && Number(ethers.utils.formatUnits(balanceOf, decimals)) < 0.001 ? '< 0.001' : Number(ethers.utils.formatUnits(balanceOf, decimals))}`}
 					</label>
 					<label
 						onClick={() => updateInputValue(ethers.utils.formatUnits(balanceOf, decimals))}

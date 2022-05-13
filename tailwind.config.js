@@ -6,13 +6,13 @@ module.exports = {
 		'./pages/**/*.js',
 		'./components/**/*.js'
 	],
-	darkMode: false,
+	darkMode: 'media',
 	corePlugins: {
 		ringColor: false,
 	},
 	theme: {
 		colors: {
-			gray: colors.coolGray,
+			gray: colors.gray,
 			green: colors.green,
 			red: colors.red,
 			white: colors.white,

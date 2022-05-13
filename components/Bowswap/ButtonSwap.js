@@ -1,7 +1,7 @@
 import	React, {useState, useEffect}				from	'react';
 import	{ethers}									from	'ethers';
 import	useWeb3										from	'contexts/useWeb3';
-import	V2_PATHS									from	'utils/currentPaths';
+import	SWAPS										from	'utils/detected_swaps';
 import	{metapoolSwapTokens, swapTokens,
 	metapoolSwapTokensWithSignature,
 	swapTokensWithSignature}						from	'utils/actions';
@@ -31,12 +31,11 @@ function	ButtonSwap({
 		try {
 			swapTokens({
 				provider: provider,
-				contractAddress: process.env.BOWSWAP_SWAPPER_ADDR,
 				from: fromVault.address,
 				to: toVault.address,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(18), fromVault.decimals),
-				instructions: V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2],
+				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(fromVault.decimals || 18), fromVault.decimals),
+				instructions: SWAPS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2],
 				donation: donation * 100,
 				shouldIncreaseGasLimit
 			}, ({error}) => {
@@ -61,16 +60,15 @@ function	ButtonSwap({
 		}
 	}
 	function	performV1Swap() {
-		const	v2PathExists = V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address);
+		const	v2PathExists = SWAPS.find(path => path[0] === fromVault.address && path[1] === toVault.address);
 
 		try {
 			metapoolSwapTokens({
 				provider: provider,
-				contractAddress: process.env.BOWSWAP_SWAPPER_ADDR,
 				from: fromVault.address,
 				to: toVault.address,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(18), fromVault.decimals),
+				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(fromVault.decimals || 18), fromVault.decimals),
 				donation: donation * 100,
 				shouldIncreaseGasLimit
 			}, ({error}) => {
@@ -118,8 +116,8 @@ function	ButtonSwap({
 			from: fromVault.address,
 			to: toVault.address,
 			amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-			minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(18), fromVault.decimals),
-			instructions: V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2],
+			minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(fromVault.decimals || 18), fromVault.decimals),
+			instructions: SWAPS.find(path => path[0] === fromVault.address && path[1] === toVault.address)?.[2],
 			signature,
 			donation: donation * 100,
 			shouldIncreaseGasLimit
@@ -146,7 +144,7 @@ function	ButtonSwap({
 		});
 	}
 	function	performV1SwapWithSignature() {
-		const	v2PathExists = V2_PATHS.find(path => path[0] === fromVault.address && path[1] === toVault.address);
+		const	v2PathExists = SWAPS.find(path => path[0] === fromVault.address && path[1] === toVault.address);
 
 		try {
 			metapoolSwapTokensWithSignature({
@@ -155,7 +153,7 @@ function	ButtonSwap({
 				from: fromVault.address,
 				to: toVault.address,
 				amount: ethers.utils.parseUnits(fromAmount, fromVault.decimals),
-				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(18), fromVault.decimals),
+				minAmountOut: ethers.utils.parseUnits((expectedReceiveAmount - (expectedReceiveAmount * slippage / 100)).toFixed(fromVault.decimals || 18), fromVault.decimals),
 				signature,
 				donation: donation * 100,
 				shouldIncreaseGasLimit
@@ -188,6 +186,7 @@ function	ButtonSwap({
 				set_transactionProcessing(false);
 				return onCallback('error', 'User denied transaction signature');
 			} else if (v2PathExists) {
+				console.warn(error);
 				console.log('FALLBACK_WITH_V2');
 				return performV2Swap();
 			} else {

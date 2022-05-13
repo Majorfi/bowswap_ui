@@ -1,44 +1,54 @@
-import	React, {useState, useEffect}	from	'react';
+import	React, {useState}				from	'react';
 import	{ethers}						from	'ethers';
+import	useAccount						from	'contexts/useAccount';
 import	InputToken						from	'components/Bowswap/InputToken';
 import	ModalVaultList					from	'components/Bowswap/ModalVaultList';
+
+function parseAmount(amount) {
+	let		_value = amount.replaceAll('..', '.').replaceAll(/[^0-9.]/g, '');
+	const	[dec, frac] = _value.split('.');
+	if (frac) _value = `${dec}.${frac.slice(0, 12)}`;
+
+	if (_value === '.') {
+		return ('0.');
+	} else if (_value.length > 0 && _value[0] === '-') {
+		return ('');
+	} else if (_value.length >= 2 && _value[0] === '0' && _value[1] !== '.') {
+		return (_value.slice(1) || '');
+	} else {
+		return (_value || '');
+	}
+}
 
 function	SectionFromVault({
 	vaults, fromVault, set_fromVault,
 	fromAmount, set_fromAmount,
 	slippage, set_slippage,
 	donation, set_donation,
-	fromCounterValue, balanceOf, disabled,
+	fromCounterValue, disabled,
 	yearnVaultData
 }) {
+	const	{balancesOf, balancesNonce, isLoaded} = useAccount();
+	const	[currentFromAmount, set_currentFromAmount] = React.useState('');
 	const	[isInit, set_isInit] = useState(false);
-
-	function	updateInputValue(newValue) {
-		let		_value = newValue.replaceAll('..', '.').replaceAll(/[^0-9.]/g, '');
-		const	[dec, frac] = _value.split('.');
-		if (frac) _value = `${dec}.${frac.slice(0, 12)}`;
-
-		if (_value === '.') {
-			set_fromAmount('0.');
-		} else if (_value.length > 0 && _value[0] === '-') {
-			set_fromAmount('');
-		} else if (_value.length >= 2 && _value[0] === '0' && _value[1] !== '.') {
-			set_fromAmount(_value.slice(1) || '');
-		} else {
-			set_fromAmount(_value || '');
+	const	[balanceOf, set_balanceOf] = React.useState(ethers.constants.Zero);
+	
+	React.useEffect(() => set_currentFromAmount(fromAmount), [fromAmount]);
+	React.useEffect(() => {
+		if (fromVault.address) {
+			console.log(balancesOf[fromVault.address]?.toString() || '0');
+			set_balanceOf(balancesOf[fromVault.address]?.toString() || '0');
 		}
-	}
+	}, [balancesOf, balancesNonce, fromVault?.address]);
 
-	useEffect(() => {
+	React.useEffect(() => {
 		if (!isInit && (fromAmount !== '' && fromAmount !== '0.0' && Number(fromAmount) !== 0)) {
-			updateInputValue(fromAmount);
+			set_fromAmount(parseAmount(fromAmount));
+			set_isInit(true);
+		} else if (!isInit && balanceOf !== '0') {
 			set_isInit(true);
 		}
-		else if (!isInit && balanceOf !== '0') {
-			set_fromAmount(ethers.utils.formatUnits(balanceOf, fromVault.decimals));
-			set_isInit(true);
-		}
-	}, [isInit, balanceOf, fromAmount]);
+	}, [isInit, fromAmount, balanceOf, isLoaded]);
 
 	return (
 		<section aria-label={'FROM_VAULT'}>
@@ -53,17 +63,15 @@ function	SectionFromVault({
 						yearnVaultData={yearnVaultData}
 						value={fromVault}
 						set_value={set_fromVault}
-						set_input={(v) => {
-							updateInputValue(ethers.utils.formatUnits(v, fromVault.decimals));
-						}} />
+						set_input={(v) => set_fromAmount(parseAmount(ethers.utils.formatUnits((v || '0'), fromVault.decimals)))} />
 				</div>
 				<div className={'w-full md:w-7/11'}>
 					<InputToken
 						disabled={disabled}
 						balanceOf={balanceOf}
-						decimals={fromVault.decimals}
+						decimals={fromVault?.decimals || 18}
 						fromCounterValue={fromCounterValue}
-						value={fromAmount}
+						value={currentFromAmount}
 						set_value={set_fromAmount}
 						slippage={slippage}
 						set_slippage={set_slippage}

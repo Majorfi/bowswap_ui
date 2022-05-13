@@ -15,12 +15,17 @@ function	SectionButtons({
 	const	[canSign, set_canSign] = useState(true);
 	const	{balancesOf, updateBalanceOf, allowances} = useAccount();
 
-	const	isAllowed = fromAmount !== '' && Number(fromAmount) > 0 && ethers.BigNumber.from(allowances?.[fromVault.address] || 0)?.gte(ethers.utils.parseUnits(fromAmount || '0', fromVault.decimals || 18));
+	const	isAllowed = (
+		fromAmount !== '' && 
+		Number(fromAmount) > 0 &&
+		ethers.BigNumber.from(allowances?.[fromVault?.address] || 0)
+			?.gte(ethers.utils.parseUnits(Number(fromAmount || '0').toFixed(fromVault?.decimals || 18), fromVault?.decimals || 18))
+	);
 
 	return (
 		<div className={'flex flex-row justify-center pt-8 w-full space-x-4'}>
 			<ButtonApprove
-				disabled={(Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals)) || txApproveStatus.success || isAllowed)}
+				disabled={(Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault?.address || '']?.toString() || '0', fromVault?.decimals || 18)) || txApproveStatus.success || isAllowed)}
 				approved={txApproveStatus.success || isAllowed}
 				fromVault={fromVault}
 				fromAmount={fromAmount}
@@ -32,12 +37,12 @@ function	SectionButtons({
 						setTimeout(() => set_txApproveStatus((s) => s.error ? {none: true, pending: false, error: false, success: false, message} : s), 2500);
 					}
 					if (type === 'success') {
-						updateBalanceOf([fromVault.address]);
+						// updateBalanceOf([fromVault?.address || '']);
 						setTimeout(() => set_txApproveStatus({none: false, pending: false, error: false, success: true, hide: true, message: null}), 2500);
 					}
 				}} />
 			<ButtonSwap
-				disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault.address]?.toString() || '0', fromVault.decimals))}
+				disabled={Number(fromAmount) > Number(ethers.utils.formatUnits(balancesOf[fromVault?.address || '']?.toString() || '0', fromVault?.decimals || 18))}
 				approved={txApproveStatus.success || isAllowed || signature}
 				fromVault={fromVault}
 				toVault={toVault}
@@ -65,7 +70,7 @@ function	SectionButtons({
 						}
 					}
 					if (type === 'success') {
-						updateBalanceOf([fromVault.address, toVault.address]);
+						updateBalanceOf([fromVault?.address || '', toVault.address]);
 						setTimeout(() => set_txSwapStatus({none: true, pending: false, error: false, success: false}), 2500);
 						resetStates();
 					}
