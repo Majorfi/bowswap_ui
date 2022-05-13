@@ -636,6 +636,26 @@
     ],
     "canWithdraw": true
   },
+  "0x4e0915C88bC70750D68C481540F081fEFaF22273": {
+    "address": "0x4e0915C88bC70750D68C481540F081fEFaF22273",
+    "name": "4pool",
+    "coins": [
+      "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      "0xa693B19d2931d498c5B318dF961919BB4aee87a5",
+      "0x853d955aCEf822Db058eb8505911ED77F175b99e"
+    ],
+    "lpToken": "0x4e0915C88bC70750D68C481540F081fEFaF22273"
+  },
+  "0x1005F7406f32a61BD760CfA14aCCd2737913d546": {
+    "address": "0x1005F7406f32a61BD760CfA14aCCd2737913d546",
+    "name": "2pool",
+    "coins": [
+      "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+    ],
+    "lpToken": "0x1005F7406f32a61BD760CfA14aCCd2737913d546"
+  },
   "0x1F71f05CF491595652378Fe94B7820344A551B8E": {
     "address": "0x1F71f05CF491595652378Fe94B7820344A551B8E",
     "name": "Curve.fi Factory Plain Pool: ibEUR/sEUR",
@@ -1334,6 +1354,331 @@
     "coins": [
       "0xDC59ac4FeFa32293A95889Dc396682858d52e5Db",
       "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+    ],
+    "canWithdraw": true
+  },
+  "0x7abD51BbA7f9F6Ae87aC77e1eA1C5783adA56e5c": {
+    "address": "0x7abD51BbA7f9F6Ae87aC77e1eA1C5783adA56e5c",
+    "name": "Curve.fi Factory USD Metapool: USDV",
+    "coins": [
+      "0xea3Fb6f331735252E7Bfb0b24b3B761301293DBe",
+      "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+    ],
+    "canWithdraw": true
+  },
+  "0x5b78b93Fa851c357586915c7bA7258b762eB1ba0": {
+    "address": "0x5b78b93Fa851c357586915c7bA7258b762eB1ba0",
+    "name": "Curve.fi Factory USD Metapool: PAR/USDC",
+    "coins": [
+      "0x68037790A0229e9Ce6EaA8A99ea92964106C4703",
+      "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+    ],
+    "canWithdraw": true
+  },
+  "0x0FaFaFD3C393ead5F5129cFC7e0E12367088c473": {
+    "address": "0x0FaFaFD3C393ead5F5129cFC7e0E12367088c473",
+    "name": "Curve.fi Factory USD Metapool: baoUSD",
+    "coins": [
+      "0x7945b0A6674b175695e5d1D08aE1e6F13744Abb0",
+      "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+    ],
+    "canWithdraw": true
+  },
+  "0xd05ce4AB1f4fb0C0e1b65ebE3Ed7F2dcFc6ccf20": {
+    "address": "0xd05ce4AB1f4fb0C0e1b65ebE3Ed7F2dcFc6ccf20",
+    "name": "Curve.fi Factory USD Metapool: sUSD Metapool",
+    "coins": [
+      "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51",
+      "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+    ],
+    "canWithdraw": true
+  },
+  "0x97aEB34ac6561146DD9cE191EFD5634F6465DeF4": {
+    "address": "0x97aEB34ac6561146DD9cE191EFD5634F6465DeF4",
+    "name": "Curve.fi Factory USD Metapool: AETHV1",
+    "coins": [
+      "0x3a3A65aAb0dd2A17E3F1947bA16138cd37d08c04",
+      "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+    ],
+    "canWithdraw": true
+  },
+  "0x9462F2b3C9bEeA8afc334Cdb1D1382B072e494eA": {
+    "address": "0x9462F2b3C9bEeA8afc334Cdb1D1382B072e494eA",
+    "name": "Curve.fi Factory Plain Pool: Tokemak tGAMMA/GAMMA",
+    "coins": [
+      "0x2Fc6e9c1b2C07E18632eFE51879415a580AD22E1",
+      "0x6BeA7CFEF803D1e3d5f7C0103f7ded065644e197"
+    ],
+    "canWithdraw": true
+  },
+  "0x50B0D9171160d6EB8Aa39E090Da51E7e078E81c4": {
+    "address": "0x50B0D9171160d6EB8Aa39E090Da51E7e078E81c4",
+    "name": "Curve.fi Factory Plain Pool: Tokemak tSNX/SNX",
+    "coins": [
+      "0xeff721Eae19885e17f5B80187d6527aad3fFc8DE",
+      "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F"
+    ],
+    "canWithdraw": true
+  },
+  "0x447Ddd4960d9fdBF6af9a790560d0AF76795CB08": {
+    "address": "0x447Ddd4960d9fdBF6af9a790560d0AF76795CB08",
+    "name": "Curve.fi Factory Plain Pool: rETH/wstETH",
+    "coins": [
+      "0xae78736Cd615f374D3085123A210448E74Fc6393",
+      "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+    ],
+    "canWithdraw": true
+  },
+  "0xCaf8703f8664731cEd11f63bB0570E53Ab4600A9": {
+    "address": "0xCaf8703f8664731cEd11f63bB0570E53Ab4600A9",
+    "name": "Curve.fi Factory Plain Pool: Tokemak tAPW/APW",
+    "coins": [
+      "0xDc0b02849Bb8E0F126a216A2840275Da829709B0",
+      "0x4104b135DBC9609Fc1A9490E61369036497660c8"
+    ],
+    "canWithdraw": true
+  },
+  "0x01FE650EF2f8e2982295489AE6aDc1413bF6011F": {
+    "address": "0x01FE650EF2f8e2982295489AE6aDc1413bF6011F",
+    "name": "Curve.fi Factory Plain Pool: Tokemak tTCR/TCR",
+    "coins": [
+      "0x15A629f0665A3Eb97D7aE9A7ce7ABF73AeB79415",
+      "0x9C4A4204B79dd291D6b6571C5BE8BbcD0622F050"
+    ],
+    "canWithdraw": true
+  },
+  "0xC250B22d15e43d95fBE27B12d98B6098f8493eaC": {
+    "address": "0xC250B22d15e43d95fBE27B12d98B6098f8493eaC",
+    "name": "Curve.fi Factory Plain Pool: Tokemak tFOX/FOX",
+    "coins": [
+      "0x808D3E6b23516967ceAE4f17a5F9038383ED5311",
+      "0xc770EEfAd204B5180dF6a14Ee197D99d808ee52d"
+    ],
+    "canWithdraw": true
+  },
+  "0x0437ac6109e8A366A1F4816edF312A36952DB856": {
+    "address": "0x0437ac6109e8A366A1F4816edF312A36952DB856",
+    "name": "Curve.fi Factory Plain Pool: Tokemak tSUSHI/SUSHI",
+    "coins": [
+      "0xf49764c9C5d644ece6aE2d18Ffd9F1E902629777",
+      "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2"
+    ],
+    "canWithdraw": true
+  },
+  "0x9001a452d39A8710D27ED5c2E10431C13F5Fba74": {
+    "address": "0x9001a452d39A8710D27ED5c2E10431C13F5Fba74",
+    "name": "Curve.fi Factory Plain Pool: Tokemak tALCX/ALCX",
+    "coins": [
+      "0xD3B5D9a561c293Fb42b446FE7e237DaA9BF9AA84",
+      "0xdBdb4d16EdA451D0503b854CF79D55697F90c8DF"
+    ],
+    "canWithdraw": true
+  },
+  "0x961226B64AD373275130234145b96D100Dc0b655": {
+    "address": "0x961226B64AD373275130234145b96D100Dc0b655",
+    "name": "Curve.fi Factory Plain Pool: Tokemak tFXS/FXS",
+    "coins": [
+      "0xADF15Ec41689fc5b6DcA0db7c53c9bFE7981E655",
+      "0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0"
+    ],
+    "canWithdraw": true
+  },
+  "0xe7E4366f6ED6aFd23e88154C00B532BDc0352333": {
+    "address": "0xe7E4366f6ED6aFd23e88154C00B532BDc0352333",
+    "name": "Curve.fi Factory Plain Pool: Test Only",
+    "coins": [
+      "0xADF15Ec41689fc5b6DcA0db7c53c9bFE7981E655",
+      "0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0"
+    ],
+    "canWithdraw": true
+  },
+  "0x9809f2B973bDB056D24bC2b6571EA1f23dB4e861": {
+    "address": "0x9809f2B973bDB056D24bC2b6571EA1f23dB4e861",
+    "name": "Curve.fi Factory USD Metapool: GOLD/BSD",
+    "coins": [
+      "0x804c23B6CCFa0a1FAE1a81C9964f42aE689c790E",
+      "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+    ],
+    "canWithdraw": true
+  },
+  "0x04EcD49246bf5143E43e2305136c46AeB6fAd400": {
+    "address": "0x04EcD49246bf5143E43e2305136c46AeB6fAd400",
+    "name": "Curve.fi Factory Plain Pool: DYDX/stkDYDX",
+    "coins": [
+      "0x92D6C1e31e14520e676a687F0a93788B716BEff5",
+      "0x65f7BA4Ec257AF7c55fd5854E5f6356bBd0fb8EC"
+    ],
+    "canWithdraw": true
+  },
+  "0xC9467E453620f16b57a34a770C6bceBECe002587": {
+    "address": "0xC9467E453620f16b57a34a770C6bceBECe002587",
+    "name": "Curve.fi Factory BTC Metapool: pbtc",
+    "coins": [
+      "0x62199B909FB8B8cf870f97BEf2cE6783493c4908",
+      "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3"
+    ],
+    "canWithdraw": true
+  },
+  "0x8c524635d52bd7b1Bd55E062303177a7d916C046": {
+    "address": "0x8c524635d52bd7b1Bd55E062303177a7d916C046",
+    "name": "Curve.fi Factory Plain Pool: sdFXS",
+    "coins": [
+      "0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0",
+      "0x402F878BDd1f5C66FdAF0fabaBcF74741B68ac36"
+    ],
+    "canWithdraw": true
+  },
+  "0x48fF31bBbD8Ab553Ebe7cBD84e1eA3dBa8f54957": {
+    "address": "0x48fF31bBbD8Ab553Ebe7cBD84e1eA3dBa8f54957",
+    "name": "Curve.fi Factory Plain Pool: sdANGLE",
+    "coins": [
+      "0x31429d1856aD1377A8A0079410B297e1a9e214c2",
+      "0x752B4c6e92d96467fE9b9a2522EF07228E00F87c"
+    ],
+    "canWithdraw": true
+  },
+  "0x9CA41a2DaB3CEE15308998868ca644e2e3be5C59": {
+    "address": "0x9CA41a2DaB3CEE15308998868ca644e2e3be5C59",
+    "name": "Curve.fi Factory Plain Pool: dfxCAD/CADC",
+    "coins": [
+      "0xFE32747d0251BA92bcb80b6D16C8257eCF25AB1C",
+      "0xcaDC0acd4B445166f12d2C07EAc6E2544FbE2Eef"
+    ],
+    "canWithdraw": true
+  },
+  "0xD652c40fBb3f06d6B58Cb9aa9CFF063eE63d465D": {
+    "address": "0xD652c40fBb3f06d6B58Cb9aa9CFF063eE63d465D",
+    "name": "Curve.fi Factory Plain Pool: Bean-LUSD",
+    "coins": [
+      "0xDC59ac4FeFa32293A95889Dc396682858d52e5Db",
+      "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0"
+    ],
+    "canWithdraw": true
+  },
+  "0xd1011B637F979a5d9093Df1B32e7736c289024F5": {
+    "address": "0xd1011B637F979a5d9093Df1B32e7736c289024F5",
+    "name": "Curve.fi Factory Plain Pool: Curve sETH2-stETH",
+    "coins": [
+      "0xFe2e637202056d30016725477c5da089Ab0A043A",
+      "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+    ],
+    "canWithdraw": true
+  },
+  "0xE95E4c2dAC312F31Dc605533D5A4d0aF42579308": {
+    "address": "0xE95E4c2dAC312F31Dc605533D5A4d0aF42579308",
+    "name": "Curve.fi Factory Plain Pool: sETH2/stETH",
+    "coins": [
+      "0xFe2e637202056d30016725477c5da089Ab0A043A",
+      "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+    ],
+    "canWithdraw": true
+  },
+  "0x6577b46a566aDe492ad551a315c04DE3Fbe3DbFa": {
+    "address": "0x6577b46a566aDe492ad551a315c04DE3Fbe3DbFa",
+    "name": "Curve.fi Factory Plain Pool: TriCRV",
+    "coins": [
+      "0xd6ecDfD41dDB7167F3eD9b37f33Fb24D57543E26",
+      "0x62B9c7356A2Dc64a1969e19C23e4f579F9810Aa7",
+      "0xD533a949740bb3306d119CC777fa900bA034cd52"
+    ],
+    "canWithdraw": true
+  },
+  "0xDB8Cc7eCeD700A4bfFdE98013760Ff31FF9408D8": {
+    "address": "0xDB8Cc7eCeD700A4bfFdE98013760Ff31FF9408D8",
+    "name": "Curve.fi Factory USD Metapool: fiat",
+    "coins": [
+      "0x586Aa273F262909EEF8fA02d90Ab65F5015e0516",
+      "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+    ],
+    "canWithdraw": true
+  },
+  "0x323b3a6e7a71c1b8C257606Ef0364D61df8AA525": {
+    "address": "0x323b3a6e7a71c1b8C257606Ef0364D61df8AA525",
+    "name": "Curve.fi Factory Plain Pool: sdCRV",
+    "coins": [
+      "0xD533a949740bb3306d119CC777fa900bA034cd52",
+      "0xD1b5651E55D4CeeD36251c61c50C889B36F6abB5"
+    ],
+    "canWithdraw": true
+  },
+  "0xf7b55C3732aD8b2c2dA7c24f30A69f55c54FB717": {
+    "address": "0xf7b55C3732aD8b2c2dA7c24f30A69f55c54FB717",
+    "name": "Curve.fi Factory Plain Pool: sdCRV",
+    "coins": [
+      "0xD533a949740bb3306d119CC777fa900bA034cd52",
+      "0xD1b5651E55D4CeeD36251c61c50C889B36F6abB5"
+    ],
+    "canWithdraw": true
+  },
+  "0xF74bEc4bcf432A17470e9C4F71542f2677B9AF6a": {
+    "address": "0xF74bEc4bcf432A17470e9C4F71542f2677B9AF6a",
+    "name": "Curve.fi Factory Plain Pool: mCRV-CRV",
+    "coins": [
+      "0x79317218de52Dfa2a233a3AeED098161889418c7",
+      "0xD533a949740bb3306d119CC777fa900bA034cd52"
+    ],
+    "canWithdraw": true
+  },
+  "0x5a59Fd6018186471727FAAeAE4e57890aBC49B08": {
+    "address": "0x5a59Fd6018186471727FAAeAE4e57890aBC49B08",
+    "name": "Curve.fi Factory Plain Pool: FRAX/ARTH.usd",
+    "coins": [
+      "0x973F054eDBECD287209c36A2651094fA52F99a71",
+      "0x853d955aCEf822Db058eb8505911ED77F175b99e"
+    ],
+    "canWithdraw": true
+  },
+  "0xeb07FcD7A8627281845ba3aCbed24435802d4B52": {
+    "address": "0xeb07FcD7A8627281845ba3aCbed24435802d4B52",
+    "name": "Curve.fi Factory USD Metapool: PUSd",
+    "coins": [
+      "0x466a756E9A7401B5e2444a3fCB3c2C12FBEa0a54",
+      "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+    ],
+    "canWithdraw": true
+  },
+  "0x8EE017541375F6Bcd802ba119bdDC94dad6911A1": {
+    "address": "0x8EE017541375F6Bcd802ba119bdDC94dad6911A1",
+    "name": "Curve.fi Factory USD Metapool: PUSd",
+    "coins": [
+      "0x466a756E9A7401B5e2444a3fCB3c2C12FBEa0a54",
+      "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+    ],
+    "canWithdraw": true
+  },
+  "0xaa6a4f8DDcca7d3B9E7ad38C8338a2FCfdB1E713": {
+    "address": "0xaa6a4f8DDcca7d3B9E7ad38C8338a2FCfdB1E713",
+    "name": "Curve.fi Factory Plain Pool: CLever CVX",
+    "coins": [
+      "0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B",
+      "0xf05e58fCeA29ab4dA01A495140B349F8410Ba904"
+    ],
+    "canWithdraw": true
+  },
+  "0x8c1de7a8F8852197B109Daf75A6fbB685C013315": {
+    "address": "0x8c1de7a8F8852197B109Daf75A6fbB685C013315",
+    "name": "Curve.fi Factory Plain Pool: CLever CVX",
+    "coins": [
+      "0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B",
+      "0xf05e58fCeA29ab4dA01A495140B349F8410Ba904"
+    ],
+    "canWithdraw": true
+  },
+  "0xe6b5CC1B4b47305c58392CE3D359B10282FC36Ea": {
+    "address": "0xe6b5CC1B4b47305c58392CE3D359B10282FC36Ea",
+    "name": "Curve.fi Factory USD Metapool: USDD/3CRV",
+    "coins": [
+      "0x0C10bF8FcB7Bf5412187A595ab97a3609160b5c6",
+      "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+    ],
+    "canWithdraw": true
+  },
+  "0x828b154032950C8ff7CF8085D841723Db2696056": {
+    "address": "0x828b154032950C8ff7CF8085D841723Db2696056",
+    "name": "Curve.fi Factory Plain Pool: stETH concentrated",
+    "coins": [
+      "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
     ],
     "canWithdraw": true
   }
