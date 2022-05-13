@@ -1,5 +1,6 @@
-import	React, {useState, useEffect}	from	'react';
+import	React, {useState}				from	'react';
 import	{ethers}						from	'ethers';
+import	useAccount						from	'contexts/useAccount';
 import	InputToken						from	'components/Bowswap/InputToken';
 import	ModalVaultList					from	'components/Bowswap/ModalVaultList';
 
@@ -24,19 +25,30 @@ function	SectionFromVault({
 	fromAmount, set_fromAmount,
 	slippage, set_slippage,
 	donation, set_donation,
-	fromCounterValue, balanceOf, disabled,
+	fromCounterValue, disabled,
 	yearnVaultData
 }) {
+	const	{balancesOf, balancesNonce, isLoaded} = useAccount();
+	const	[currentFromAmount, set_currentFromAmount] = React.useState('');
 	const	[isInit, set_isInit] = useState(false);
+	const	[balanceOf, set_balanceOf] = React.useState(ethers.constants.Zero);
+	
+	React.useEffect(() => set_currentFromAmount(fromAmount), [fromAmount]);
+	React.useEffect(() => {
+		if (fromVault.address) {
+			console.log(balancesOf[fromVault.address]?.toString() || '0');
+			set_balanceOf(balancesOf[fromVault.address]?.toString() || '0');
+		}
+	}, [balancesOf, balancesNonce, fromVault?.address]);
 
-	useEffect(() => {
+	React.useEffect(() => {
 		if (!isInit && (fromAmount !== '' && fromAmount !== '0.0' && Number(fromAmount) !== 0)) {
 			set_fromAmount(parseAmount(fromAmount));
 			set_isInit(true);
 		} else if (!isInit && balanceOf !== '0') {
 			set_isInit(true);
 		}
-	}, [isInit, balanceOf]);
+	}, [isInit, fromAmount, balanceOf, isLoaded]);
 
 	return (
 		<section aria-label={'FROM_VAULT'}>
@@ -57,9 +69,9 @@ function	SectionFromVault({
 					<InputToken
 						disabled={disabled}
 						balanceOf={balanceOf}
-						decimals={fromVault?.decimals}
+						decimals={fromVault?.decimals || 18}
 						fromCounterValue={fromCounterValue}
-						value={fromAmount}
+						value={currentFromAmount}
 						set_value={set_fromAmount}
 						slippage={slippage}
 						set_slippage={set_slippage}

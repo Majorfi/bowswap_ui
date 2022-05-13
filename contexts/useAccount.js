@@ -3,6 +3,7 @@ import	{ethers}							from	'ethers';
 import	{Contract}							from	'ethcall';
 import	useWeb3								from	'contexts/useWeb3';
 import	{toAddress, newEthCallProvider}		from	'utils';
+import	performBatchedUpdates				from	'utils/performBatchedUpdates';
 import	{fetchYearnVaults}					from	'utils/API';
 import	AAVE_V1								from	'utils/AaveV1';
 import	AAVE_V2								from	'utils/AaveV2';
@@ -27,6 +28,7 @@ export const AccountContextApp = ({children}) => {
 	const	[yVempireNotificationCounter, set_yVempireNotificationCounter] = useState([]);
 	const	[yearnVaultData, set_yearnVaultData] = useState([]);
 	const	[balancesOf, set_balancesOf] = useState({});
+	const	[isLoaded, set_isLoaded] = useState(false);
 	const	[allowances, set_allowances] = useState({});
 
 	async function	retrieveBalances(yVaults) {
@@ -41,11 +43,15 @@ export const AccountContextApp = ({children}) => {
 		});
 		const callResult = await ethcallProvider.all(multiCalls);
 
-		let	index = 0;
-		(crvVaultsNoDuplicates).forEach((vaultAddress) => {
-			set_balancesOf((b) => {b[vaultAddress] = callResult[index]; return b;});
-			set_allowances((b) => {b[vaultAddress] = callResult[index + 1]; return b;});			
-			index += 2;
+		performBatchedUpdates(() => {
+			let	index = 0;
+			(crvVaultsNoDuplicates).forEach((vaultAddress) => {
+				set_balancesOf((b) => {b[vaultAddress] = callResult[index]; return b;});
+				set_allowances((b) => {b[vaultAddress] = callResult[index + 1]; return b;});			
+				index += 2;
+			});
+			set_nonce(n => n + 1);
+			set_isLoaded(true);
 		});
 	}
 
@@ -61,24 +67,25 @@ export const AccountContextApp = ({children}) => {
 			multiCalls.push(vaulContract.allowance(address, toAddress(process.env.VYEMPIRE_SWAPPER_ADDR)));
 		});
 		const callResult = await ethcallProvider.all(multiCalls);
-		let	index = 0;
-		let	_yVempireNotificationCounter = {};
-		(vaultsNoDuplicates).forEach((vaultAddress) => {
-			if (!callResult[index].isZero()) {
-				const	lender = LENDERS.find(e => e.uToken.address === vaultAddress);
-				const	price = _prices[lender.cgID].usd;
-				const	decimals = lender.decimals;
-				const	value = ethers.utils.formatUnits(callResult[index], decimals) * price;
-				if (Number(value) >= 100) {
-					_yVempireNotificationCounter[vaultAddress] = value;
+		performBatchedUpdates(() => {
+			let	index = 0;
+			let	_yVempireNotificationCounter = {};
+			(vaultsNoDuplicates).forEach((vaultAddress) => {
+				if (!callResult[index].isZero()) {
+					const	lender = LENDERS.find(e => e.uToken.address === vaultAddress);
+					const	price = _prices[lender.cgID].usd;
+					const	decimals = lender.decimals;
+					const	value = ethers.utils.formatUnits(callResult[index], decimals) * price;
+					if (Number(value) >= 100) {
+						_yVempireNotificationCounter[vaultAddress] = value;
+					}
 				}
-			}
-			set_balancesOf((b) => {b[vaultAddress] = callResult[index]; return b;});
-			set_allowances((b) => {b[vaultAddress] = callResult[index + 1]; return b;});			
-			index += 2;
+				set_balancesOf((b) => {b[vaultAddress] = callResult[index]; return b;});
+				set_allowances((b) => {b[vaultAddress] = callResult[index + 1]; return b;});			
+				index += 2;
+			});
+			set_yVempireNotificationCounter(_yVempireNotificationCounter);
 		});
-
-		set_yVempireNotificationCounter(_yVempireNotificationCounter);
 	}
 
 	async function retrieveUTokenBalances({_yVaultsData}) {
@@ -116,17 +123,21 @@ export const AccountContextApp = ({children}) => {
 
 	useEffect(() => {
 		if (!active) {
-			set_balancesOf({});
-			set_allowances({});
-			set_nonce(0);
+			performBatchedUpdates(() => {
+				set_balancesOf({});
+				set_allowances({});
+				set_nonce(0);
+			});
 		}
 	}, [active]);
 
 	useEffect(() => {
 		if (!address) {
-			set_balancesOf({});
-			set_allowances({});
-			set_nonce(0);
+			performBatchedUpdates(() => {
+				set_balancesOf({});
+				set_allowances({});
+				set_nonce(0);
+			});
 		}
 	}, [address]);
 
@@ -161,16 +172,20 @@ export const AccountContextApp = ({children}) => {
 		});
 		const callResult = await ethcallProvider.all(multiCalls);
 
-		let	index = 0;
-		(addresses).forEach((addr) => {
-			set_balancesOf((b) => {b[addr] = callResult[index]; return b;});
-			set_allowances((b) => {b[addr] = callResult[index + 1]; return b;});			
-			index += 2;
+		performBatchedUpdates(() => {
+			let	index = 0;
+			(addresses).forEach((addr) => {
+				set_balancesOf((b) => {b[addr] = callResult[index]; return b;});
+				set_allowances((b) => {b[addr] = callResult[index + 1]; return b;});
+				set_nonce(n => n + 1);
+				index += 2;
+			});
 		});
 	}
 
 	return (
 		<AccountContext.Provider value={{
+			isLoaded,
 			balancesOf, 
 			updateBalanceOf, 
 			allowances, 

@@ -1,5 +1,6 @@
 import	React					from	'react';
 import	{ethers}				from	'ethers';
+import	useAccount				from	'contexts/useAccount';
 import	BlockStatus				from	'components/Bowswap/BlockStatus';
 import	Success					from	'components/Icons/Success';
 import	Error					from	'components/Icons/Error';
@@ -57,23 +58,21 @@ const	getArgs = ({fromDisplayName, fromAddress, fromDecimals, toDisplayName, txA
 
 const SectionBlockStatus = React.memo(
 	function SectionBlockStatus({txApproveStatus, txSwapStatus, slippage, fromAmount, balancesOf, fromVault, toVault}) {
-		const	[args, set_args] = React.useState(getArgs({
-			fromDisplayName: fromVault.display_name,
-			fromAddress: fromVault.address,
-			fromDecimals: fromVault.decimals,
-			toDisplayName: toVault?.display_name,
-			txApproveStatus, txSwapStatus, slippage, fromAmount, balancesOf
-		}));
+		const	{isLoaded} = useAccount();
+		const	[args, set_args] = React.useState({open: false, title: '', color: 'bg-yblue', icon: <div/>});
 
 		React.useEffect(() => {
+			if (!isLoaded) {
+				return;
+			}
 			set_args(getArgs({
-				fromDisplayName: fromVault.display_name,
-				fromAddress: fromVault.address,
-				fromDecimals: fromVault.decimals,
+				fromDisplayName: fromVault?.display_name || '',
+				fromAddress: fromVault?.address || '',
+				fromDecimals: fromVault?.decimals || 18,
 				toDisplayName: toVault?.display_name,
 				txApproveStatus, txSwapStatus, slippage, fromAmount, balancesOf
 			}));
-		}, [txApproveStatus, txSwapStatus, slippage, fromAmount, balancesOf, fromVault, toVault]);
+		}, [isLoaded, txApproveStatus, txSwapStatus, slippage, fromAmount, balancesOf, fromVault, toVault]);
 
 		return (
 			<BlockStatus {...args} />

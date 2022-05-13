@@ -13,7 +13,7 @@ function	InputToken({
 
 	useEffect(() => {
 		if (inputRef?.current) {
-			let inputWitdh = (value.length * 20) + 3;
+			let inputWitdh = ((value?.length || 0) * 20) + 3;
 			if (String(value).includes('.')) {
 				inputWitdh -= 10;
 			}

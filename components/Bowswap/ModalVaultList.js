@@ -17,7 +17,6 @@ function	VaultList({element, onClick, style, balanceOf}) {
 					<div className={'flex flex-row items-center'}>
 						<Image
 							src={element?.icon || ''}
-							alt={element?.displayName || element?.name}
 							objectFit={'contain'}
 							loading={'eager'}
 							width={40}
@@ -109,7 +108,6 @@ function ModalVaultList({vaults, label, value, set_value, set_input, isFrom, dis
 						<div className={'w-10 h-10 bg-ygray-50 rounded-full'}>
 							{value?.icon ? <Image
 								src={value?.icon || ''}
-								alt={value?.displayName || value?.name}
 								objectFit={'contain'}
 								width={40}
 								height={40} /> : null}

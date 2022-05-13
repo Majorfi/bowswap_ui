@@ -8,6 +8,10 @@ function	SectionToVault({
 	slippage, isFetchingExpectedReceiveAmount, disabled,
 	yearnVaultData
 }) {
+	const	[currentToVault, set_currentToVault] = React.useState();
+
+	React.useEffect(() => set_currentToVault(toVault), [toVault]);
+
 	return (
 		<section aria-label={'TO_VAULT'}>
 			<label className={'font-medium text-ybase text-ygray-900 pl-0.5'}>{'To Vault'}</label>
@@ -18,7 +22,7 @@ function	SectionToVault({
 						disabled={disabled}
 						vaults={vaults}
 						yearnVaultData={yearnVaultData}
-						value={toVault}
+						value={currentToVault}
 						set_value={set_toVault}
 						set_input={() => null} />
 				</div>

@@ -282,9 +282,9 @@ function	Bowswap({prices, yVaults}) {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toVault?.address, provider, active, debouncedFromAmount]);
 
-	if (!fromVault) {
-		return null;
-	}
+	// if (!fromVault) {
+	// 	return null;
+	// }
 
 	return (
 		<div className={'w-full max-w-2xl'}>
@@ -347,3 +347,21 @@ function	Bowswap({prices, yVaults}) {
 }
 
 export default Bowswap;
+export function Wrapper(props) {
+	const [showChild, setShowChild] = useState(false);
+	useEffect(() => {
+		setShowChild(true);
+	}, []);
+
+	if (!showChild) {
+		return null;
+	}
+
+	if (typeof window === 'undefined') {
+		return <></>;
+	} else {
+		return (
+			<Bowswap {...props} />
+		);
+	}
+}
