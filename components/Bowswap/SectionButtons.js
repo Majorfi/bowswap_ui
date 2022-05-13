@@ -37,7 +37,7 @@ function	SectionButtons({
 						setTimeout(() => set_txApproveStatus((s) => s.error ? {none: true, pending: false, error: false, success: false, message} : s), 2500);
 					}
 					if (type === 'success') {
-						updateBalanceOf([fromVault.address]);
+						// updateBalanceOf([fromVault.address]);
 						setTimeout(() => set_txApproveStatus({none: false, pending: false, error: false, success: true, hide: true, message: null}), 2500);
 					}
 				}} />
