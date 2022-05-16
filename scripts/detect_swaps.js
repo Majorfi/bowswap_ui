@@ -254,6 +254,7 @@ async function	findAllPath() {
 	const	validVaults = allVaults.data
 		.filter(e => e.type === 'v2')
 		.filter(e => !e.migration || e.migration?.available === false);
+		// .filter(e => e.address === '0xa258C4606Ca8206D8aA700cE2143D7db854D168c' || e.address === '0x5faF6a2D186448Dfa667c51CB3D695c7A6E52d8E');
 	const	vaultsWithDepositLimit = [];
 	const	calls = [];
 
