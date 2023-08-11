@@ -51,7 +51,7 @@
     "ethereum-waffle": "^3.4.4"
   },
   "devDependencies": {
-    "@openzeppelin/contracts": "^4.7.3",
+    "@openzeppelin/contracts": "^4.9.3",
     "chai": "^4.3.6",
     "eslint": "^8.15.0",
     "eslint-config-next": "^12.1.6",
